@@ -1,0 +1,8 @@
+<RCC>
+    <qresource >
+        <file>camera.png</file>
+        <file>light.png</file>
+        <file>transform.png</file>
+        <file>bezier.png</file>
+    </qresource>
+</RCC>
