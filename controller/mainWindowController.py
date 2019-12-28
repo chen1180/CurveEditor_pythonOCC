@@ -1,8 +1,8 @@
 from view import mainWindow
-from controller import editorController,openglWindowController
+from controller import editorController,openglWindowController,toolController
 from data.model import *
 from data.node import *
-from data.curve import *
+from data.primitives import *
 from PyQt5.QtCore import *
 import resources.icon.icon
 class Window(QtWidgets.QMainWindow):
@@ -68,11 +68,6 @@ class Window(QtWidgets.QMainWindow):
 
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
-        from OCC.Display.SimpleGui import init_display
-        from OCC.Core.gp import gp_Pnt
-        P0 = gp_Pnt(0, 0, 1)
-        P1 = gp_Pnt(0, 30, 20)
-        self._glWindow._display.DisplayShape(P0)
 
     def updateModel(self,item):
         '''
@@ -84,6 +79,7 @@ class Window(QtWidgets.QMainWindow):
 
         '''
         self._model.insertMeshNode(item,0,1)
+
     def createToolBars(self):
         # Curve tool bar
         self._curveToolBar = QtWidgets.QToolBar("Curve")
@@ -100,13 +96,13 @@ class Window(QtWidgets.QMainWindow):
         #                               triggered=self.deleteItem)
         self.addBezierCurve = QtWidgets.QAction(QtGui.QIcon(":bezier.png"),"Add Bezier Curve", self,
                                       statusTip="Add a cubic Bezier curve",
-                                      triggered=self.drawBezierCurve)
+                                      triggered=self._glWindow.shape_drawer.drawBezierCurve)
         self.addBSplineCurve = QtWidgets.QAction(QtGui.QIcon(":spline.png"),"Add B Spline Curve", self,
                                        statusTip="Add a B Spline curve",
-                                       triggered=self.drawBSpline)
+                                       triggered=self._glWindow.shape_drawer.drawBSpline)
         self.addNurbs = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"),"Add a NURB", self,
                                        statusTip="Add a Nurb curve",
-                                       triggered=self.drawNurbs)
+                                       triggered=self._glWindow.shape_drawer.drawNurbs)
 
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",
@@ -114,15 +110,6 @@ class Window(QtWidgets.QMainWindow):
         # self.addNurbsPatch = QtWidgets.QAction(QtGui.QIcon(":images/nurbs_patch.png"), "Add a NURB patch", self,
         #                         statusTip="Add a Nurb patch",
         #                         triggered=self.drawNurbsPatch)
-    def drawBezierCurve(self):
-        self._glWindow._drawController.startDraw(self._glWindow._drawController.CURVE_BEZIER)
-        self.statusBar().showMessage("Draw Bezier Curve! Press \"Esc\" exit")
-
-    def drawBSpline(self):
-        self._glWindow._drawController.startDraw(self._glWindow._drawController.CURVE_NURBS)
-
-    def drawNurbs(self):
-        self._glWindow._drawController.startDraw(self._glWindow._drawController.CURVE_NURBS_CIRCLE)
 # Qt error message traceback
 sys._excepthook = sys.excepthook
 def my_exception_hook(exctype, value, traceback):

@@ -1,6 +1,5 @@
 import resources.icon.icon
 import resources.shaders.shaders
-from data.shader import Shader
 import numpy as np
 class Node(object):
     def __init__(self, name, parent=None):
@@ -84,9 +83,6 @@ class Node(object):
 
     def resource(self):
         return None
-    def render(self):
-        for child in self._children:
-            child.render()
 
 class TransformNode(Node):
     def __init__(self, name, parent=None):
@@ -247,27 +243,18 @@ class LightNode(Node):
 class MeshNode(Node):
     def __init__(self, name, parent=None):
         super(MeshNode, self).__init__(name, parent)
-        self._shaderDirty=True
-        self._readyForRendering = False
-        self._shader=Shader()
+        self._vertices=None
+        self._edges=None
+        self._faces=None
     def typeInfo(self):
-        return "Mesh"
-    def resource(self):
-        return ":/bezier.png"
-    def initializeShader(self):
+        return "Geometry"
+class MaterialNode(Node):
+    def __init__(self,name,parent=None):
+        super(MaterialNode, self).__init__(name,parent)
         pass
-    def runShader(self):
-        pass
-    def render(self):
-        super(MeshNode, self).render()
-        #Only initialize shader once for performance wise consideration
-        if self._shaderDirty==True:
-            self.initializeShader()
-        #Draw object when readyForRendering flag is True
-        if self._readyForRendering==True:
-            self.runShader()
-            return True
-        return False
+    def typeInfo(self):
+        return "Material"
+
 
 
 
