@@ -15,7 +15,9 @@ class Window(QtWidgets.QMainWindow):
         self.setCentralWidget(self._glWindow)
         # setup tool bar
         self.createDrawActions()
+        self.createViewActions()
         self.createToolBars()
+
         # setup data
         self._rootNode = Node("Scene")
         # setup model
@@ -57,12 +59,14 @@ class Window(QtWidgets.QMainWindow):
         self._toolBarDock.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
 
         # set two vertical toolbar in the tool widget
-        self._toolBarLayout = QtWidgets.QHBoxLayout()
-        self._toolBarContainer = QtWidgets.QWidget()
-        self._toolBarLayout.addWidget(self._curveToolBar)
-        self._toolBarLayout.addWidget(self._surfaceToolBar)
+        self._toolBarLayout = QtWidgets.QVBoxLayout()
 
+        self._toolBarLayout.setMenuBar(self._curveToolBar)
+        # self._toolBarLayout.setMenuBar(self._surfaceToolBar)
+
+        self._toolBarContainer = QtWidgets.QWidget()
         self._toolBarContainer.setLayout(self._toolBarLayout)
+
         self._toolBarDock.setWidget(self._toolBarContainer)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self._toolBarDock)
 
@@ -90,6 +94,49 @@ class Window(QtWidgets.QMainWindow):
         # Surface tool bar
         self._surfaceToolBar = QtWidgets.QToolBar("Surface")
         self._surfaceToolBar.setOrientation(QtCore.Qt.Vertical)
+        #View tool bar
+        self._viewToolBar=QtWidgets.QToolBar("View")
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
+        self._viewToolBar.setOrientation(QtCore.Qt.Horizontal)
+        self._viewToolBar.addAction(self._action_setView)
+        self._viewToolBar.addAction(self._action_viewTop)
+        self._viewToolBar.addAction(self._action_viewBot)
+        self._viewToolBar.addAction(self._action_viewFront)
+        self._viewToolBar.addAction(self._action_viewRear)
+        self._viewToolBar.addAction(self._action_viewLeft)
+        self._viewToolBar.addAction(self._action_viewRight)
+        self._viewToolBar.addAction(self._action_viewIso)
+    def createViewActions(self):
+        def setView(a0):
+            if a0==True:
+                self._glWindow._display.SetPerspectiveProjection()
+            else:
+                self._glWindow._display.SetOrthographicProjection()
+        self._action_setView=QtWidgets.QAction(QtGui.QIcon(""),"Projective/Orthor", self,
+                                      statusTip="set view type",
+                                      triggered=setView)
+        self._action_setView.setCheckable(True)
+        self._action_viewTop=QtWidgets.QAction(QtGui.QIcon(""),"View Top", self,
+                                      statusTip="Change view point",
+                                      triggered=self._glWindow._display.View_Top)
+        self._action_viewBot= QtWidgets.QAction(QtGui.QIcon(""), "View Bottom", self,
+                                                 statusTip="Change view point",
+                                                 triggered=self._glWindow._display.View_Bottom)
+        self._action_viewFront = QtWidgets.QAction(QtGui.QIcon(""), "View Front", self,
+                                                 statusTip="Change view point",
+                                                 triggered=self._glWindow._display.View_Front)
+        self._action_viewRear = QtWidgets.QAction(QtGui.QIcon(), "View Rear", self,
+                                                 statusTip="Change view point",
+                                                 triggered=self._glWindow._display.View_Rear)
+        self._action_viewLeft = QtWidgets.QAction(QtGui.QIcon(), "View Left", self,
+                                                 statusTip="Change view point",
+                                                 triggered=self._glWindow._display.View_Left)
+        self._action_viewRight = QtWidgets.QAction(QtGui.QIcon(), "View Right", self,
+                                                 statusTip="Change view point",
+                                                 triggered=self._glWindow._display.View_Right)
+        self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
+                                                   statusTip="Change view point",
+                                                   triggered=self._glWindow._display.View_Iso)
     def createDrawActions(self):
         # self.deleteItem_action = QtWidgets.QAction(QtGui.QIcon(":images/delete.png"), "Delete a selection", self,
         #                               statusTip="Delete an item",

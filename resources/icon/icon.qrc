@@ -4,5 +4,7 @@
         <file>light.png</file>
         <file>transform.png</file>
         <file>bezier.png</file>
+        <file>spline.png</file>
+        <file>nurbs.png</file>
     </qresource>
 </RCC>

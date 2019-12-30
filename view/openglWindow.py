@@ -4,13 +4,16 @@ from OCC.Display.backend import load_any_qt_backend, get_qt_modules
 load_any_qt_backend()
 QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 from OCC.Display.qtDisplay import qtViewer3d
-
+from OCC.Core.AIS import *
+from OCC.Core.Graphic3d import *
+from OCC.Core.gp import *
 class GLWidget(qtViewer3d):
     def __init__(self, parent=None):
         super(GLWidget, self).__init__(parent)
         self.InitDriver()
-        self._display.display_triedron()
-
+        self._cubeManip=AIS_ViewCube()
+        self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
+        self._display.Context.Display(self._cubeManip,False)
 if __name__ == '__main__':
     def TestOverPainting():
         class AppFrame(QtWidgets.QWidget):

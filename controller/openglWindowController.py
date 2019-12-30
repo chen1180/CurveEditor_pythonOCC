@@ -17,8 +17,10 @@ class OpenGLEditor(GLWidget):
         self._objects=[]
         self.shape_drawer=toolController.ToolController()
         #callback functions
-        self._display.register_select_callback(self.coordinate_clicked)
         self.shape_drawer.objectAdded.connect(self.addNewItem)
+        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
+        self.my_box = BRepPrimAPI_MakeBox(10., 20., 30.).Shape()
+        self._display.DisplayShape(self.my_box,update=True)
 
     def addNewItem(self,item):
         self._objects.append(item)
@@ -38,7 +40,6 @@ class OpenGLEditor(GLWidget):
             print("Shape selected: ", shape)
         point_2d=kwargs
         x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0],kwargs[1])
-        self.shape_drawer.setMousePos(x, y, z)
     def keyPressEvent(self, event):
         code = event.key()
         if code in self._key_map:
@@ -66,6 +67,9 @@ class OpenGLEditor(GLWidget):
         self.dragStartPosX = ev.x()
         self.dragStartPosY = ev.y()
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
+        x, y, z,vx,vy,vz= self._display.View.ConvertWithProj(ev.x(),ev.y())
+        print(x,z,y,vx,vy,vz)
+        self.shape_drawer.setMousePos(x, y, z)
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()
@@ -113,9 +117,10 @@ class OpenGLEditor(GLWidget):
         # ROTATE
         if (buttons == QtCore.Qt.LeftButton and
                 not modifiers == QtCore.Qt.ShiftModifier):
-            self.cursor = "rotate"
-            self._display.Rotation(pt.x(), pt.y())
-            self._drawbox = False
+            if modifiers==QtCore.Qt.ControlModifier:
+                self.cursor = "rotate"
+                self._display.Rotation(pt.x(), pt.y())
+                self._drawbox = False
         # DYNAMIC ZOOM
         elif (buttons == QtCore.Qt.RightButton and
               not modifiers == QtCore.Qt.ShiftModifier):
