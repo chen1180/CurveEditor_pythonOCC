@@ -34,7 +34,7 @@ def beziercurve():
     array.SetValue(2, gp_Pnt(1, 2,1))
     array.SetValue(3, gp_Pnt(2, 3,2))
     array.SetValue(4, gp_Pnt(4, 3,-2))
-    array.SetValue(5, gp_Pnt(5, 5,-2))
+    array.SetValue(5, gp_Pnt(100, 5,-2))
     beziercurve = Geom_BezierCurve(array)
     poles=beziercurve.Poles()
     for p in poles:
@@ -43,8 +43,8 @@ def beziercurve():
 
     for j in range(array.Lower(), array.Upper()+1):
         p = array.Value(j)
-        display.DisplayShape(p, update=False)
-    display.DisplayShape(beziercurve, update=True, color='RED')
+        display.DisplayShape(p)
+    display.DisplayShape(beziercurve, color='RED')
 if __name__ == '__main__':
     beziercurve()
     start_display()

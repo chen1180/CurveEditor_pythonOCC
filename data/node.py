@@ -240,20 +240,14 @@ class LightNode(Node):
     def resource(self):
         return ":/light.png"
 
-class MeshNode(Node):
+class ModelNode(Node):
     def __init__(self, name, parent=None):
-        super(MeshNode, self).__init__(name, parent)
+        super(ModelNode, self).__init__(name, parent)
         self._vertices=None
         self._edges=None
         self._faces=None
     def typeInfo(self):
         return "Geometry"
-class MaterialNode(Node):
-    def __init__(self,name,parent=None):
-        super(MaterialNode, self).__init__(name,parent)
-        pass
-    def typeInfo(self):
-        return "Material"
 
 
 

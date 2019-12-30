@@ -1,10 +1,11 @@
-from OCC.Core.gp import gp_Pnt2d,gp_Pnt
+from OCC.Core.gp import gp_Pnt2d,gp_Pnt,gp_Pln,gp_Dir,gp_Ax3
 from OCC.Core.Geom import Geom_BezierCurve,Geom_BSplineCurve
 from OCC.Core.GeomAPI import GeomAPI_PointsToBSpline
+from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
 from OCC.Core.TColgp import TColgp_Array1OfPnt
 from PyQt5.QtCore import *
 import random
-class ToolController(QObject):
+class SketchManager(QObject):
     objectAdded=pyqtSignal(object)
     DRAW_END = 0
     DRAW_START=1
@@ -12,8 +13,9 @@ class ToolController(QObject):
     CURVE_BEZIER = 10
     CURVE_NURBS = 11
     CURVE_BSPLINE=12
-    def __init__(self):
-        super(ToolController, self).__init__()
+    def __init__(self,display):
+        super(SketchManager, self).__init__()
+        self._display=display
         self._currentPos=None
         self._clickedPos=[]
         self._state=None
@@ -62,6 +64,18 @@ class ToolController(QObject):
             pos=gp_Pnt(x,y,z)
             self._currentPos=pos
             self._clickedPos.append(pos)
+    def createNewSketch(self):
+        aPlane=gp_Pln(gp_Pnt(0.0,0.0,0.0),gp_Dir(1.0,.0,0.0))
+        self.displayGrid(aPlane,0.0,0.0,1.0,1.0,0.0,10,10,0.0)
+
+
+    def displayGrid(self,aPlane,xOrigin,yOrigin,xStep,yStep,rotation,xSize,ySize,offset):
+        ax3 = gp_Ax3(aPlane.Location(), aPlane.Axis().Direction())
+        self._display.Viewer.SetPrivilegedPlane(ax3)
+        self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
+        self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
+        self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
+        self._display.Repaint()
 
     def drawBezierCurve(self):
         self._state = self.DRAW_START

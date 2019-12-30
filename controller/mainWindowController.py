@@ -1,9 +1,7 @@
-from view import mainWindow
+from view import mainWindow,customToolButton
 from controller import editorController,openglWindowController,toolController
-from data.model import *
-from data.node import *
 from data.primitives import *
-from PyQt5.QtCore import *
+
 import resources.icon.icon
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -16,6 +14,7 @@ class Window(QtWidgets.QMainWindow):
         # setup tool bar
         self.createDrawActions()
         self.createViewActions()
+        self.createModeActions()
         self.createToolBars()
 
         # setup data
@@ -106,6 +105,32 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar.addAction(self._action_viewLeft)
         self._viewToolBar.addAction(self._action_viewRight)
         self._viewToolBar.addAction(self._action_viewIso)
+        self._viewToolBar.addSeparator()
+        self._swithModeButton=customToolButton.CustomToolButton()
+        self._switchModeMenu=QtWidgets.QMenu()
+        self._switchModeMenu.addAction(self._action_switchViewMode)
+        self._switchModeMenu.addAction(self._action_switchDesignMode)
+        self._switchModeMenu.addAction(self._action_switchSketchMode)
+        self._swithModeButton.setMenu(self._switchModeMenu)
+        self._swithModeButton.setDefaultAction(self._action_switchViewMode)
+        self._viewToolBar.addWidget(self._swithModeButton)
+        # Toolbar for different modes
+        self.createSketchToolBar()
+    def createSketchToolBar(self):
+        self._sketchToolBar = QtWidgets.QToolBar("Sketch")
+        self._sketchToolBar.addAction(self._action_sketchMode_createNewSketch)
+        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
+
+
+        self._viewToolBar=QtWidgets.QToolBar("View")
+        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
+        self._designToolBar = QtWidgets.QToolBar("Design")
+        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
+        self._sketchToolBar.setVisible(False)
+        self._designToolBar.setVisible(False)
     def createViewActions(self):
         def setView(a0):
             if a0==True:
@@ -113,43 +138,46 @@ class Window(QtWidgets.QMainWindow):
             else:
                 self._glWindow._display.SetOrthographicProjection()
         self._action_setView=QtWidgets.QAction(QtGui.QIcon(""),"Projective/Orthor", self,
-                                      statusTip="set view type",
-                                      triggered=setView)
+                                               statusTip="set view type",
+                                               triggered=setView)
         self._action_setView.setCheckable(True)
         self._action_viewTop=QtWidgets.QAction(QtGui.QIcon(""),"View Top", self,
-                                      statusTip="Change view point",
-                                      triggered=self._glWindow._display.View_Top)
+                                               statusTip="Change view point",
+                                               triggered=self._glWindow._display.View_Top)
         self._action_viewBot= QtWidgets.QAction(QtGui.QIcon(""), "View Bottom", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Bottom)
+                                                statusTip="Change view point",
+                                                triggered=self._glWindow._display.View_Bottom)
         self._action_viewFront = QtWidgets.QAction(QtGui.QIcon(""), "View Front", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Front)
-        self._action_viewRear = QtWidgets.QAction(QtGui.QIcon(), "View Rear", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Rear)
-        self._action_viewLeft = QtWidgets.QAction(QtGui.QIcon(), "View Left", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Left)
-        self._action_viewRight = QtWidgets.QAction(QtGui.QIcon(), "View Right", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Right)
-        self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
                                                    statusTip="Change view point",
-                                                   triggered=self._glWindow._display.View_Iso)
+                                                   triggered=self._glWindow._display.View_Front)
+        self._action_viewRear = QtWidgets.QAction(QtGui.QIcon(), "View Rear", self,
+                                                  statusTip="Change view point",
+                                                  triggered=self._glWindow._display.View_Rear)
+        self._action_viewLeft = QtWidgets.QAction(QtGui.QIcon(), "View Left", self,
+                                                  statusTip="Change view point",
+                                                  triggered=self._glWindow._display.View_Left)
+        self._action_viewRight = QtWidgets.QAction(QtGui.QIcon(), "View Right", self,
+                                                   statusTip="Change view point",
+                                                   triggered=self._glWindow._display.View_Right)
+        self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
+                                                 statusTip="Change view point",
+                                                 triggered=self._glWindow._display.View_Iso)
     def createDrawActions(self):
         # self.deleteItem_action = QtWidgets.QAction(QtGui.QIcon(":images/delete.png"), "Delete a selection", self,
         #                               statusTip="Delete an item",
         #                               triggered=self.deleteItem)
+        self._action_sketchMode_createNewSketch=QtWidgets.QAction(QtGui.QIcon(""),"create a new sketch", self,
+                                                                  statusTip="create a new sketch",
+                                                                  triggered=self._glWindow.sketchManager.createNewSketch)
         self.addBezierCurve = QtWidgets.QAction(QtGui.QIcon(":bezier.png"),"Add Bezier Curve", self,
-                                      statusTip="Add a cubic Bezier curve",
-                                      triggered=self._glWindow.shape_drawer.drawBezierCurve)
+                                                statusTip="Add a cubic Bezier curve",
+                                                triggered=self._glWindow.sketchManager.drawBezierCurve)
         self.addBSplineCurve = QtWidgets.QAction(QtGui.QIcon(":spline.png"),"Add B Spline Curve", self,
-                                       statusTip="Add a B Spline curve",
-                                       triggered=self._glWindow.shape_drawer.drawBSpline)
+                                                 statusTip="Add a B Spline curve",
+                                                 triggered=self._glWindow.sketchManager.drawBSpline)
         self.addNurbs = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"),"Add a NURB", self,
-                                       statusTip="Add a Nurb curve",
-                                       triggered=self._glWindow.shape_drawer.drawNurbs)
+                                          statusTip="Add a Nurb curve",
+                                          triggered=self._glWindow.sketchManager.drawNurbs)
 
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",
@@ -157,33 +185,30 @@ class Window(QtWidgets.QMainWindow):
         # self.addNurbsPatch = QtWidgets.QAction(QtGui.QIcon(":images/nurbs_patch.png"), "Add a NURB patch", self,
         #                         statusTip="Add a Nurb patch",
         #                         triggered=self.drawNurbsPatch)
-# Qt error message traceback
-sys._excepthook = sys.excepthook
-def my_exception_hook(exctype, value, traceback):
-    # Print the error and traceback
-    print(exctype, value, traceback)
-    # Call the normal Exception hook after
-    sys._excepthook(exctype, value, traceback)
-    sys.exit(1)
-sys.excepthook = my_exception_hook
-# Install qt debug message handler
-def qt_message_handler(mode, context, message):
-    if mode == QtInfoMsg:
-        mode = 'INFO'
-    elif mode == QtWarningMsg:
-        mode = 'WARNING'
-    elif mode == QtCriticalMsg:
-        mode = 'CRITICAL'
-    elif mode == QtFatalMsg:
-        mode = 'FATAL'
-    else:
-        mode = 'DEBUG'
-    print('qt_message_handler: line: %d, func: %s(), file: %s' % (
-          context.line, context.function, context.file))
-    print('  %s: %s\n' % (mode, message))
-if __name__ == '__main__':
-    qInstallMessageHandler(qt_message_handler)
-    app = QtWidgets.QApplication([])
-    mainWin = Window()
-    mainWin.showMaximized()
-    sys.exit(app.exec_())
+    def createModeActions(self):
+        self._action_switchViewMode=QtWidgets.QAction(QtGui.QIcon(""),"View", self,
+                                                      statusTip="The tools set will change to view mode",
+                                                      triggered=lambda state,x=self._glWindow.MODE_VIEW: self.setState(x))
+        self._action_switchSketchMode = QtWidgets.QAction(QtGui.QIcon(""), "Sketch", self,
+                                                          statusTip="The tools set will change to sketch mode",
+                                                          triggered=lambda
+                                                              state,x=self._glWindow.MODE_SKETCH: self.setState(x))
+        self._action_switchDesignMode = QtWidgets.QAction(QtGui.QIcon(""), "Design", self,
+                                                          statusTip="The tools set will change to design mode",
+                                                          triggered=lambda
+                                                              state,x=self._glWindow.MODE_DESIGN: self.setState(x))
+    def setState(self,gl_state):
+        self._glWindow.setState(gl_state)
+        if gl_state == self._glWindow.MODE_DESIGN:
+            self._designToolBar.setVisible(True)
+            self._sketchToolBar.setVisible(False)
+            self._viewToolBar.setVisible(False)
+        elif gl_state == self._glWindow.MODE_SKETCH:
+            self._designToolBar.setVisible(False)
+            self._sketchToolBar.setVisible(True)
+            self._viewToolBar.setVisible(False)
+        elif gl_state == self._glWindow.MODE_VIEW:
+            self._designToolBar.setVisible(False)
+            self._sketchToolBar.setVisible(False)
+            self._viewToolBar.setVisible(True)
+

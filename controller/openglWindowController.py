@@ -12,25 +12,43 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 log = logging.getLogger(__name__)
 class OpenGLEditor(GLWidget):
     modelUpdated=QtCore.pyqtSignal(object)
+    MODE_SKETCH=0
+    MODE_DESIGN=1
+    MODE_VIEW=2
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
         self._objects=[]
-        self.shape_drawer=toolController.ToolController()
+        self.sketchManager=toolController.SketchManager(self._display)
+        self._state=self.MODE_VIEW
         #callback functions
-        self.shape_drawer.objectAdded.connect(self.addNewItem)
+        self._display.register_select_callback(self.coordinate_clicked)
+        self.sketchManager.objectAdded.connect(self.addNewItem)
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        self.my_box = BRepPrimAPI_MakeBox(10., 20., 30.).Shape()
+        self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
         self._display.DisplayShape(self.my_box,update=True)
 
     def addNewItem(self,item):
         self._objects.append(item)
-        self._display.DisplayShape(item,update=True)
+        self._display.DisplayShape(item)
+        self._display.Repaint()
     def setScene(self,scene):
         self._objects=scene
-
+    def state(self):
+        return self._state
+    def setState(self,state):
+        self._state=state
+        print(self._state)
+        self.update()
+    def processActions(self):
+        if self._state==self.MODE_VIEW:
+            pass
+        elif self._state==self.MODE_DESIGN:
+            pass
+        elif self._state==self.MODE_SKETCH:
+            self.sketchManager.EnterDrawingMode()
     def paintEvent(self, event):
         super(OpenGLEditor, self).paintEvent(event)
-        self.shape_drawer.EnterDrawingMode()
+        self.processActions()
         self.update()
 
     def coordinate_clicked(self,shp, *kwargs):
@@ -49,7 +67,7 @@ class OpenGLEditor(GLWidget):
         else:
             log.info('key: code %i not mapped to any function' % code)
         if code==QtCore.Qt.Key_Escape:
-            self.shape_drawer.ExitDrawingMode()
+            self.sketchManager.ExitDrawingMode()
 
     def wheelEvent(self, event):
         try:  # PyQt4/PySide
@@ -69,7 +87,7 @@ class OpenGLEditor(GLWidget):
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
         x, y, z,vx,vy,vz= self._display.View.ConvertWithProj(ev.x(),ev.y())
         print(x,z,y,vx,vy,vz)
-        self.shape_drawer.setMousePos(x, y, z)
+        self.sketchManager.setMousePos(x, y, z)
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()
@@ -159,19 +177,6 @@ class OpenGLEditor(GLWidget):
             self._drawbox = False
             self._display.MoveTo(pt.x(), pt.y())
             self.cursor = "arrow"
-    def getOpenglInfo(self):
-        info = """ 
-      Vendor: {0} 
-      Renderer: {1} 
-      OpenGL Version: {2} 
-      Shader Version: {3} 
-     """.format(
-            glGetString(GL_VENDOR),
-            glGetString(GL_RENDERER),
-            glGetString(GL_VERSION),
-            glGetString(GL_SHADING_LANGUAGE_VERSION)
-        )
-        return info
 # -----------------------------Debugging-----------------------------------#
 if __name__ == '__main__':
     sys._excepthook = sys.excepthook
