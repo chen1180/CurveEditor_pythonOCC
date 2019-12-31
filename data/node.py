@@ -1,6 +1,4 @@
 import resources.icon.icon
-import resources.shaders.shaders
-import numpy as np
 class Node(object):
     def __init__(self, name, parent=None):
         '''
@@ -248,6 +246,14 @@ class ModelNode(Node):
         self._faces=None
     def typeInfo(self):
         return "Geometry"
+class SketchNode(Node):
+    def __init__(self, name, parent=None):
+        super(SketchNode, self).__init__(name, parent)
+        self._sketch_plane=None
+        self._vertices=None
+        self._edges=None
+    def typeInfo(self):
+        return "Sketch"
 
 
 

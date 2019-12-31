@@ -1,8 +1,9 @@
 from view import mainWindow,customToolButton
 from controller import editorController,openglWindowController,toolController
-from data.primitives import *
-
 import resources.icon.icon
+from PyQt5 import QtWidgets,QtCore,QtGui
+from data.node import *
+from data.model import *
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
@@ -21,6 +22,7 @@ class Window(QtWidgets.QMainWindow):
         self._rootNode = Node("Scene")
         # setup model
         self._model = SceneGraphModel(self._rootNode)
+        self._glWindow.setScene(self._model)
 
         # """VIEW <------> PROXY MODEL <------> DATA MODEL"""
         self._proxyModel = QtCore.QSortFilterProxyModel()
@@ -71,7 +73,7 @@ class Window(QtWidgets.QMainWindow):
 
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
-
+        self._glWindow.modelUpdated.connect(self.updateModel)
     def updateModel(self,item):
         '''
 
@@ -81,15 +83,15 @@ class Window(QtWidgets.QMainWindow):
         Returns:
 
         '''
-        self._model.insertMeshNode(item,0,1)
+        self._model.insertNode(item,0,1)
 
     def createToolBars(self):
         # Curve tool bar
         self._curveToolBar = QtWidgets.QToolBar("Curve")
         self._curveToolBar.setOrientation(QtCore.Qt.Vertical)
-        self._curveToolBar.addAction(self.addBezierCurve)
-        self._curveToolBar.addAction(self.addBSplineCurve)
-        self._curveToolBar.addAction(self.addNurbs)
+        # self._curveToolBar.addAction(self._action_sketchMode_addBezierCurve)
+        # self._curveToolBar.addAction(self._action_sketchMode_addBSpline)
+        # self._curveToolBar.addAction(self._action_sketchMode_addNurbs)
         # Surface tool bar
         self._surfaceToolBar = QtWidgets.QToolBar("Surface")
         self._surfaceToolBar.setOrientation(QtCore.Qt.Vertical)
@@ -119,6 +121,9 @@ class Window(QtWidgets.QMainWindow):
     def createSketchToolBar(self):
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
         self._sketchToolBar.addAction(self._action_sketchMode_createNewSketch)
+        self._sketchToolBar.addAction(self._action_sketchMode_addBezierCurve)
+        self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
+        self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
@@ -169,15 +174,15 @@ class Window(QtWidgets.QMainWindow):
         self._action_sketchMode_createNewSketch=QtWidgets.QAction(QtGui.QIcon(""),"create a new sketch", self,
                                                                   statusTip="create a new sketch",
                                                                   triggered=self._glWindow.sketchManager.createNewSketch)
-        self.addBezierCurve = QtWidgets.QAction(QtGui.QIcon(":bezier.png"),"Add Bezier Curve", self,
-                                                statusTip="Add a cubic Bezier curve",
-                                                triggered=self._glWindow.sketchManager.drawBezierCurve)
-        self.addBSplineCurve = QtWidgets.QAction(QtGui.QIcon(":spline.png"),"Add B Spline Curve", self,
-                                                 statusTip="Add a B Spline curve",
-                                                 triggered=self._glWindow.sketchManager.drawBSpline)
-        self.addNurbs = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"),"Add a NURB", self,
-                                          statusTip="Add a Nurb curve",
-                                          triggered=self._glWindow.sketchManager.drawNurbs)
+        self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(":bezier.png"), "Add Bezier Curve", self,
+                                                                   statusTip="Add a cubic Bezier curve",
+                                                                   triggered=self._glWindow.sketchManager.action_bezierCurve)
+        self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(":spline.png"), "Add B Spline Curve", self,
+                                                               statusTip="Add a B Spline curve",
+                                                               triggered=self._glWindow.sketchManager.action_bSpline)
+        self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "Add Circle", self,
+                                                              statusTip="Add a circle",
+                                                              triggered=self._glWindow.sketchManager.action_circle)
 
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",

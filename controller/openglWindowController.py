@@ -1,5 +1,4 @@
 from PyQt5 import QtCore,QtGui,QtWidgets
-from OpenGL.GL import *
 import sys
 from view.openglWindow import GLWidget
 from controller import toolController
@@ -17,22 +16,20 @@ class OpenGLEditor(GLWidget):
     MODE_VIEW=2
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
-        self._objects=[]
-        self.sketchManager=toolController.SketchManager(self._display)
+        self._sceneGraph=None
+        self.sketchManager=toolController.SketchController(self._display)
         self._state=self.MODE_VIEW
         #callback functions
         self._display.register_select_callback(self.coordinate_clicked)
-        self.sketchManager.objectAdded.connect(self.addNewItem)
-        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
-        self._display.DisplayShape(self.my_box,update=True)
+        self.sketchManager.modelUpdate.connect(self.addNewItem)
+        # from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
+        # self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
+        # self._display.DisplayShape(self.my_box,update=True)
 
     def addNewItem(self,item):
-        self._objects.append(item)
-        self._display.DisplayShape(item)
-        self._display.Repaint()
+        self.modelUpdated.emit(item)
     def setScene(self,scene):
-        self._objects=scene
+        self._sceneGraph=scene
     def state(self):
         return self._state
     def setState(self,state):
@@ -41,11 +38,13 @@ class OpenGLEditor(GLWidget):
         self.update()
     def processActions(self):
         if self._state==self.MODE_VIEW:
-            pass
+            if self._display.Viewer.IsActive()==True:
+                self._display.Viewer.DeactivateGrid()
         elif self._state==self.MODE_DESIGN:
             pass
         elif self._state==self.MODE_SKETCH:
             self.sketchManager.EnterDrawingMode()
+        self._display.Repaint()
     def paintEvent(self, event):
         super(OpenGLEditor, self).paintEvent(event)
         self.processActions()
@@ -86,7 +85,6 @@ class OpenGLEditor(GLWidget):
         self.dragStartPosY = ev.y()
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
         x, y, z,vx,vy,vz= self._display.View.ConvertWithProj(ev.x(),ev.y())
-        print(x,z,y,vx,vy,vz)
         self.sketchManager.setMousePos(x, y, z)
 
     def mouseReleaseEvent(self, event):

@@ -19,13 +19,18 @@
 
 from __future__ import print_function
 
-from OCC.Core.gp import gp_Pnt2d,gp_Pnt,gp_Circ2d,gp_Ax2d
-from OCC.Core.Geom import Geom_Circle
+from OCC.Core.gp import *
+from OCC.Core.Geom import Geom_Circle,Geom_SurfaceOfLinearExtrusion,Geom_BezierCurve,Geom_CylindricalSurface,Geom_SphericalSurface
 from OCC.Core.TColgp import TColgp_Array1OfPnt
 from OCC.Display.SimpleGui import init_display
-from OCC.Core.Convert import Convert_CircleToBSplineCurve,Convert_TgtThetaOver2
 display, start_display, add_menu, add_function_to_menu = init_display()
 
-circle = Geom_Circle(gp_Circ2d(gp_Ax2d(),1.0))
-display.DisplayShape(circle, update=True, color='RED')
-start_display()
+
+def beziercurve():
+
+    axe=gp_Ax3()
+    c=Geom_SphericalSurface(axe,10.0)
+    display.DisplayShape(c,update=True)
+if __name__ == '__main__':
+    beziercurve()
+    start_display()

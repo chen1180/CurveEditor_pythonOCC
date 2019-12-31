@@ -1,6 +1,6 @@
 from PyQt5 import QtGui, QtWidgets, QtCore, uic
 import sys
-from view import lightProperty, nodeProperty, property, transformProperty, cameraProperty,curveProperty
+from view import lightProperty, nodeProperty, property, transformProperty, cameraProperty,curveProperty,newSketchProperty
 class PropertyEditor(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(PropertyEditor, self).__init__(parent)
@@ -181,3 +181,37 @@ class CurveEditor(QtWidgets.QWidget):
         parent = current.parent()
         self._dataMapper.setRootIndex(parent)
         self._dataMapper.setCurrentModelIndex(current)
+from OCC.Core.gp import gp_Pnt,gp_Pln,gp_Dir,gp_Ax3
+from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
+class Sketch_NewSketchEditor(QtWidgets.QWidget):
+    def __init__(self,parent=None,display=None):
+        super(Sketch_NewSketchEditor, self).__init__(parent)
+        self.ui=newSketchProperty.Ui_newSketchEditor()
+        self.ui.setupUi(self)
+        self._display=display
+        self.ui.uiOk.accepted.connect(self.acceptData)
+        self.ui.uiOk.rejected.connect(self.close)
+    def acceptData(self):
+        self.dir=gp_Dir()
+        if self.ui.uiXYPlane.isChecked():
+            self.dir=gp_Dir(0.0,0.0,1.0)
+            self._display.View_Top()
+        if self.ui.uiXZPlane.isChecked():
+            self.dir=gp_Dir(0.0,1.0,0.0)
+            self._display.View_Front()
+        if self.ui.uiYZPlane.isChecked():
+            self.dir=gp_Dir(1.0,0.0,0.0)
+            self._display.View_Right()
+        aPlane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), self.dir)
+        self.displayGrid(aPlane, 0.0, 0.0, 1.0, 1.0, 0.0, 100, 100, self.ui.uiOffset.value())
+        self.close()
+
+
+    def displayGrid(self, aPlane, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
+        ax3 = gp_Ax3(aPlane.Location(), aPlane.Axis().Direction())
+        self._display.Viewer.SetPrivilegedPlane(ax3)
+        self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
+        self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
+        self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
+        self._display.FitAll()
+        self._display.Repaint()

@@ -109,6 +109,19 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         return success
 
+    def insertNode(self, node, position, rows, parent=QtCore.QModelIndex()):
+        parentNode = self.getNode(parent)
+
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        for row in range(rows):
+            childCount = parentNode.childCount()
+            childNode = node
+            success = parentNode.insertChild(position, childNode)
+
+        self.endInsertRows()
+
+        return success
     def insertLights(self, position, rows, parent=QtCore.QModelIndex()) -> bool:
         parentNode = self.getNode(parent)
 
