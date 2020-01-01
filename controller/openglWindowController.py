@@ -16,21 +16,21 @@ class OpenGLEditor(GLWidget):
     MODE_VIEW=2
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
-        self._sceneGraph=None
-        self.sketchManager=toolController.SketchController(self._display)
-        self._state=self.MODE_VIEW
 
+        self.sketchManager=toolController.SketchController(self._display)
+        self.viewManager=toolController.ViewController(self._display)
+        self._state=self.MODE_VIEW
 
         #callback functions
         self._display.register_select_callback(self.coordinate_clicked)
-        self._display.register_select_callback(self.sketchManager.setSelectedShape)
         self._display.register_select_callback(self.sketchManager.recognize_clicked)
+        self._display.register_select_callback(self.sketchManager.setMousePos)
+        self._display.register_select_callback(self.viewManager.selectAIS_Shape)
+
         self.sketchManager.modelUpdate.connect(self.addNewItem)
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        from OCC.Core.AIS import AIS_Manipulator
         self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
-        self._display.DisplayShape(self.my_box,update=True)
-
+        box=self._display.DisplayShape(self.my_box,update=True)
 
     def addNewItem(self,item):
         self.modelUpdated.emit(item)
@@ -40,12 +40,12 @@ class OpenGLEditor(GLWidget):
         return self._state
     def setState(self,state):
         self._state=state
-        print(self._state)
         self.update()
     def processActions(self):
         if self._state==self.MODE_VIEW:
             if self._display.Viewer.IsActive()==True:
                 self._display.Viewer.DeactivateGrid()
+            self.viewManager.displayManipulator()
         elif self._state==self.MODE_DESIGN:
             pass
         elif self._state==self.MODE_SKETCH:
@@ -53,15 +53,16 @@ class OpenGLEditor(GLWidget):
         self._display.Repaint()
     def paintEvent(self, event):
         super(OpenGLEditor, self).paintEvent(event)
-        self.processActions()
-        self.update()
+        if self._inited:
+            self._display.Context.UpdateCurrentViewer()
+            self.processActions()
+            self.update()
     def coordinate_clicked(self,shp, *kwargs):
         """ This function is called whenever a vertex is selected
         """
-        for shape in shp:
-            print(shape.ShapeType())
         point_2d=kwargs
         x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0],kwargs[1])
+        print(self._display.GetSelectedShapes())
 
     def keyPressEvent(self, event):
         code = event.key()
@@ -91,24 +92,9 @@ class OpenGLEditor(GLWidget):
         self.dragStartPosX = ev.x()
         self.dragStartPosY = ev.y()
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
-        x, y, z,vx,vy,vz= self._display.View.ConvertWithProj(ev.x(),ev.y())
-        self.sketchManager.setMousePos(x, y, z)
-        ##object selection
-        self._display.MoveTo(ev.x(),ev.y())
-        assert isinstance(self._display.Context, AIS_InteractiveContext)
-        try:
-            if self._display.Context.HasDetected():
-                self._display.Context.InitDetected()
-                while(self._display.Context.MoreDetected()):
-                    detected_object = self._display.Context.DetectedInteractive()
-                    assert isinstance(detected_object, AIS_InteractiveObject)
-                    shape = AIS_Shape.DownCast(detected_object)
-                    assert isinstance(shape, AIS_Shape)
-                    if shape:
-                        print(shape)
-                    self._display.Context.NextDetected()
-        except Exception as e:
-            print(e)
+        self.viewManager.startTransform(ev.x(),ev.y())
+
+
 
 
     def mouseReleaseEvent(self, event):
@@ -161,6 +147,8 @@ class OpenGLEditor(GLWidget):
                 self.cursor = "rotate"
                 self._display.Rotation(pt.x(), pt.y())
                 self._drawbox = False
+            # manipulater
+            self.viewManager.transform(pt.x(), pt.y())
         # DYNAMIC ZOOM
         elif (buttons == QtCore.Qt.RightButton and
               not modifiers == QtCore.Qt.ShiftModifier):

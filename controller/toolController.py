@@ -19,7 +19,7 @@ class SketchController(QObject):
     CURVE_BEZIER = 10
     CURVE_BSPLINE=11
     CURVE_CIRCLE=12
-    SURFACE_REVOLUTED=20
+    SURFACE_REVOLUTION=20
     def __init__(self,display):
         super(SketchController, self).__init__()
         self._display=display
@@ -41,7 +41,7 @@ class SketchController(QObject):
         self._shape_type=self.CURVE_CIRCLE
     def action_revolutedSurface(self):
         self._state=self.DRAW_START
-        self._shape_type=self.SURFACE_REVOLUTED
+        self._shape_type=self.SURFACE_REVOLUTION
 
     def makeBezierCurve(self):
         array = TColgp_Array1OfPnt(1, len(self._clickedPos))
@@ -62,11 +62,13 @@ class SketchController(QObject):
         radius=self._clickedPos[0].Distance(self._clickedPos[1])
         circle=Geom_Circle(axe,radius)
         self._display.DisplayShape(circle)
+
     def makeSurfaceOfRevolution(self):
         # the first bezier curve
         surface=Geom_SurfaceOfRevolution(self._selectedShape,gp_Ax1(gp_Pnt(0.0,0.0,0.0),gp_Dir(1.0,0.0,0.0)))
         self._display.DisplayShape(surface)
         self.ExitDrawingMode()
+
     def EnterDrawingMode(self):
         if self._state==self.DRAW_START:
             if self._shape_type==self.CURVE_BEZIER:
@@ -81,7 +83,7 @@ class SketchController(QObject):
                 # the first bezier curve
                 if self._currentPos:
                     self._display.DisplayShape(self._currentPos)
-            elif self._shape_type==self.SURFACE_REVOLUTED:
+            elif self._shape_type==self.SURFACE_REVOLUTION:
                 pass
         else:
             try:
@@ -91,7 +93,7 @@ class SketchController(QObject):
                     self.makeBSpline()
                 elif self._shape_type==self.CURVE_CIRCLE:
                     self.makeCircle()
-                elif self._shape_type==self.SURFACE_REVOLUTED:
+                elif self._shape_type==self.SURFACE_REVOLUTION:
                     self.makeSurfaceOfRevolution()
             except Exception as e:
                 print(e)
@@ -107,13 +109,12 @@ class SketchController(QObject):
         self._clickedPos.clear()
         self._shape_type=None
 
-    def setMousePos(self,x,y,z):
+    def setMousePos(self,shapes,*kargs):
         if self._state==self.DRAW_START:
+            x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kargs[0],kargs[1])
             pos=gp_Pnt(x,y,z)
             self._currentPos=pos
             self._clickedPos.append(pos)
-    def setSelectedShape(self,shp,*kargs):
-        pass
 
     def recognize_clicked(self,shp, *kwargs):
         """ This is the function called every time
@@ -121,11 +122,11 @@ class SketchController(QObject):
         """
         for shape in shp:
             if shape.ShapeType() == TopAbs_SOLID:
-                print("solid selected")
+                pass
             if shape.ShapeType() == TopAbs_EDGE:
                 self.recognize_edge(topods_Edge(shape))
             if shape.ShapeType() == TopAbs_FACE:
-                print("face selected")
+                pass
 
     def recognize_edge(self,a_edge):
         """ Takes a TopoDS shape and tries to identify its nature
@@ -153,11 +154,53 @@ class SketchController(QObject):
         self.new_sketch=Sketch_NewSketchEditor(None,self._display)
         self.new_sketch.show()
         self.new_sketch.ui.uiOk.accepted.connect(self.createSketchNode)
-
     def createSketchNode(self):
         self.new_sketch.acceptData()
         self._sketch = SketchNode("Sketch")
         self.modelUpdate.emit(self._sketch)
+
+from OCC.Core.AIS import AIS_Manipulator,AIS_Shape,AIS_InteractiveContext,AIS_InteractiveObject
+class ViewController(QObject):
+    modelUpdate=pyqtSignal(object)
+    def __init__(self,display):
+        super(ViewController, self).__init__()
+        self._manipulator=AIS_Manipulator()
+        self._manipulator.SetModeActivationOnDetection(True)
+        self._display=display
+        self._selectedShape=None
+
+    def displayManipulator(self):
+        pass
+    def setObject(self,shape):
+        self._manipulator.Detach()
+        self._selectedShape=shape
+        self._manipulator.Attach(self._selectedShape)
+        print("detected object",  self._selectedShape)
+    def selectAIS_Shape(self,shp, *kwargs):
+        ##object selection
+        x,y=kwargs
+        self._display.MoveTo(x,y)
+        assert isinstance(self._display.Context, AIS_InteractiveContext)
+        try:
+            if self._display.Context.HasDetected():
+                self._display.Context.InitDetected()
+                while (self._display.Context.MoreDetected()):
+                    detected_object = self._display.Context.DetectedInteractive()
+                    assert isinstance(detected_object, AIS_InteractiveObject)
+                    self.setObject(detected_object)
+                    self._display.Context.NextDetected()
+        except Exception as e:
+            print(e)
+
+    def startTransform(self,x,y):
+        if self._manipulator.HasActiveMode():
+            self._manipulator.StartTransform(x, y, self._display.View)
+
+    def transform(self,x,y):
+        if self._manipulator.HasActiveMode():
+            self._manipulator.Transform(x, y, self._display.View)
+            self._display.View.Redraw()
+
 
 
 

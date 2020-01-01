@@ -185,7 +185,7 @@ class Window(QtWidgets.QMainWindow):
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "Add Circle", self,
                                                               statusTip="Add a circle",
                                                               triggered=self._glWindow.sketchManager.action_circle)
-        self._action_sketchMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "Create surface of revolution", self,
+        self._action_sketchMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "revolve a shape", self,
                                                               statusTip="Create surface of revolution based on a selected shape",
                                                               triggered=self._glWindow.sketchManager.action_revolutedSurface)
 
