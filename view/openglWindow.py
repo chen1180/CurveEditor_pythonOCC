@@ -15,6 +15,7 @@ class GLWidget(qtViewer3d):
         self._cubeManip=AIS_ViewCube()
         self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
         self._display.Context.Display(self._cubeManip,False)
+        assert isinstance(self._display.Context, AIS_InteractiveContext)
         # self._display.View.SetBgGradientColors(Quantity_Color(Quantity_NOC_SKYBLUE), Quantity_Color(Quantity_NOC_GRAY), 2, True)
 if __name__ == '__main__':
     def TestOverPainting():

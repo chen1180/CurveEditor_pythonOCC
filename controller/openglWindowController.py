@@ -2,8 +2,8 @@ from PyQt5 import QtCore,QtGui,QtWidgets
 import sys
 from view.openglWindow import GLWidget
 from controller import toolController
-
 import logging
+from OCC.Core.AIS import AIS_InteractiveContext,AIS_InteractiveObject,AIS_Shape
 
 HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
 
@@ -19,12 +19,18 @@ class OpenGLEditor(GLWidget):
         self._sceneGraph=None
         self.sketchManager=toolController.SketchController(self._display)
         self._state=self.MODE_VIEW
+
+
         #callback functions
         self._display.register_select_callback(self.coordinate_clicked)
+        self._display.register_select_callback(self.sketchManager.setSelectedShape)
+        self._display.register_select_callback(self.sketchManager.recognize_clicked)
         self.sketchManager.modelUpdate.connect(self.addNewItem)
-        # from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        # self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
-        # self._display.DisplayShape(self.my_box,update=True)
+        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
+        from OCC.Core.AIS import AIS_Manipulator
+        self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
+        self._display.DisplayShape(self.my_box,update=True)
+
 
     def addNewItem(self,item):
         self.modelUpdated.emit(item)
@@ -49,14 +55,14 @@ class OpenGLEditor(GLWidget):
         super(OpenGLEditor, self).paintEvent(event)
         self.processActions()
         self.update()
-
     def coordinate_clicked(self,shp, *kwargs):
         """ This function is called whenever a vertex is selected
         """
         for shape in shp:
-            print("Shape selected: ", shape)
+            print(shape.ShapeType())
         point_2d=kwargs
         x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0],kwargs[1])
+
     def keyPressEvent(self, event):
         code = event.key()
         if code in self._key_map:
@@ -78,6 +84,7 @@ class OpenGLEditor(GLWidget):
         else:
             zoom_factor = 0.5
         self._display.ZoomFactor(zoom_factor)
+
     def mousePressEvent(self, event):
         self.setFocus()
         ev = event.pos()
@@ -86,6 +93,23 @@ class OpenGLEditor(GLWidget):
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
         x, y, z,vx,vy,vz= self._display.View.ConvertWithProj(ev.x(),ev.y())
         self.sketchManager.setMousePos(x, y, z)
+        ##object selection
+        self._display.MoveTo(ev.x(),ev.y())
+        assert isinstance(self._display.Context, AIS_InteractiveContext)
+        try:
+            if self._display.Context.HasDetected():
+                self._display.Context.InitDetected()
+                while(self._display.Context.MoreDetected()):
+                    detected_object = self._display.Context.DetectedInteractive()
+                    assert isinstance(detected_object, AIS_InteractiveObject)
+                    shape = AIS_Shape.DownCast(detected_object)
+                    assert isinstance(shape, AIS_Shape)
+                    if shape:
+                        print(shape)
+                    self._display.Context.NextDetected()
+        except Exception as e:
+            print(e)
+
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()

@@ -124,6 +124,8 @@ class Window(QtWidgets.QMainWindow):
         self._sketchToolBar.addAction(self._action_sketchMode_addBezierCurve)
         self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
         self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
+        self._sketchToolBar.addSeparator()
+        self._sketchToolBar.addAction(self._action_sketchMode_revolutedSurface)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
@@ -183,6 +185,9 @@ class Window(QtWidgets.QMainWindow):
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "Add Circle", self,
                                                               statusTip="Add a circle",
                                                               triggered=self._glWindow.sketchManager.action_circle)
+        self._action_sketchMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "Create surface of revolution", self,
+                                                              statusTip="Create surface of revolution based on a selected shape",
+                                                              triggered=self._glWindow.sketchManager.action_revolutedSurface)
 
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",
