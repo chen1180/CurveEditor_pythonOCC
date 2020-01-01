@@ -25,7 +25,6 @@ class OpenGLEditor(GLWidget):
         self._display.register_select_callback(self.coordinate_clicked)
         self._display.register_select_callback(self.sketchManager.recognize_clicked)
         self._display.register_select_callback(self.sketchManager.setMousePos)
-        self._display.register_select_callback(self.viewManager.selectAIS_Shape)
 
         self.sketchManager.modelUpdate.connect(self.addNewItem)
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
@@ -45,10 +44,10 @@ class OpenGLEditor(GLWidget):
         if self._state==self.MODE_VIEW:
             if self._display.Viewer.IsActive()==True:
                 self._display.Viewer.DeactivateGrid()
-            self.viewManager.displayManipulator()
         elif self._state==self.MODE_DESIGN:
-            pass
+            self.viewManager.setIdle()
         elif self._state==self.MODE_SKETCH:
+            self.viewManager.setIdle()
             self.sketchManager.EnterDrawingMode()
         self._display.Repaint()
     def paintEvent(self, event):
@@ -92,7 +91,13 @@ class OpenGLEditor(GLWidget):
         self.dragStartPosX = ev.x()
         self.dragStartPosY = ev.y()
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
-        self.viewManager.startTransform(ev.x(),ev.y())
+        if self._state == self.MODE_VIEW:
+            self.viewManager.startTransform(ev.x(),ev.y())
+            self.viewManager.selectAIS_Shape(ev.x(), ev.y())
+        elif self._state == self.MODE_DESIGN:
+            pass
+        elif self._state == self.MODE_SKETCH:
+            pass
 
 
 
@@ -147,8 +152,13 @@ class OpenGLEditor(GLWidget):
                 self.cursor = "rotate"
                 self._display.Rotation(pt.x(), pt.y())
                 self._drawbox = False
-            # manipulater
-            self.viewManager.transform(pt.x(), pt.y())
+            if self._state == self.MODE_VIEW:
+                self.viewManager.transform(pt.x(), pt.y())
+            elif self._state == self.MODE_DESIGN:
+                pass
+            elif self._state == self.MODE_SKETCH:
+                pass
+
         # DYNAMIC ZOOM
         elif (buttons == QtCore.Qt.RightButton and
               not modifiers == QtCore.Qt.ShiftModifier):

@@ -125,6 +125,7 @@ class Window(QtWidgets.QMainWindow):
         self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
         self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
         self._sketchToolBar.addSeparator()
+        self._sketchToolBar.addAction(self._action_sketchMode_addBezierSurface)
         self._sketchToolBar.addAction(self._action_sketchMode_revolutedSurface)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
@@ -144,6 +145,7 @@ class Window(QtWidgets.QMainWindow):
                 self._glWindow._display.SetPerspectiveProjection()
             else:
                 self._glWindow._display.SetOrthographicProjection()
+            self._glWindow._display.Repaint()
         self._action_setView=QtWidgets.QAction(QtGui.QIcon(""),"Projective/Orthor", self,
                                                statusTip="set view type",
                                                triggered=setView)
@@ -176,16 +178,19 @@ class Window(QtWidgets.QMainWindow):
         self._action_sketchMode_createNewSketch=QtWidgets.QAction(QtGui.QIcon(""),"create a new sketch", self,
                                                                   statusTip="create a new sketch",
                                                                   triggered=self._glWindow.sketchManager.createNewSketch)
-        self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(":bezier.png"), "Add Bezier Curve", self,
+        self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(""), "Add Bezier Curve", self,
                                                                    statusTip="Add a cubic Bezier curve",
                                                                    triggered=self._glWindow.sketchManager.action_bezierCurve)
-        self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(":spline.png"), "Add B Spline Curve", self,
+        self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Add BSpline Curve", self,
                                                                statusTip="Add a B Spline curve",
                                                                triggered=self._glWindow.sketchManager.action_bSpline)
-        self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "Add Circle", self,
+        self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
                                                               statusTip="Add a circle",
                                                               triggered=self._glWindow.sketchManager.action_circle)
-        self._action_sketchMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(":nurbs.png"), "revolve a shape", self,
+        self._action_sketchMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface", self,
+                                                              statusTip="Create from two Bezier curve",
+                                                              triggered=self._glWindow.sketchManager.action_bezierSurface)
+        self._action_sketchMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
                                                               statusTip="Create surface of revolution based on a selected shape",
                                                               triggered=self._glWindow.sketchManager.action_revolutedSurface)
 

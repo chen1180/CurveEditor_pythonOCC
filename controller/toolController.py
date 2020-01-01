@@ -19,7 +19,9 @@ class SketchController(QObject):
     CURVE_BEZIER = 10
     CURVE_BSPLINE=11
     CURVE_CIRCLE=12
-    SURFACE_REVOLUTION=20
+    SURFACE_BEZIER=20
+    SURFACE_BSPLINE=21
+    SURFACE_REVOLUTION=30
     def __init__(self,display):
         super(SketchController, self).__init__()
         self._display=display
@@ -42,7 +44,9 @@ class SketchController(QObject):
     def action_revolutedSurface(self):
         self._state=self.DRAW_START
         self._shape_type=self.SURFACE_REVOLUTION
-
+    def action_bezierSurface(self):
+        self._state=self.DRAW_START
+        self._shape_type=self.SURFACE_BEZIER
     def makeBezierCurve(self):
         array = TColgp_Array1OfPnt(1, len(self._clickedPos))
         for i, p in enumerate(self._clickedPos):
@@ -68,7 +72,8 @@ class SketchController(QObject):
         surface=Geom_SurfaceOfRevolution(self._selectedShape,gp_Ax1(gp_Pnt(0.0,0.0,0.0),gp_Dir(1.0,0.0,0.0)))
         self._display.DisplayShape(surface)
         self.ExitDrawingMode()
-
+    def makeSurfaceBezier(self):
+        pass
     def EnterDrawingMode(self):
         if self._state==self.DRAW_START:
             if self._shape_type==self.CURVE_BEZIER:
@@ -169,16 +174,13 @@ class ViewController(QObject):
         self._display=display
         self._selectedShape=None
 
-    def displayManipulator(self):
-        pass
     def setObject(self,shape):
-        self._manipulator.Detach()
         self._selectedShape=shape
         self._manipulator.Attach(self._selectedShape)
         print("detected object",  self._selectedShape)
-    def selectAIS_Shape(self,shp, *kwargs):
+
+    def selectAIS_Shape(self,x,y):
         ##object selection
-        x,y=kwargs
         self._display.MoveTo(x,y)
         assert isinstance(self._display.Context, AIS_InteractiveContext)
         try:
@@ -200,8 +202,8 @@ class ViewController(QObject):
         if self._manipulator.HasActiveMode():
             self._manipulator.Transform(x, y, self._display.View)
             self._display.View.Redraw()
-
-
+    def setIdle(self):
+        self._manipulator.Detach()
 
 
 
