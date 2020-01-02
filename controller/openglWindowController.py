@@ -21,6 +21,10 @@ class OpenGLEditor(GLWidget):
         self.viewManager=toolController.ViewController(self._display)
         self._state=self.MODE_VIEW
 
+        self._mousePress_callback=[]
+        self._mouseMove_callback=[]
+        self._mouseRelease_callback=[]
+
         #callback functions
         self._display.register_select_callback(self.coordinate_clicked)
         self._display.register_select_callback(self.sketchManager.recognize_clicked)
@@ -29,7 +33,7 @@ class OpenGLEditor(GLWidget):
         self.sketchManager.modelUpdate.connect(self.addNewItem)
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
         self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
-        box=self._display.DisplayShape(self.my_box,update=True)
+        # box=self._display.DisplayShape(self.my_box,update=True)
 
     def addNewItem(self,item):
         self.modelUpdated.emit(item)
@@ -61,7 +65,6 @@ class OpenGLEditor(GLWidget):
         """
         point_2d=kwargs
         x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0],kwargs[1])
-        print(self._display.GetSelectedShapes())
 
     def keyPressEvent(self, event):
         code = event.key()
@@ -87,17 +90,20 @@ class OpenGLEditor(GLWidget):
 
     def mousePressEvent(self, event):
         self.setFocus()
-        ev = event.pos()
-        self.dragStartPosX = ev.x()
-        self.dragStartPosY = ev.y()
+        pt = event.pos()
+        self.dragStartPosX = pt.x()
+        self.dragStartPosY = pt.y()
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
+
         if self._state == self.MODE_VIEW:
-            self.viewManager.startTransform(ev.x(),ev.y())
-            self.viewManager.selectAIS_Shape(ev.x(), ev.y())
+            self.viewManager.startTransform(pt.x(),pt.y())
+            self.viewManager.selectAIS_Shape(pt.x(), pt.y())
         elif self._state == self.MODE_DESIGN:
             pass
         elif self._state == self.MODE_SKETCH:
             pass
+        for callback in self._mousePress_callback:
+            callback(pt.x(), pt.y())
 
 
 
@@ -121,7 +127,8 @@ class OpenGLEditor(GLWidget):
 
                     if (self._display.selected_shapes is not None) and HAVE_PYQT_SIGNAL:
                         self.sig_topods_selected.emit(self._display.selected_shapes)
-
+            for callback in self._mouseRelease_callback:
+                callback( pt.x(),pt.y())
 
         elif event.button() == QtCore.Qt.RightButton:
             if self._zoom_area:
@@ -158,6 +165,8 @@ class OpenGLEditor(GLWidget):
                 pass
             elif self._state == self.MODE_SKETCH:
                 pass
+            for callback in self._mouseMove_callback:
+                callback(pt.x(),pt.y())
 
         # DYNAMIC ZOOM
         elif (buttons == QtCore.Qt.RightButton and
@@ -197,6 +206,22 @@ class OpenGLEditor(GLWidget):
             self._drawbox = False
             self._display.MoveTo(pt.x(), pt.y())
             self.cursor = "arrow"
+    def register_mousePress_callback(self,callback):
+        if not callable(callback):
+            raise AssertionError("You must provide a callable to register the callback")
+        else:
+            self._mousePress_callback.append(callback)
+    def register_mouseMove_callback(self,callback):
+        if not callable(callback):
+            raise AssertionError("You must provide a callable to register the callback")
+        else:
+            self._mouseMove_callback.append(callback)
+    def register_mouseRelease_callback(self,callback):
+        if not callable(callback):
+            raise AssertionError("You must provide a callable to register the callback")
+        else:
+            self._mouseRelease_callback.append(callback)
+
 # -----------------------------Debugging-----------------------------------#
 if __name__ == '__main__':
     sys._excepthook = sys.excepthook

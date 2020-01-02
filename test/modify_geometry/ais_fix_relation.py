@@ -19,14 +19,16 @@
 
 from __future__ import print_function
 
-from OCC.Core.gp import gp_Pnt2d,gp_Pnt
-from OCC.Core.Geom import Geom_BezierCurve,Geom_BezierSurface
+from OCC.Core.gp import gp_Pnt2d,gp_Pnt,gp_Dir
+from OCC.Core.Geom import Geom_BezierCurve,Geom_BezierSurface,Geom_Plane
 from OCC.Core.TColgp import TColgp_Array1OfPnt,TColgp_Array2OfPnt
 from OCC.Display.SimpleGui import init_display
 from OCC.Core.GeomFill import (GeomFill_BSplineCurves,
                                GeomFill_StretchStyle,
                                GeomFill_CoonsStyle,
                                GeomFill_CurvedStyle,GeomFill_BezierCurves)
+from OCC.Core.AIS import AIS_FixRelation
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
 display, start_display, add_menu, add_function_to_menu = init_display()
 
 
@@ -57,10 +59,24 @@ def beziercurve():
     array2.SetValue(5, gp_Pnt(1, 5, -9))
     beziercurve2 = Geom_BezierCurve(array2)
 
+    plane = Geom_Plane(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0, 1, 1))
+    display.DisplayShape(plane, color='RED')
+
     surface1=GeomFill_BezierCurves(beziercurve,beziercurve1,beziercurve2,GeomFill_CurvedStyle)
     surface2 = GeomFill_BezierCurves(beziercurve, beziercurve1, GeomFill_StretchStyle)
     surface3 = GeomFill_BezierCurves(beziercurve, beziercurve1, GeomFill_CoonsStyle)
-    display.DisplayShape(surface1.Surface(), color='RED')
+
+    bounds = True
+    toldegen = 1e-6
+    face = BRepBuilderAPI_MakeFace()
+    face.Init(surface1.Surface(), bounds, toldegen)
+    face.Build()
+
+    shapes = face.Shape()
+
+    fix=AIS_FixRelation(shapes,plane)
+    display.Context.Display(fix, True)
+    display.DisplayShape(shapes, color="RED")
     # display.DisplayShape(surface2.Surface(), color='GREEN')
     # display.DisplayShape(surface3.Surface(), color='BLUE')
 if __name__ == '__main__':

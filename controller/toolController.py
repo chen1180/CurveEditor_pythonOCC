@@ -177,7 +177,6 @@ class ViewController(QObject):
     def setObject(self,shape):
         self._selectedShape=shape
         self._manipulator.Attach(self._selectedShape)
-        print("detected object",  self._selectedShape)
 
     def selectAIS_Shape(self,x,y):
         ##object selection
