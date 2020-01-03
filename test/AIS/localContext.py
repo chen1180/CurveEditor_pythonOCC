@@ -13,25 +13,26 @@ from OCC.Display.OCCViewer import Viewer3d
 from OCC.Core.TopAbs import *
 from OCC.Core.TopoDS import *
 from OCC.Core.StdSelect import *
-
+from OCC.Core.BRepAdaptor import *
+from OCC.Core.BRep import *
+from OCC.Core.Standard import Standard_Transient_get_type_descriptor
 
 class InteractiveEditor(object):
-    def __init__(self,context:AIS_InteractiveContext,view:V3d_View):
-        self._context=context
-        self._view=view
+    def __init__(self,display):
+        self._display=display
+        self._context:AIS_InteractiveContext=display.Context
         self.prepareContext()
         self.points=[]
         self.First_Point=True
     def prepareContext(self):
         self._context.Deactivate()
 
-        self.f1=AIS_SignatureFilter(AIS_KOI_Datum,AIS_SD_Axis) #AIS_KindOfInteractive #AIS_StandardDatum
-        self.f3=StdSelect_FaceFilter(StdSelect_AnyEdge)
+        self.f1=AIS_SignatureFilter(AIS_KOI_Datum,AIS_SD_Line)
         self.f2=StdSelect_ShapeTypeFilter(TopAbs_VERTEX)
-        self._context.AddFilter(self.f2)
-        self._context.Activate(AIS_Shape.SelectionMode(TopAbs_EDGE))
-        self._context.Activate(AIS_Shape.SelectionMode(TopAbs_FACE))
-        self._context.Activate(AIS_Shape.SelectionMode(TopAbs_VERTEX))
+        self.f3 = StdSelect_ShapeTypeFilter(TopAbs_EDGE)
+        self.f4 = StdSelect_ShapeTypeFilter(TopAbs_FACE)
+        self.selectALLShapes()
+
         #Allows you to add the filter aFilter to Neutral Point or to a local context if one or more selection modes have been activated.
         #Only type filters may be active in Neutral Point.
 
@@ -48,8 +49,13 @@ class InteractiveEditor(object):
     #                 self._display.Context.NextDetected()
     #     except Exception as e:
     #         print(e)
+    def selectALLShapes(self):
+        self._context.Activate(AIS_Shape.SelectionMode(TopAbs_EDGE))
+        self._context.Activate(AIS_Shape.SelectionMode(TopAbs_FACE))
+        self._context.Activate(AIS_Shape.SelectionMode(TopAbs_VERTEX))
+
     def moveTo(self,xPix,yPix):
-        detect=self._context.MoveTo(xPix,yPix,self._view,True)
+        detect=self._display.MoveTo(xPix,yPix)
         self._context.Select(True)
         self._context.InitSelected()
         if self._context.MoreSelected():
@@ -70,16 +76,42 @@ class InteractiveEditor(object):
                     if self.First_Point==True:
                         self.points.append(shape)
                         self._context.RemoveFilters()
-
-
-                        self._context.AddFilter(self.f3)
+                        self._context.AddFilter(self.f2)
                         self.First_Point=False
                         return True
                     else:
                         self.points.append(shape)
-                        print(self.points)
-
-
+                        self.First_Point=True
+                        p1=BRep_Tool.Pnt(self.points[0])
+                        p1=Geom_CartesianPoint(p1)
+                        p2=BRep_Tool.Pnt(self.points[1])
+                        p2=Geom_CartesianPoint(p2)
+                        ais_line=AIS_Line(p1,p2)
+                        self._context.Display(ais_line,True)
+                        self.points.clear()
+                        self._context.RemoveFilters()
+                        # self._context.AddFilter(self.f1)
+                        return False
+                elif shape.ShapeType() == TopAbs_EDGE:
+                    if self.First_Point==True:
+                        self.points.append(shape)
+                        self._context.RemoveFilters()
+                        self._context.AddFilter(self.f3)
+                        self.First_Point=False
+                        return True
+                    else:
+                        self.First_Point = True
+                        return False
+                elif shape.ShapeType() == TopAbs_FACE:
+                    surface:Geom_Surface=BRep_Tool.Surface(shape)
+                    if type==Geom_Plane.get_type_descriptor():
+                        plane:Geom_Plane=Geom_Plane.DownCast(surface)
+                        # plane.SetLocation(gp_Pnt(0,100,10))
+                        ais_surface=AIS_PlaneTrihedron(plane)
+                        ais_surface.SetLength(100)
+                        self._context.Display(ais_surface,True)
+                    elif type==Geom_CylindricalSurface.get_type_descriptor():
+                        print("cylindrical surface detected")
     def terminate(self):
         # deactivate Local Selection
         self._context.Deactivate()
@@ -114,7 +146,7 @@ def Test():
     context.Display(ais_plane, True)
     context.Display(ais_point, True)
 
-    editor = InteractiveEditor(context,view)
+    editor = InteractiveEditor(display)
     window.register_mousePress_callback(editor.moveTo)
 
     window.show()

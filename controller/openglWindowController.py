@@ -1,81 +1,103 @@
-from PyQt5 import QtCore,QtGui,QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 from view.openglWindow import GLWidget
 from controller import toolController
 import logging
-from OCC.Core.AIS import AIS_InteractiveContext,AIS_InteractiveObject,AIS_Shape
+
 
 HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 log = logging.getLogger(__name__)
+
+
 class OpenGLEditor(GLWidget):
-    modelUpdated=QtCore.pyqtSignal(object)
-    MODE_SKETCH=0
-    MODE_DESIGN=1
-    MODE_VIEW=2
+    modelUpdated = QtCore.pyqtSignal(object)
+    MODE_SKETCH = 0
+    MODE_DESIGN = 1
+    MODE_VIEW = 2
+
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
 
-        self.sketchManager=toolController.SketchController(self._display)
-        self.viewManager=toolController.ViewController(self._display)
-        self._state=self.MODE_VIEW
+        self.sketchManager = toolController.SketchController(self._display)
+        self.viewManager = toolController.ViewController(self._display)
 
-        self._mousePress_callback=[]
-        self._mouseMove_callback=[]
-        self._mouseRelease_callback=[]
 
-        #callback functions
+        self._state = self.MODE_DESIGN
+
+        self._mousePress_callback = []
+        self._mouseMove_callback = []
+        self._mouseRelease_callback = []
+
+        # callback functions
         self._display.register_select_callback(self.coordinate_clicked)
         self._display.register_select_callback(self.sketchManager.recognize_clicked)
-        self._display.register_select_callback(self.sketchManager.setMousePos)
 
+        self.register_mousePress_callback(self.sketchManager.mousePress)
+        self.register_mouseMove_callback(self.sketchManager.mouseMove)
+        self.register_mouseRelease_callback(self.sketchManager.mouseRelease)
+
+
+        self.register_mousePress_callback(self.viewManager.selectAIS_Shape)
+        self.register_mousePress_callback(self.viewManager.startTransform)
+
+        #signals and slots
         self.sketchManager.modelUpdate.connect(self.addNewItem)
-        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Shape()
-        # box=self._display.DisplayShape(self.my_box,update=True)
 
-    def addNewItem(self,item):
+        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
+        self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Solid()
+        self._display.DisplayShape(self.my_box)
+        self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
+        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
+    def addNewItem(self, item):
         self.modelUpdated.emit(item)
-    def setScene(self,scene):
-        self._sceneGraph=scene
+
+    def setScene(self, scene):
+        self._sceneGraph = scene
+
     def state(self):
         return self._state
-    def setState(self,state):
-        self._state=state
+
+    def setState(self, state):
+        self._state = state
         self.update()
+
     def processActions(self):
-        if self._state==self.MODE_VIEW:
-            if self._display.Viewer.IsActive()==True:
+        if self._state == self.MODE_VIEW:
+            if self._display.Viewer.IsActive() == True:
                 self._display.Viewer.DeactivateGrid()
-        elif self._state==self.MODE_DESIGN:
-            self.viewManager.setIdle()
-        elif self._state==self.MODE_SKETCH:
-            self.viewManager.setIdle()
+        elif self._state == self.MODE_DESIGN:
+            pass
+        elif self._state == self.MODE_SKETCH:
             self.sketchManager.EnterDrawingMode()
         self._display.Repaint()
+
     def paintEvent(self, event):
         super(OpenGLEditor, self).paintEvent(event)
         if self._inited:
             self._display.Context.UpdateCurrentViewer()
             self.processActions()
             self.update()
-    def coordinate_clicked(self,shp, *kwargs):
+
+    def coordinate_clicked(self, shp, *kwargs):
         """ This function is called whenever a vertex is selected
         """
-        point_2d=kwargs
-        x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0],kwargs[1])
+        point_2d = kwargs
+        x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0], kwargs[1])
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
         code = event.key()
         if code in self._key_map:
-            self._key_map[code]()
-        elif code in range(256):
-            log.info('key: "%s"(code %i) not mapped to any function' % (chr(code), code))
+            functions=self._key_map[code]
+            if type(functions)==list:
+                for func in functions:
+                    func()
+            else:
+                functions()
         else:
             log.info('key: code %i not mapped to any function' % code)
-        if code==QtCore.Qt.Key_Escape:
-            self.sketchManager.ExitDrawingMode()
+
 
     def wheelEvent(self, event):
         try:  # PyQt4/PySide
@@ -96,16 +118,13 @@ class OpenGLEditor(GLWidget):
         self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
 
         if self._state == self.MODE_VIEW:
-            self.viewManager.startTransform(pt.x(),pt.y())
-            self.viewManager.selectAIS_Shape(pt.x(), pt.y())
+            pass
         elif self._state == self.MODE_DESIGN:
             pass
         elif self._state == self.MODE_SKETCH:
             pass
         for callback in self._mousePress_callback:
             callback(pt.x(), pt.y())
-
-
 
 
     def mouseReleaseEvent(self, event):
@@ -128,7 +147,7 @@ class OpenGLEditor(GLWidget):
                     if (self._display.selected_shapes is not None) and HAVE_PYQT_SIGNAL:
                         self.sig_topods_selected.emit(self._display.selected_shapes)
             for callback in self._mouseRelease_callback:
-                callback( pt.x(),pt.y())
+                callback(pt.x(), pt.y())
 
         elif event.button() == QtCore.Qt.RightButton:
             if self._zoom_area:
@@ -147,26 +166,28 @@ class OpenGLEditor(GLWidget):
             return
         self._drawbox = [self.dragStartPosX, self.dragStartPosY, dx, dy]
 
-
     def mouseMoveEvent(self, evt):
         pt = evt.pos()
         buttons = int(evt.buttons())
         modifiers = evt.modifiers()
+        for callback in self._mouseMove_callback:
+            callback(pt.x(), pt.y())
         # ROTATE
         if (buttons == QtCore.Qt.LeftButton and
                 not modifiers == QtCore.Qt.ShiftModifier):
-            if modifiers==QtCore.Qt.ControlModifier:
+            if modifiers == QtCore.Qt.ControlModifier:
                 self.cursor = "rotate"
                 self._display.Rotation(pt.x(), pt.y())
                 self._drawbox = False
             if self._state == self.MODE_VIEW:
-                self.viewManager.transform(pt.x(), pt.y())
+                pass
             elif self._state == self.MODE_DESIGN:
                 pass
             elif self._state == self.MODE_SKETCH:
                 pass
-            for callback in self._mouseMove_callback:
-                callback(pt.x(),pt.y())
+            self.viewManager.transform(pt.x(),pt.y())
+
+
 
         # DYNAMIC ZOOM
         elif (buttons == QtCore.Qt.RightButton and
@@ -206,31 +227,39 @@ class OpenGLEditor(GLWidget):
             self._drawbox = False
             self._display.MoveTo(pt.x(), pt.y())
             self.cursor = "arrow"
-    def register_mousePress_callback(self,callback):
+
+    def register_mousePress_callback(self, callback):
         if not callable(callback):
             raise AssertionError("You must provide a callable to register the callback")
         else:
             self._mousePress_callback.append(callback)
-    def register_mouseMove_callback(self,callback):
+
+    def register_mouseMove_callback(self, callback):
         if not callable(callback):
             raise AssertionError("You must provide a callable to register the callback")
         else:
             self._mouseMove_callback.append(callback)
-    def register_mouseRelease_callback(self,callback):
+
+    def register_mouseRelease_callback(self, callback):
         if not callable(callback):
             raise AssertionError("You must provide a callable to register the callback")
         else:
             self._mouseRelease_callback.append(callback)
 
+
 # -----------------------------Debugging-----------------------------------#
 if __name__ == '__main__':
     sys._excepthook = sys.excepthook
+
+
     def my_exception_hook(exctype, value, traceback):
         # Print the error and traceback
         print(exctype, value, traceback)
         # Call the normal Exception hook after
         sys._excepthook(exctype, value, traceback)
         sys.exit(1)
+
+
     sys.excepthook = my_exception_hook
     application = QtWidgets.QApplication([])
     window = OpenGLEditor()  # Opengl window creation

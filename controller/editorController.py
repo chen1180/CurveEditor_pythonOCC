@@ -189,9 +189,11 @@ class Sketch_NewSketchEditor(QtWidgets.QWidget):
         self.ui=newSketchProperty.Ui_newSketchEditor()
         self.ui.setupUi(self)
         self._display=display
-        self.ui.uiOk.accepted.connect(self.acceptData)
+        self.ui.uiOk.accepted.connect(self.constructGrid)
         self.ui.uiOk.rejected.connect(self.close)
-    def acceptData(self):
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.show()
+    def constructGrid(self):
         self.dir=gp_Dir()
         if self.ui.uiXYPlane.isChecked():
             self.dir=gp_Dir(0.0,0.0,1.0)
@@ -203,6 +205,7 @@ class Sketch_NewSketchEditor(QtWidgets.QWidget):
             self.dir=gp_Dir(1.0,0.0,0.0)
             self._display.View_Right()
         aPlane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), self.dir)
+
         self.displayGrid(aPlane, 0.0, 0.0, 1.0, 1.0, 0.0, 100, 100, self.ui.uiOffset.value())
         self.close()
 
