@@ -178,6 +178,7 @@ class OpenGLEditor(GLWidget):
         pt = evt.pos()
         buttons = int(evt.buttons())
         modifiers = evt.modifiers()
+        self.sketch.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
             callback(pt.x(), pt.y())
         # ROTATE

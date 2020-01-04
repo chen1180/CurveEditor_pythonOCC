@@ -4,7 +4,6 @@ from OCC.Core.AIS import AIS_Point
 from OCC.Core.Geom2d import Geom2d_CartesianPoint
 from enum import Enum
 
-
 class PointAction(Enum):
     Nothing = 0
     Input_Point = 1
@@ -19,19 +18,19 @@ class Sketch_CommandPoint(Sketch_Command):
         self.myPointAction = PointAction.Input_Point
 
     def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
-        curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
+        self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
         if self.myPointAction == PointAction.Nothing:
             pass
         elif self.myPointAction == PointAction.Input_Point:
-            myGeom2d_Point = Geom2d_CartesianPoint(curPnt2d)
-            myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2()))
+            myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
+            myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(),self.curPnt2d))
             myAIS_Point = AIS_Point(myGeom_Point)
-            self.myContext.Display(myAIS_Point)
+            self.myContext.Display(myAIS_Point,True )
             self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_ObjectGeometryType.PointSketcherObject)
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
-        curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
+        self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
 
     def CancelEvent(self):
         self.myPointAction = PointAction.Nothing

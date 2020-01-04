@@ -10,22 +10,18 @@ from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1,Quant
 from OCC.Core.TColStd import TColStd_HSequenceOfTransient
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
-from OCC.Core.Standard import Standard_Transient
-
-
-class Sketch_Command(Standard_Transient):
+class Sketch_Command(object):
     def __init__(self, name):
-        super(Sketch_Command, self).__init__()
         # self.myContext = AIS_InteractiveContext()
-        self.data = TColStd_HSequenceOfTransient()
+        self.data = []
 
         self.objectName = name
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
-        self.objectType = Sketch_ObjectType.MainSketcherType
+
 
         # self.myAnalyserSnap = Sketch_AnalyserSnap()
-
+        self.myType = Sketch_ObjectType.MainSketcherType
         self.myColor = Quantity_Color(Quantity_NOC_YELLOW)
         self.myStyle = Aspect_TOL_SOLID
         self.myWidth = 1.0
@@ -81,9 +77,9 @@ class Sketch_Command(Standard_Transient):
         so.SetType(self.myType)
         so.SetStyle(self.myStyle)
         so.SetWidth(self.myWidth)
-        self.data.Append(so)
+        self.data.append(so)
 
-    def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
+    def GetTypeOfMethod(self):
         raise NotImplementedError()
 
     def Action(self):
