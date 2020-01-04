@@ -5,9 +5,10 @@ from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
 
 class Sketch(object):
-    def __init__(self, theContext: AIS_InteractiveContext, sg: Sketch_GUI = None):
+    def __init__(self, theDisplay, sg: Sketch_GUI = None):
         self.myCoordinateSystem = gp_Ax3(gp.XOY())
-        self.myContext = theContext
+        self.myContext:AIS_InteractiveContext = theDisplay.Context
+        self.myView:V3d_View=theDisplay.View
         self.myGUI = sg
         self.myGUI.SetAx3(self.myCoordinateSystem)
         self.myGUI.SetContext(self.myContext)
@@ -29,7 +30,7 @@ class Sketch(object):
         self.myCommands = TColStd_HSequenceOfTransient()
 
         self.myAnalyserSnap = Sketch_AnalyserSnap(self.myContext, self.myData, self.myCoordinateSystem)
-        self.addCommands(Sketch_CommandPoint())
+        self.addCommand(Sketch_CommandPoint())
 
     def SetContext(self, theContext):
         self.myContext = theContext
@@ -116,29 +117,37 @@ class Sketch(object):
             return False
 
     def OnMouseInputEvent(self, *kargs):
-        if len(kargs)==6:
-            v3dX, v3dY, v3dZ, projVx, projVy, projVz=kargs
-            if self.ProjectPointOnPlane( v3dX, v3dY, v3dZ, projVx, projVy, projVz):
+        if len(kargs)==2:
+            theX,theY=kargs
+            aView:V3d_View = self.myView
+            v3dX, v3dY, v3dZ, projVx, projVy, projVz=aView.ConvertWithProj(theX,theY)
+            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
                 self.SelectCurCommand()
                 if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d):
-                    self.myCurrentMethod=Sketch_ObjectTypeOfMethod.Nothing_Method
-        if len(kargs)==2:
-            theX,theY=kargs
-            aView:V3d_View = self.myContext.CurrentViewer().ActiveView()
-            aVx,aVy,aVz,aPx,aPy,aPz=aView.ConvertWithProj(theX,theY)
-            self.OnMouseInputEvent( aVx,aVy,aVz,aPx,aPy,aPz)
+                    self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+        elif len(kargs)==6:
+            v3dX, v3dY, v3dZ, projVx, projVy, projVz = kargs
+            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
+                self.SelectCurCommand()
+                if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d):
+                    self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+
     def OnMouseMoveEvent(self,*kargs):
-        if len(kargs)==6:
-            v3dX, v3dY, v3dZ, projVx, projVy, projVz=kargs
-            if self.ProjectPointOnPlane( v3dX, v3dY, v3dZ, projVx, projVy, projVz):
+        if len(kargs) == 2:
+            theX, theY = kargs
+            aView: V3d_View = self.myContext.CurrentViewer().ActiveView()
+            v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
+            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
                 self.SelectCurCommand()
                 if self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d):
-                    self.myCurrentMethod=Sketch_ObjectTypeOfMethod.Nothing_Method
-        if len(kargs)==2:
-            theX,theY=kargs
-            aView:V3d_View = self.myContext.CurrentViewer().ActiveView()
-            aVx,aVy,aVz,aPx,aPy,aPz=aView.ConvertWithProj(theX,theY)
-            self.OnMouseMoveEvent( aVx,aVy,aVz,aPx,aPy,aPz)
+                    self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+        elif len(kargs) == 6:
+            v3dX, v3dY, v3dZ, projVx, projVy, projVz = kargs
+            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
+                self.SelectCurCommand()
+                if self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d):
+                    self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+
     def OnCancel(self):
         self.SelectCurCommand()
         self.myAnalyserSnap.Cancel()

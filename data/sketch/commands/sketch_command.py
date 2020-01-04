@@ -6,7 +6,7 @@ from OCC.Core.gp import gp_Origin2d, gp_Origin, gp_Ax3, gp_Pnt2d, gp
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject
 from OCC.Core.Aspect import Aspect_TOL_SOLID
 from OCC.Core.Prs3d import Prs3d_LineAspect
-from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1
+from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1,Quantity_Color
 from OCC.Core.TColStd import TColStd_HSequenceOfTransient
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
@@ -16,7 +16,7 @@ from OCC.Core.Standard import Standard_Transient
 class Sketch_Command(Standard_Transient):
     def __init__(self, name):
         super(Sketch_Command, self).__init__()
-        self.myContext = AIS_InteractiveContext()
+        # self.myContext = AIS_InteractiveContext()
         self.data = TColStd_HSequenceOfTransient()
 
         self.objectName = name
@@ -24,9 +24,9 @@ class Sketch_Command(Standard_Transient):
         self.objectCounter = 0
         self.objectType = Sketch_ObjectType.MainSketcherType
 
-        self.myAnalyserSnap = Sketch_AnalyserSnap()
+        # self.myAnalyserSnap = Sketch_AnalyserSnap()
 
-        self.myColor = Quantity_NOC_YELLOW
+        self.myColor = Quantity_Color(Quantity_NOC_YELLOW)
         self.myStyle = Aspect_TOL_SOLID
         self.myWidth = 1.0
         self.myPrs3dAspect = Prs3d_LineAspect(self.myColor, self.myStyle, self.myWidth)
@@ -38,7 +38,7 @@ class Sketch_Command(Standard_Transient):
         self.myFirstPoint = Geom_CartesianPoint(gp_Origin())
         self.mySecondPoint = Geom_CartesianPoint(gp_Origin())
         self.myRubberLine = AIS_Line(self.myFirstPoint, self.mySecondPoint)
-        self.myRubberLine.SetColor(Quantity_NOC_LIGHTPINK1)
+        self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
@@ -84,7 +84,7 @@ class Sketch_Command(Standard_Transient):
         self.data.Append(so)
 
     def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
-        return 0
+        raise NotImplementedError()
 
     def Action(self):
         raise NotImplementedError()

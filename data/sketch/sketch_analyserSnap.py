@@ -42,7 +42,7 @@ class Sketch_AnalyserSnap(Standard_Transient):
         self.curDist = 0
 
         self.storedPnt2d = gp.Origin2d()
-        self.storedTangentType = Sketcher_SnapType.NothingTangent
+        self.storedTangentType = TangentType.NothingTangent
         self.isTangent = False
         self.isLine = False
 

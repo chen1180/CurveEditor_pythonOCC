@@ -3,8 +3,10 @@ import sys
 from view.openglWindow import GLWidget
 from controller import toolController
 import logging
-
-
+from data.sketch.sketch import *
+from data.sketch.sketch_gui import *
+from data.sketch.sketch_type import *
+from OCC.Core.gp import gp_Pnt2d
 HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -22,7 +24,9 @@ class OpenGLEditor(GLWidget):
         self._display.Context.SetAutoActivateSelection(False)
         self.sketchManager = toolController.SketchController(self._display)
         self.viewManager = toolController.ViewController(self._display)
-
+        self.sketchUI = Sketch_GUI()
+        self.sketch=Sketch(self._display,self.sketchUI)
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
 
         self._state = self.MODE_VIEW
 
@@ -126,6 +130,7 @@ class OpenGLEditor(GLWidget):
         for callback in self._mousePress_callback:
             callback(pt.x(), pt.y())
 
+        self.sketch.OnMouseInputEvent(pt.x(), pt.y())
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()
