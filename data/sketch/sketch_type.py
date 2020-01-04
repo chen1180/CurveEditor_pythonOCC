@@ -24,6 +24,7 @@ class Sketch_ObjectTypeOfMethod(enum.Enum):
     CircleP2Tan_Method = 6
     Circle3Tan_Method = 7
     Arc3P_Method = 8
+
     ArcCenter2P_Method = 9
     BezierCurve_Method = 10
     Trim_Method = 11

@@ -51,7 +51,7 @@ class OpenGLEditor(GLWidget):
 
         self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
-
+        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketch.OnCancel)
         # self._display.Test()
 
     def addNewItem(self, item):

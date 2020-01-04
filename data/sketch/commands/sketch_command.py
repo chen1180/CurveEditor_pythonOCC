@@ -46,7 +46,7 @@ class Sketch_Command(object):
         self.curCoordinateSystem = theAx3
 
     def SetAnalyserSnap(self, theAnalyserSnap):
-        self.myAnalyserSnap = theAnalyserSnap
+        self.myAnalyserSnap:Sketch_AnalyserSnap = theAnalyserSnap
 
     def SetColor(self, theColor):
         self.myColor = theColor

@@ -10,11 +10,10 @@ from OCC.Core.Standard import Standard_Transient
 from data.sketch.sketch_type import *
 
 
-class Sketch_Object(Standard_Transient):
+class Sketch_Object(object):
     def __init__(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
                  theName: TCollection_ExtendedString, theGeometryType: Sketch_ObjectGeometryType,
                  theTypeOfMethod: Sketch_ObjectTypeOfMethod):
-        super(Sketch_Object, self).__init__()
         self.myGeometry = theGeom2d_Geometry
         self.myAIS_InteractiveObject = theAIS_InteractiveObject
         self.myName = theName

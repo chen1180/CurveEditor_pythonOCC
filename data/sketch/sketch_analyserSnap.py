@@ -23,11 +23,10 @@ from data.sketch.sketch_type import *
 from OCC.Core.TColgp import *
 
 
-class Sketch_AnalyserSnap(Standard_Transient):
+class Sketch_AnalyserSnap(object):
     def __init__(self, theContext: AIS_InteractiveContext,
                  thedata: TColStd_HSequenceOfTransient,
                  theAx3: gp_Ax3):
-        super(Sketch_AnalyserSnap, self).__init__()
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.myContext = theContext
         self.data = thedata
@@ -150,6 +149,22 @@ class Sketch_AnalyserSnap(Standard_Transient):
         self.isLine = False
 
     def MouseInputException(self, p1: gp_Pnt2d, thePnt2d: gp_Pnt2d, CType: TangentType, TangentOnly: bool):
+        if (self.myCurrentSnap == Sketcher_SnapType.SnapAnalyse) or \
+                (self.myCurrentSnap == Sketcher_SnapType.SnapParallel) or \
+                (self.myCurrentSnap == Sketcher_SnapType.SnapPerpendicular) or \
+                (self.myCurrentSnap == Sketcher_SnapType.SnapTangent):
+            self.storedPnt2d = p1
+            self.storedTangentType = CType
+            if TangentOnly == False:
+                self.isLine = True
+            self.MouseInput(thePnt2d)
+            self.isTangent = False
+            self.isLine = False
+            return self.myPnt2d
+        else:
+            return self.MouseInput(thePnt2d)
+
+    def MouseMoveException(self, p1: gp_Pnt2d, thePnt2d: gp_Pnt2d, CType: TangentType, TangentOnly: bool):
         if (self.myCurrentSnap == Sketcher_SnapType.SnapAnalyse) or \
                 (self.myCurrentSnap == Sketcher_SnapType.SnapParallel) or \
                 (self.myCurrentSnap == Sketcher_SnapType.SnapPerpendicular) or \

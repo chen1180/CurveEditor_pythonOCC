@@ -120,36 +120,22 @@ class Sketch(object):
             return False
 
     def OnMouseInputEvent(self, *kargs):
-        if len(kargs) == 2:
-            theX, theY = kargs
-            aView: V3d_View = self.myView
-            v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
-            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
-                self.SelectCurCommand()
-                self.CurCommand.MouseInputEvent(self.myCurrentPnt2d)
-                self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
-        elif len(kargs) == 6:
-            v3dX, v3dY, v3dZ, projVx, projVy, projVz = kargs
-            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
-                self.SelectCurCommand()
-                self.CurCommand.MouseInputEvent(self.myCurrentPnt2d)
-                self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+        theX, theY = kargs
+        aView: V3d_View = self.myView
+        v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
+        if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
+            self.SelectCurCommand()
+            self.CurCommand.MouseInputEvent(self.myCurrentPnt2d)
+            self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
 
     def OnMouseMoveEvent(self, *kargs):
-        if len(kargs) == 2:
-            theX, theY = kargs
-            aView: V3d_View = self.myView
-            v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
-            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
-                self.SelectCurCommand()
-                self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d)
-                self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
-        elif len(kargs) == 6:
-            v3dX, v3dY, v3dZ, projVx, projVy, projVz = kargs
-            if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
-                self.SelectCurCommand()
-                self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d)
-                self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+        theX, theY = kargs
+        aView: V3d_View = self.myView
+        v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
+        if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
+            self.SelectCurCommand()
+            self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d)
+            self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
 
     def OnCancel(self):
         self.SelectCurCommand()

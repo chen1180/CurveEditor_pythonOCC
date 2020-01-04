@@ -13,9 +13,8 @@ MINIMUMSNAP = 25
 MINANGLE = 3.14 / 64
 
 
-class Sketch_Snap(Standard_Transient):
+class Sketch_Snap(object):
     def __init__(self):
-        super(Sketch_Snap, self).__init__()
         self.myContext = AIS_InteractiveContext()
         self.data = TColStd_HSequenceOfTransient()
         self.curHilightedObj = AIS_InteractiveObject()
