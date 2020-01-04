@@ -13,7 +13,7 @@ from OCC.Core.Aspect import *
 my_box = BRepPrimAPI_MakeBox(10., 20., 30.).Shape()
 cube=AIS_ViewCube()
 cube.SetTransformPersistence (Graphic3d_TMF_TriedronPers,gp_Pnt (1,1,100))
-display.DisplayShape(my_box)
+display.DisplayShape(my_box,update=True)
 display.Context.Display(cube,True)
 
 start_display()

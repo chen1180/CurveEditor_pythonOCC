@@ -19,12 +19,12 @@ class OpenGLEditor(GLWidget):
 
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
-
+        self._display.Context.SetAutoActivateSelection(False)
         self.sketchManager = toolController.SketchController(self._display)
         self.viewManager = toolController.ViewController(self._display)
 
 
-        self._state = self.MODE_DESIGN
+        self._state = self.MODE_VIEW
 
         self._mousePress_callback = []
         self._mouseMove_callback = []
@@ -34,7 +34,7 @@ class OpenGLEditor(GLWidget):
         self._display.register_select_callback(self.coordinate_clicked)
         self._display.register_select_callback(self.sketchManager.recognize_clicked)
 
-        self.register_mousePress_callback(self.sketchManager.mousePress)
+        # self.register_mousePress_callback(self.sketchManager.mousePress)
         self.register_mouseMove_callback(self.sketchManager.mouseMove)
         self.register_mouseRelease_callback(self.sketchManager.mouseRelease)
 
@@ -45,11 +45,11 @@ class OpenGLEditor(GLWidget):
         #signals and slots
         self.sketchManager.modelUpdate.connect(self.addNewItem)
 
-        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        self.my_box = BRepPrimAPI_MakeBox(1., 2., 3.).Solid()
-        self._display.DisplayShape(self.my_box)
         self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
+
+        # self._display.Test()
+
     def addNewItem(self, item):
         self.modelUpdated.emit(item)
 
@@ -133,9 +133,12 @@ class OpenGLEditor(GLWidget):
 
         if event.button() == QtCore.Qt.LeftButton:
             if self._select_area:
-                [Xmin, Ymin, dx, dy] = self._drawbox
-                self._display.SelectArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
-                self._select_area = False
+                if type(self._drawbox)==list:
+                    [Xmin, Ymin, dx, dy] = self._drawbox
+                    self._display.SelectArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
+                    self._select_area = False
+                else:
+                    self._display.Select(pt.x(), pt.y())
             else:
                 # multiple select if shift is pressed
                 if modifiers == QtCore.Qt.ShiftModifier:
@@ -186,7 +189,6 @@ class OpenGLEditor(GLWidget):
             elif self._state == self.MODE_SKETCH:
                 pass
             self.viewManager.transform(pt.x(),pt.y())
-
 
 
         # DYNAMIC ZOOM

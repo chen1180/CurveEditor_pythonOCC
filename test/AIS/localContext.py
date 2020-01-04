@@ -112,6 +112,11 @@ class InteractiveEditor(object):
                         self._context.Display(ais_surface,True)
                     elif type==Geom_CylindricalSurface.get_type_descriptor():
                         print("cylindrical surface detected")
+            else:
+                SelObj = self._display.Context.SelectedInteractive()
+                print(SelObj)
+                if SelObj.Type() == AIS_KOI_Datum:
+                    print(SelObj.Type(), SelObj.Signature())
     def terminate(self):
         # deactivate Local Selection
         self._context.Deactivate()
