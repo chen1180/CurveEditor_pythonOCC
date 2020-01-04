@@ -19,10 +19,10 @@ class InteractiveEditor(object):
     Filter_Face = StdSelect_ShapeTypeFilter(TopAbs_FACE)
     Filter_Datum_Line=AIS_SignatureFilter(AIS_KOI_Datum,AIS_SD_Line)
     Filter_Datum_Point = AIS_SignatureFilter(AIS_KOI_Datum, AIS_SD_Point)
+    Filter_Datum=AIS_TypeFilter(AIS_KOI_Datum)
     def __init__(self, display):
         self._display = display
         self._context: AIS_InteractiveContext = display.Context
-
         self.First_Point = True
         self.points = []
         self.curves = []
@@ -72,6 +72,7 @@ class InteractiveEditor(object):
                     self._selectedEdge = self.convertEdge(shape)
                     self._context.RemoveFilters()
                     self._context.AddFilter(self.Filter_Vertex)
+                    self._context.AddFilter(self.Filter_Datum)
                     # self._context.AddFilter(self.Filter_Vertex)
                 elif shape.ShapeType() == TopAbs_FACE:
                     surface: Geom_Surface = BRep_Tool.Surface(shape)
