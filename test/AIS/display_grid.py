@@ -23,10 +23,8 @@ def coordinate_clicked(shp, *kwargs):
     for shape in shp:
         print("Shape selected: ", shape)
     point_2d = kwargs
-    X,Y,Z=display.View.ConvertToGrid(kwargs[0], kwargs[1])
-    print(X,Y,Z)
-    viewer.ShowGridEcho(display.View, Graphic3d_Vertex(X, Y, Z))
-    viewer.RedrawImmediate()
+    ans=display.View.ConvertWithProj(kwargs[0], kwargs[1])
+    print(ans)
 #viwer https://www.opencascade.com/doc/occt-7.4.0/refman/html/class_v3d___viewer.html#aea2c2ae246f1c951cf99529734cdb219
 #view  https://www.opencascade.com/doc/occt-7.4.0/refman/html/class_v3d___view.html#a9f0abb65a86d59b3816745a4bbe24744
 viewer.ActivateGrid(Aspect_GT_Rectangular,Aspect_GDM_Lines)

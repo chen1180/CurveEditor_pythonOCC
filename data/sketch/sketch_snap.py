@@ -1,35 +1,21 @@
-from OCC.Core.Geom import *
-from OCC.Core.gp import *
-from OCC.Core.V3d import *
-from OCC.Core.AIS import *
-from OCC.Core.BRepPrimAPI import *
-from OCC.Display.OCCViewer import Viewer3d
-from OCC.Core.TopAbs import *
-from OCC.Core.TopoDS import *
-from OCC.Core.StdSelect import *
-from OCC.Core.BRepAdaptor import *
-from OCC.Core.BRep import *
-from OCC.Core.GeomAbs import *
-from OCC.Core.GeomFill import *
-from OCC.Core.Aspect import *
-from OCC.Core.Prs3d import *
-from OCC.Core.Quantity import *
-from OCC.Core.TColStd import *
-from OCC.Core.Geom2d import *
-from OCC.Core.TCollection import *
-from OCC.Core.Standard import Standard_Transient
-from OCC.Core.ElCLib import *
-from data.sketch.sketch_type import *
-from data.sketch.sketch_object import *
+from OCC.Core.Geom import Geom_CartesianPoint,Geom_Plane
+from OCC.Core.gp import gp_Ax3,gp,gp_Pnt2d
+from OCC.Core.TopoDS import  TopoDS_Edge
+from OCC.Core.TColStd import TColStd_HSequenceOfTransient
+from OCC.Core.ElCLib import elclib
 from OCC.Core.Geom2dAPI import *
-
+from OCC.Core.Standard import Standard_Transient
+from OCC.Core.Quantity import Quantity_NOC_CYAN1
+from OCC.Core.Geom2d import Geom2d_CartesianPoint
+from OCC.Core.AIS import AIS_InteractiveContext,AIS_InteractiveObject,AIS_Point
+from data.sketch.sketch_type import *
 MINIMUMSNAP = 25
 MINANGLE = 3.14 / 64
 
 
-class Sketcher_Snap(Standard_Transient):
+class Sketch_Snap(Standard_Transient):
     def __init__(self):
-        super(Sketcher_Snap, self).__init__()
+        super(Sketch_Snap, self).__init__()
         self.myContext = AIS_InteractiveContext()
         self.data = TColStd_HSequenceOfTransient()
         self.curHilightedObj = AIS_InteractiveObject()
@@ -97,13 +83,13 @@ class Sketcher_Snap(Standard_Transient):
         self.myContext.Remove(self.myAIS_Point)
         self.EraseRelation()
 
-    def AnalyserEvent(self, tempPnt2d: gp_Pnt2d, newPnt2d: gp_Pnt2d, dist: float, type: int):
+    def AnalyserEvent(self, tempPnt2d: gp_Pnt2d):
         self.curPnt2d = tempPnt2d
         self.SelectEvent()
-        self.newPnt2d = self.bestPnt2d
-        self.dist = self.minDistance
-        self.type = self.GetSnapType()
-        return self.findbestPnt2d
+        newPnt2d = self.bestPnt2d
+        dist = self.minDistance
+        type = self.GetSnapType()
+        return self.findbestPnt2d,newPnt2d,dist,type
 
     def DrawRelation(self):
         self.myContext.SetSelected(self.curHilightedObj)
@@ -126,10 +112,7 @@ class Sketcher_Snap(Standard_Transient):
         else:
             return False
 
-    def setFirstPnt(self, p: gp_Pnt2d):
-        pass
-
-    def setFirstPnt(self, p: gp_Pnt2d, ttype: TangentType):
+    def setFirstPnt(self, p: gp_Pnt2d,ttype:TangentType=None):
         pass
 
     def GetSnapType(self) -> Sketcher_SnapType:

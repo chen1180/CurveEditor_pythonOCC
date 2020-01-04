@@ -1,39 +1,30 @@
-from OCC.Core.Geom import *
-from OCC.Core.gp import *
-from OCC.Core.V3d import *
-from OCC.Core.AIS import *
-from OCC.Core.BRepPrimAPI import *
-from OCC.Display.OCCViewer import Viewer3d
-from OCC.Core.TopAbs import *
-from OCC.Core.TopoDS import *
-from OCC.Core.StdSelect import *
-from OCC.Core.BRepAdaptor import *
-from OCC.Core.BRep import *
-from OCC.Core.GeomAbs import *
-from OCC.Core.GeomFill import *
-from OCC.Core.Aspect import *
-from OCC.Core.Prs3d import *
-from OCC.Core.Quantity import *
-from OCC.Core.TColStd import *
-from OCC.Core.Geom2d import *
-from OCC.Core.TCollection import *
-from OCC.Core.Standard import Standard_Transient
+from data.sketch.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
-from data.sketch.sketch_analyserSnap import *
+from data.sketch.sketch_object import Sketch_Object
+from OCC.Core.Geom import Geom_CartesianPoint
+from OCC.Core.gp import gp_Origin2d, gp_Origin, gp_Ax3, gp_Pnt2d, gp
+from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject
+from OCC.Core.Aspect import Aspect_TOL_SOLID
+from OCC.Core.Prs3d import Prs3d_LineAspect
+from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1
+from OCC.Core.TColStd import TColStd_HSequenceOfTransient
+from OCC.Core.Geom2d import Geom2d_Geometry
+from OCC.Core.TCollection import TCollection_ExtendedString
+from OCC.Core.Standard import Standard_Transient
 
 
 class Sketch_Command(Standard_Transient):
     def __init__(self, name):
         super(Sketch_Command, self).__init__()
         self.myContext = AIS_InteractiveContext()
-        self.data=TColStd_HSequenceOfTransient()
+        self.data = TColStd_HSequenceOfTransient()
 
         self.objectName = name
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
-        self.objectType = Sketcher_ObjectType.MainSketcherType
+        self.objectType = Sketch_ObjectType.MainSketcherType
 
-        self.myAnalyserSnap=Sketcher_AnalyserSnap()
+        self.myAnalyserSnap = Sketch_AnalyserSnap()
 
         self.myColor = Quantity_NOC_YELLOW
         self.myStyle = Aspect_TOL_SOLID
@@ -69,14 +60,16 @@ class Sketch_Command(Standard_Transient):
 
     def SetWidth(self, theWidth):
         self.myWidth = theWidth
+    def SetStyle(self,theLineStyle):
+        self.myStyle=theLineStyle
 
     def AddObject(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
-                  theGeometryType: Sketcher_ObjectGeometryType):
+                  theGeometryType: Sketch_ObjectGeometryType):
         self.objectCounter += 1
         numString = TCollection_ExtendedString(self.objectCounter)
         currentName = TCollection_ExtendedString(self.objectName)
         currentName += numString
-        if self.GetTypeOfMethod() == Sketcher_ObjectTypeOfMethod.Point_Method:
+        if self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.Point_Method:
             theAIS_InteractiveObject.SetColor(self.myColor)
         else:
             self.myPrs3dAspect.SetColor(self.myColor)
@@ -90,7 +83,7 @@ class Sketch_Command(Standard_Transient):
         so.SetWidth(self.myWidth)
         self.data.Append(so)
 
-    def GetTypeOfMethod(self) -> Sketcher_ObjectTypeOfMethod:
+    def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
         return 0
 
     def Action(self):

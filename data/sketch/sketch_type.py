@@ -1,7 +1,7 @@
 import enum
 
 
-class Sketcher_ObjectGeometryType(enum.Enum):
+class Sketch_ObjectGeometryType(enum.Enum):
     PointSketcherObject = 0
     LineSketcherObject = 1
     CircleSketcherObject = 2
@@ -9,12 +9,12 @@ class Sketcher_ObjectGeometryType(enum.Enum):
     CurveSketcherObject = 3
 
 
-class Sketcher_ObjectType(enum.Enum):
+class Sketch_ObjectType(enum.Enum):
     MainSketcherType = 0
     AuxiliarySketcherType = 1
 
 
-class Sketcher_ObjectTypeOfMethod(enum.Enum):
+class Sketch_ObjectTypeOfMethod(enum.Enum):
     Nothing_Method = 0
     Point_Method = 1
     Line2P_Method = 2
