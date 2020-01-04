@@ -1,8 +1,8 @@
-from data.sketch.sketch_analyserSnap import Sketch_AnalyserSnap
+from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
 from data.sketch.sketch_object import Sketch_Object
 from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Origin, gp_Ax3, gp_Pnt2d, gp
+from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject
 from OCC.Core.Aspect import Aspect_TOL_SOLID
 from OCC.Core.Prs3d import Prs3d_LineAspect
@@ -20,7 +20,6 @@ class Sketch_Command(object):
         self.objectCounter = 0
 
 
-        # self.myAnalyserSnap = Sketch_AnalyserSnap()
         self.myType = Sketch_ObjectType.MainSketcherType
         self.myColor = Quantity_Color(Quantity_NOC_YELLOW)
         self.myStyle = Aspect_TOL_SOLID
@@ -31,15 +30,15 @@ class Sketch_Command(object):
         self.curPnt2d = gp_Origin2d()
         self.myFirstgp_Pnt2d = gp_Origin2d()
 
-        self.myFirstPoint = Geom_CartesianPoint(gp_Origin())
-        self.mySecondPoint = Geom_CartesianPoint(gp_Origin())
+        self.myFirstPoint = Geom_CartesianPoint(gp.Origin())
+        self.mySecondPoint = Geom_CartesianPoint(gp.Origin())
         self.myRubberLine = AIS_Line(self.myFirstPoint, self.mySecondPoint)
         self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
 
-    def SetData(self, theData: TColStd_HSequenceOfTransient):
+    def SetData(self, theData: list):
         self.data = theData
 
     def SetAx3(self, theAx3: gp_Ax3):
@@ -98,7 +97,7 @@ class Sketch_Command(object):
         raise NotImplementedError()
 
     def GetPolylineFirstPnt(self, p1):
-        return False
+        pass
 
     def SetPolylineMode(self, mode):
-        raise NotImplementedError()
+        pass

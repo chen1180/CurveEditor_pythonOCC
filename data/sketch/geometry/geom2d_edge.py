@@ -2,6 +2,7 @@ from OCC.Core.ElCLib import elclib
 from OCC.Core.AIS import AIS_Point
 from OCC.Core.Geom2d import Geom2d_CartesianPoint,Geom2d_Line
 from OCC.Core.gp import gp_Pnt2d,gp_Dir2d,gp,gp_Vec2d
+from OCC.Core._Geom2d import Geom2d_Line_swigregister
 class Geom2d_Edge(Geom2d_Line):
     def __init__(self):
         super(Geom2d_Edge, self).__init__(gp.Origin2d(),gp.DX2d())
@@ -26,3 +27,5 @@ class Geom2d_Edge(Geom2d_Line):
         return elclib.Parameter(self.Lin2d(),self.StartPnt)
     def EndParameter(self):
         return elclib.Parameter(self.Lin2d(), self.EndPnt)
+# Register Geom2d_Line in _Geom2d:
+Geom2d_Line_swigregister(Geom2d_Edge)

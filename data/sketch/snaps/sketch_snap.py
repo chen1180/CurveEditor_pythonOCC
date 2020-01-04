@@ -4,20 +4,20 @@ from OCC.Core.TopoDS import  TopoDS_Edge
 from OCC.Core.TColStd import TColStd_HSequenceOfTransient
 from OCC.Core.ElCLib import elclib
 from OCC.Core.Geom2dAPI import *
-from OCC.Core.Standard import Standard_Transient
-from OCC.Core.Quantity import Quantity_NOC_CYAN1
+from OCC.Core.Quantity import Quantity_NOC_CYAN1,Quantity_Color
 from OCC.Core.Geom2d import Geom2d_CartesianPoint
 from OCC.Core.AIS import AIS_InteractiveContext,AIS_InteractiveObject,AIS_Point
 from data.sketch.sketch_type import *
+from data.sketch.sketch_object import Sketch_Object
 MINIMUMSNAP = 25
 MINANGLE = 3.14 / 64
 
 
 class Sketch_Snap(object):
     def __init__(self):
-        self.myContext = AIS_InteractiveContext()
-        self.data = TColStd_HSequenceOfTransient()
-        self.curHilightedObj = AIS_InteractiveObject()
+        # self.myContext = AIS_InteractiveContext()
+        self.data = []
+        # self.curHilightedObj = AIS_InteractiveObject()
         self.ProjectOnCurve = Geom2dAPI_ProjectPointOnCurve()
 
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
@@ -32,7 +32,7 @@ class Sketch_Snap(object):
         self.firstDisplay = True
         self.myGeom_Point = Geom_CartesianPoint(gp.Origin())
         self.myAIS_Point = AIS_Point(self.myGeom_Point)
-        self.myAIS_Point.SetColor(Quantity_NOC_CYAN1)
+        self.myAIS_Point.SetColor(Quantity_Color(Quantity_NOC_CYAN1))
 
         self.minimumSnapDistance = MINIMUMSNAP
         self.minDistance = 0
@@ -79,7 +79,7 @@ class Sketch_Snap(object):
 
     def EraseSnap(self):
         self.firstDisplay = False
-        self.myContext.Remove(self.myAIS_Point)
+        self.myContext.Remove(self.myAIS_Point,True)
         self.EraseRelation()
 
     def AnalyserEvent(self, tempPnt2d: gp_Pnt2d):
@@ -94,7 +94,7 @@ class Sketch_Snap(object):
         self.myContext.SetSelected(self.curHilightedObj)
 
     def EraseRelation(self):
-        self.myContext.ClearSelected()
+        self.myContext.ClearSelected(True)
 
     def countProject(self):
         if self.ProjectOnCurve.NbPoints() > 0:
@@ -115,4 +115,6 @@ class Sketch_Snap(object):
         pass
 
     def GetSnapType(self) -> Sketcher_SnapType:
-        return 0
+        pass
+    def SelectEvent(self):
+        pass

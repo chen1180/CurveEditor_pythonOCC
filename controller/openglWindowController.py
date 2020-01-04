@@ -26,7 +26,7 @@ class OpenGLEditor(GLWidget):
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_GUI()
         self.sketch=Sketch(self._display,self.sketchUI)
-        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Line2P_Method)
 
         self._state = self.MODE_VIEW
 
@@ -49,8 +49,8 @@ class OpenGLEditor(GLWidget):
         #signals and slots
         self.sketchManager.modelUpdate.connect(self.addNewItem)
 
-        self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
-        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
+        # self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
+        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketch.OnCancel)
         # self._display.Test()
 
@@ -117,10 +117,12 @@ class OpenGLEditor(GLWidget):
     def mousePressEvent(self, event):
         self.setFocus()
         pt = event.pos()
-        self.dragStartPosX = pt.x()
-        self.dragStartPosY = pt.y()
-        self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
-
+        buttons = int(event.buttons())
+        modifiers = event.modifiers()
+        if buttons == QtCore.Qt.LeftButton and modifiers == QtCore.Qt.ControlModifier:
+            self.dragStartPosX = pt.x()
+            self.dragStartPosY = pt.y()
+            self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
         if self._state == self.MODE_VIEW:
             pass
         elif self._state == self.MODE_DESIGN:

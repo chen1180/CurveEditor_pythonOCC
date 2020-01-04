@@ -1,31 +1,15 @@
-from data.sketch.sketch_snap import *
-from OCC.Core.Geom import *
+from data.sketch.snaps.sketch_snap import *
 from OCC.Core.gp import *
-from OCC.Core.V3d import *
 from OCC.Core.AIS import *
-from OCC.Core.BRepPrimAPI import *
-from OCC.Display.OCCViewer import Viewer3d
-from OCC.Core.TopAbs import *
-from OCC.Core.TopoDS import *
-from OCC.Core.StdSelect import *
-from OCC.Core.BRepAdaptor import *
-from OCC.Core.BRep import *
-from OCC.Core.GeomAbs import *
-from OCC.Core.GeomFill import *
-from OCC.Core.Aspect import *
-from OCC.Core.Prs3d import *
-from OCC.Core.Quantity import *
 from OCC.Core.TColStd import *
-from OCC.Core.Geom2d import *
-from OCC.Core.TCollection import *
-from OCC.Core.Standard import Standard_Transient
 from data.sketch.sketch_type import *
+from data.sketch.snaps.sketch_snapCenter import Sketch_SnapCenter
 from OCC.Core.TColgp import *
 
 
 class Sketch_AnalyserSnap(object):
     def __init__(self, theContext: AIS_InteractiveContext,
-                 thedata: TColStd_HSequenceOfTransient,
+                 thedata: list,
                  theAx3: gp_Ax3):
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.myContext = theContext
@@ -45,14 +29,16 @@ class Sketch_AnalyserSnap(object):
         self.isTangent = False
         self.isLine = False
 
-        self.mySnaps = TColStd_HSequenceOfTransient()
-        # self.addSnap(Sketcher_SnapEnd())
+        self.mySnaps = []
+
         self.curSnapAnType = Sketcher_SnapType.SnapNothing
 
         self.mySeqOfPnt2d = TColgp_SequenceOfPnt2d()
         self.mySeqOfDistance = TColStd_SequenceOfReal()
         self.mySeqOfFactor = TColStd_SequenceOfReal()
         self.mySnapType = TColStd_SequenceOfInteger()
+
+        self.addSnap(Sketch_SnapCenter())
 
     def SetContext(self, theContext):
         self.myContext = theContext
@@ -234,10 +220,10 @@ class Sketch_AnalyserSnap(object):
         theSnap.SetData(self.data)
         theSnap.SetContext(self.myContext)
         theSnap.SetAx3(self.curCoordinateSystem)
-        self.mySnaps.Append(theSnap)
+        self.mySnaps.append(theSnap)
 
     def SelectCurSnap(self):
-        for idx in range(1, self.mySnaps.Length() + 1):
-            self.CurSnap: Sketch_Snap = Sketch_Snap.DownCast(self.mySnaps.Value(idx))
+        for idx in range(len(self.mySnaps)):
+            self.CurSnap: Sketch_Snap = self.mySnaps[idx]
             if self.CurSnap.GetSnapType() == self.myCurrentSnap:
                 break

@@ -1,8 +1,10 @@
 from data.sketch.sketch_gui import *
 from data.sketch.commands.sketch_commandPoint import *
-from data.sketch.sketch_analyserSnap import *
+from data.sketch.commands.sketch_commandLine2p import *
+from data.sketch.snaps.sketch_analyserSnap import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
+from OCC.Core.Geom import Geom_Line
 
 
 class Sketch(object):
@@ -33,19 +35,20 @@ class Sketch(object):
         self.myAnalyserSnap = Sketch_AnalyserSnap(self.myContext, self.myData, self.myCoordinateSystem)
 
         self.addCommand(Sketch_CommandPoint())
+        self.addCommand(Sketch_CommandLine2P())
 
     def SetContext(self, theContext):
         self.myContext = theContext
         self.myAnalyserSnap.SetContext(self.myContext)
         self.myGUI.SetContext(theContext)
-        for idx in range(1, self.myCommands.Length() + 1):
-            self.CurCommand: Sketch_Command = Sketch_Command.DownCast(self.myCommands.Value(idx))
+        for idx in range(1, len(self.myCommands)):
+            self.CurCommand: Sketch_Command = self.myCommands[idx]
             self.CurCommand.SetContext(self.myContext)
 
     def SetData(self, thedata):
         self.myData = thedata
-        for idx in range(1, self.myCommands.Length() + 1):
-            self.CurCommand: Sketch_Command = Sketch_Command.DownCast(self.myCommands.Value(idx))
+        for idx in range(1, len(self.myCommands)):
+            self.CurCommand: Sketch_Command = self.myCommands[idx]
             self.CurCommand.SetData(self.myData)
 
     def GetData(self):
@@ -114,7 +117,6 @@ class Sketch(object):
                         self.myTempPnt.X() - self.myCoordinateSystem.Location().X()) * self.myCoordinateSystem.YDirection().X() + (
                         self.myTempPnt.Y() - self.myCoordinateSystem.Location().Y()) * self.myCoordinateSystem.YDirection().Y() + (
                         self.myTempPnt.Z() - self.myCoordinateSystem.Location().Z()) * self.myCoordinateSystem.YDirection().Z())
-            print("current xy",self.myCurrentPnt2d.X(),self.myCurrentPnt2d.Y())
             return True
         else:
             return False
@@ -126,7 +128,6 @@ class Sketch(object):
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             self.CurCommand.MouseInputEvent(self.myCurrentPnt2d)
-            self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
 
     def OnMouseMoveEvent(self, *kargs):
         theX, theY = kargs
@@ -135,13 +136,11 @@ class Sketch(object):
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d)
-            self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
 
     def OnCancel(self):
         self.SelectCurCommand()
         self.myAnalyserSnap.Cancel()
-        if (
-                self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Line2P_Method and self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Arc3P_Method):
+        if (self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Line2P_Method and self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Arc3P_Method):
             self.PolylineFirstPointExist = self.CurCommand.GetPolylineFirstPnt(self.PolylineFirstPoint)
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
@@ -169,7 +168,7 @@ class Sketch(object):
 
     def SetPolylineMode(self, amode):
         for idx in range(len(self.myCommands)):
-            self.CurCommand: Sketch_Command = self.myCommands[idx]
+            self.CurCommand = self.myCommands[idx]
             self.CurCommand.SetPolylineMode(amode)
 
     def SetSnap(self, theSnap):
