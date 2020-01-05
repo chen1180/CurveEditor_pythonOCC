@@ -5,7 +5,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
 from data.model import *
 
-
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
@@ -127,6 +126,8 @@ class Window(QtWidgets.QMainWindow):
     def createSketchToolBar(self):
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
         self._sketchToolBar.addAction(self._action_sketchMode_createNewSketch)
+        self._sketchToolBar.addAction(self._action_sketchMode_addPoint)
+        self._sketchToolBar.addAction(self._action_sketchMode_addLine)
         self._sketchToolBar.addAction(self._action_sketchMode_addBezierCurve)
         self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
         self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
@@ -192,6 +193,12 @@ class Window(QtWidgets.QMainWindow):
         self._action_sketchMode_createNewSketch = QtWidgets.QAction(QtGui.QIcon(""), "create a new sketch", self,
                                                                     statusTip="create a new sketch",
                                                                     triggered=self._glWindow.sketchManager.createNewSketch)
+        self._action_sketchMode_addPoint = QtWidgets.QAction(QtGui.QIcon(""), "add points", self,
+                                                                    statusTip="add points on sketch",
+                                                                    triggered=self._glWindow.sketchPoint)
+        self._action_sketchMode_addLine = QtWidgets.QAction(QtGui.QIcon(""), "add lines", self,
+                                                             statusTip="add a line",
+                                                             triggered=self._glWindow.sketchLine)
         self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(""), "Add Bezier Curve", self,
                                                                    statusTip="Add a cubic Bezier curve",
                                                                    triggered=self._glWindow.sketchManager.action_bezierCurve)

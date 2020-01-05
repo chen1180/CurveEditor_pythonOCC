@@ -21,12 +21,13 @@ class OpenGLEditor(GLWidget):
 
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
+        print(self._display._window_handle)
         self._display.Context.SetAutoActivateSelection(False)
         self.sketchManager = toolController.SketchController(self._display)
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_GUI()
         self.sketch=Sketch(self._display,self.sketchUI)
-        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Line2P_Method)
+
 
         self._state = self.MODE_VIEW
 
@@ -35,8 +36,7 @@ class OpenGLEditor(GLWidget):
         self._mouseRelease_callback = []
 
         # callback functions
-        self._display.register_select_callback(self.coordinate_clicked)
-        self._display.register_select_callback(self.sketchManager.recognize_clicked)
+        # self._display.register_select_callback(self.sketchManager.recognize_clicked)
 
         # self.register_mousePress_callback(self.sketchManager.mousePress)
         self.register_mouseMove_callback(self.sketchManager.mouseMove)
@@ -53,7 +53,10 @@ class OpenGLEditor(GLWidget):
         # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketch.OnCancel)
         # self._display.Test()
-
+    def sketchPoint(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
+    def sketchLine(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Line2P_Method)
     def addNewItem(self, item):
         self.modelUpdated.emit(item)
 
@@ -84,11 +87,6 @@ class OpenGLEditor(GLWidget):
             self.processActions()
             self.update()
 
-    def coordinate_clicked(self, shp, *kwargs):
-        """ This function is called whenever a vertex is selected
-        """
-        point_2d = kwargs
-        x, y, z, vx, vy, vz = self._display.View.ConvertWithProj(kwargs[0], kwargs[1])
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         code = event.key()
