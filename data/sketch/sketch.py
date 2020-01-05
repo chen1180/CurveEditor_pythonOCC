@@ -1,6 +1,9 @@
 from data.sketch.sketch_gui import *
-from data.sketch.commands.sketch_commandPoint import *
-from data.sketch.commands.sketch_commandLine2p import *
+from data.sketch.commands.sketch_command import Sketch_Command
+from data.sketch.commands.sketch_commandPoint import Sketch_CommandPoint
+from data.sketch.commands.sketch_commandLine2p import Sketch_CommandLine2P
+from data.sketch.commands.sketch_commandBezierCurve import Sketch_CommandBezierCurve
+from data.sketch.commands.sketch_commandArc3P import Sketch_CommandArc3P
 from data.sketch.snaps.sketch_analyserSnap import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
@@ -36,7 +39,8 @@ class Sketch(object):
 
         self.addCommand(Sketch_CommandPoint())
         self.addCommand(Sketch_CommandLine2P())
-
+        self.addCommand(Sketch_CommandBezierCurve())
+        self.addCommand(Sketch_CommandArc3P())
     def SetContext(self, theContext):
         self.myContext = theContext
         self.myAnalyserSnap.SetContext(self.myContext)
@@ -53,6 +57,7 @@ class Sketch(object):
 
     def GetData(self):
         return self.myData
+
 
     def SetCoordinateSystem(self, theCS):
         self.myCoordinateSystem = theCS
@@ -164,7 +169,8 @@ class Sketch(object):
         for idx in range(len(self.myData)):
             myCurObject: Sketch_Object = self.myData[idx]
             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                self.myContext.Display(myCurObject.GetAIS_Object())
+                print(myCurObject.GetAIS_Object())
+                self.myContext.Display(myCurObject.GetAIS_Object(),True)
 
     def SetPolylineMode(self, amode):
         for idx in range(len(self.myCommands)):

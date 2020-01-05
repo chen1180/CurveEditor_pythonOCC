@@ -201,13 +201,13 @@ class Window(QtWidgets.QMainWindow):
                                                              triggered=self._glWindow.sketchLine)
         self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(""), "Add Bezier Curve", self,
                                                                    statusTip="Add a cubic Bezier curve",
-                                                                   triggered=self._glWindow.sketchManager.action_bezierCurve)
+                                                                   triggered=self._glWindow.sketchBezier)
         self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Add BSpline Curve", self,
                                                                statusTip="Add a B Spline curve",
                                                                triggered=self._glWindow.sketchManager.action_bSpline)
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
                                                               statusTip="Add a circle",
-                                                              triggered=self._glWindow.sketchManager.action_circle)
+                                                              triggered=self._glWindow.sketchArc3P)
         self._action_sketchMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
                                                                      self,
                                                                      statusTip="Create from two Bezier curve",

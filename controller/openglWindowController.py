@@ -28,7 +28,6 @@ class OpenGLEditor(GLWidget):
         self.sketchUI = Sketch_GUI()
         self.sketch=Sketch(self._display,self.sketchUI)
 
-
         self._state = self.MODE_VIEW
 
         self._mousePress_callback = []
@@ -38,7 +37,7 @@ class OpenGLEditor(GLWidget):
         # callback functions
         self._display.register_select_callback(self.sketchManager.recognize_clicked)
 
-        # self.register_mousePress_callback(self.sketchManager.mousePress)
+        self.register_mousePress_callback(self.sketchManager.mousePress)
         self.register_mouseMove_callback(self.sketchManager.mouseMove)
         self.register_mouseRelease_callback(self.sketchManager.mouseRelease)
 
@@ -57,6 +56,10 @@ class OpenGLEditor(GLWidget):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
     def sketchLine(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Line2P_Method)
+    def sketchBezier(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BezierCurve_Method)
+    def sketchArc3P(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Arc3P_Method)
     def addNewItem(self, item):
         self.modelUpdated.emit(item)
 
@@ -84,6 +87,7 @@ class OpenGLEditor(GLWidget):
         super(OpenGLEditor, self).paintEvent(event)
         if self._inited:
             self._display.Context.UpdateCurrentViewer()
+            self.sketch.RedrawAll()
             self.processActions()
             self.update()
 
@@ -208,27 +212,27 @@ class OpenGLEditor(GLWidget):
                 self.cursor = "pan"
                 self._display.Pan(dx, -dy)
                 self._drawbox = False
-        # # DYNAMIC ZOOM
-        # elif (buttons == QtCore.Qt.RightButton and
-        #       not modifiers == QtCore.Qt.ShiftModifier):
-        #     self.cursor = "zoom"
-        #     self._display.Repaint()
-        #     self._display.DynamicZoom(abs(self.dragStartPosX),
-        #                               abs(self.dragStartPosY), abs(pt.x()),
-        #                               abs(pt.y()))
-        #     self.dragStartPosX = pt.x()
-        #     self.dragStartPosY = pt.y()
-        #     self._drawbox = False
-        #
-        # # DRAW BOX
-        # # ZOOM WINDOW
-        # elif (buttons == QtCore.Qt.RightButton and
-        #       modifiers == QtCore.Qt.ShiftModifier):
-        #     self._zoom_area = True
-        #     self.cursor = "zoom-area"
-        #     self.DrawBox(evt)
-        #     self.update()
-        # SELECT AREA
+        # DYNAMIC ZOOM
+        elif (buttons == QtCore.Qt.RightButton and
+              not modifiers == QtCore.Qt.ShiftModifier):
+            self.cursor = "zoom"
+            self._display.Repaint()
+            self._display.DynamicZoom(abs(self.dragStartPosX),
+                                      abs(self.dragStartPosY), abs(pt.x()),
+                                      abs(pt.y()))
+            self.dragStartPosX = pt.x()
+            self.dragStartPosY = pt.y()
+            self._drawbox = False
+
+        # DRAW BOX
+        # ZOOM WINDOW
+        elif (buttons == QtCore.Qt.RightButton and
+              modifiers == QtCore.Qt.ShiftModifier):
+            self._zoom_area = True
+            self.cursor = "zoom-area"
+            self.DrawBox(evt)
+            self.update()
+        #SELECT AREA
         elif (buttons == QtCore.Qt.LeftButton and
               modifiers == QtCore.Qt.ShiftModifier):
             self._select_area = True

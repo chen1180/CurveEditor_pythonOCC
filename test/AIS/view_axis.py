@@ -21,9 +21,12 @@ ais_plane=AIS_PlaneTrihedron(plane)
 point=Geom_CartesianPoint(2,2,2)
 ais_point=AIS_Point(point)
 
+geom_circle=Geom_Circle(gp.XOY(),10)
+ais_circle=AIS_Circle(geom_circle)
 
 display.Context.Display(ais_line,True)
 display.Context.Display(ais_plane,True)
 display.Context.Display(ais_point,True)
+display.Context.Display(ais_circle,False)
 
 start_display()

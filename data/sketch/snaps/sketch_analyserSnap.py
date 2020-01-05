@@ -42,26 +42,26 @@ class Sketch_AnalyserSnap(object):
 
     def SetContext(self, theContext):
         self.myContext = theContext
-        for idx in range(1, self.mySnaps.Length() + 1):
-            self.CurSnap = Sketch_Snap.DownCast(self.mySnaps.Value(idx))
+        for idx in range(len(self.mySnaps)):
+            self.CurSnap =self.mySnaps[idx]
             self.CurSnap.SetContext(self.myContext)
 
     def SetData(self, thedata):
         self.data = thedata
-        for idx in range(1, self.mySnaps.Length() + 1):
-            self.CurSnap: Sketch_Snap = Sketch_Snap.DownCast(self.mySnaps.Value(idx))
+        for idx in range(len(self.mySnaps)):
+            self.CurSnap = self.mySnaps[idx]
             self.CurSnap.SetData(self.data)
 
     def SetAx3(self, theAx3: gp_Ax3):
         self.curCoordinateSystem = theAx3
-        for idx in range(1, self.mySnaps.Length() + 1):
-            self.CurSnap: Sketch_Snap = Sketch_Snap.DownCast(self.mySnaps.Value(idx))
+        for idx in range(len(self.mySnaps)):
+            self.CurSnap = self.mySnaps[idx]
             self.CurSnap.SetAx3(self.curCoordinateSystem)
 
     def SetMinDistance(self, aPrecise):
         self.minimumSnapDistance = aPrecise
-        for idx in range(1, self.mySnaps.Length() + 1):
-            self.CurSnap: Sketch_Snap = Sketch_Snap.DownCast(self.mySnaps.Value(idx))
+        for idx in range(len(self.mySnaps)):
+            self.CurSnap = self.mySnaps[idx]
             self.CurSnap.SetMinDistance(self.minimumSnapDistance)
 
     def SetSnapType(self, theSnap: Sketcher_SnapType):

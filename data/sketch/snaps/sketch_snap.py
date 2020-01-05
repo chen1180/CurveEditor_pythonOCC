@@ -65,14 +65,14 @@ class Sketch_Snap(object):
             self.myGeom_Point.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.bestPnt2d))
             self.myAIS_Point.SetComponent(self.myGeom_Point)
             if self.firstDisplay:
-                self.myContext.Display(self.myAIS_Point, 0, -1)
+                self.myContext.Display(self.myAIS_Point, False)
                 self.DrawRelation()
                 self.firstDisplay = False
             else:
-                self.myContext.Redisplay(self.myAIS_Point)
+                self.myContext.Redisplay(self.myAIS_Point,True)
                 self.DrawRelation()
         else:
-            self.myContext.Remove(self.myAIS_Point)
+            self.myContext.Remove(self.myAIS_Point,True)
             self.EraseRelation()
             self.firstDisplay = True
         return self.bestPnt2d
