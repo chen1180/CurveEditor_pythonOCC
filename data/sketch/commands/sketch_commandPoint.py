@@ -26,7 +26,7 @@ class Sketch_CommandPoint(Sketch_Command):
             myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(),self.curPnt2d))
             myAIS_Point = AIS_Point(myGeom_Point)
             self.myContext.Display(myAIS_Point,True )
-            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_ObjectGeometryType.PointSketcherObject)
+            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):

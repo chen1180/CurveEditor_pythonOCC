@@ -12,7 +12,7 @@ from data.sketch.sketch_type import *
 
 class Sketch_Object(object):
     def __init__(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
-                 theName: TCollection_ExtendedString, theGeometryType: Sketch_ObjectGeometryType,
+                 theName: TCollection_ExtendedString, theGeometryType: Sketch_GeometryType,
                  theTypeOfMethod: Sketch_ObjectTypeOfMethod):
         self.myGeometry = theGeom2d_Geometry
         self.myAIS_InteractiveObject = theAIS_InteractiveObject

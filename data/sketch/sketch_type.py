@@ -1,7 +1,7 @@
 import enum
 
 
-class Sketch_ObjectGeometryType(enum.Enum):
+class Sketch_GeometryType(enum.Enum):
     PointSketcherObject = 0
     LineSketcherObject = 1
     CircleSketcherObject = 2

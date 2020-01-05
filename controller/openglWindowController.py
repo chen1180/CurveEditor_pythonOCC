@@ -36,7 +36,7 @@ class OpenGLEditor(GLWidget):
         self._mouseRelease_callback = []
 
         # callback functions
-        # self._display.register_select_callback(self.sketchManager.recognize_clicked)
+        self._display.register_select_callback(self.sketchManager.recognize_clicked)
 
         # self.register_mousePress_callback(self.sketchManager.mousePress)
         self.register_mouseMove_callback(self.sketchManager.mouseMove)
@@ -49,7 +49,7 @@ class OpenGLEditor(GLWidget):
         #signals and slots
         self.sketchManager.modelUpdate.connect(self.addNewItem)
 
-        # self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
+        self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
         # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketch.OnCancel)
         # self._display.Test()
@@ -117,10 +117,14 @@ class OpenGLEditor(GLWidget):
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
-        if buttons == QtCore.Qt.LeftButton and modifiers == QtCore.Qt.ControlModifier:
-            self.dragStartPosX = pt.x()
-            self.dragStartPosY = pt.y()
-            self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
+        if buttons == QtCore.Qt.MiddleButton:
+            if modifiers != QtCore.Qt.ShiftModifier:
+                self.dragStartPosX = pt.x()
+                self.dragStartPosY = pt.y()
+                self._display.StartRotation(self.dragStartPosX, self.dragStartPosY)
+            else:
+                self.dragStartPosX = pt.x()
+                self.dragStartPosY = pt.y()
         if self._state == self.MODE_VIEW:
             pass
         elif self._state == self.MODE_DESIGN:
@@ -157,11 +161,11 @@ class OpenGLEditor(GLWidget):
             for callback in self._mouseRelease_callback:
                 callback(pt.x(), pt.y())
 
-        elif event.button() == QtCore.Qt.RightButton:
-            if self._zoom_area:
-                [Xmin, Ymin, dx, dy] = self._drawbox
-                self._display.ZoomArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
-                self._zoom_area = False
+        # elif event.button() == QtCore.Qt.RightButton:
+        #     if self._zoom_area:
+        #         [Xmin, Ymin, dx, dy] = self._drawbox
+        #         self._display.ZoomArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
+        #         self._zoom_area = False
 
         self.cursor = "arrow"
 
@@ -181,50 +185,49 @@ class OpenGLEditor(GLWidget):
         self.sketch.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
             callback(pt.x(), pt.y())
-        # ROTATE
-        if (buttons == QtCore.Qt.LeftButton and
-                not modifiers == QtCore.Qt.ShiftModifier):
-            if modifiers == QtCore.Qt.ControlModifier:
+
+        if buttons == QtCore.Qt.MiddleButton:
+            if  modifiers != QtCore.Qt.ShiftModifier:
+                # ROTATE
                 self.cursor = "rotate"
                 self._display.Rotation(pt.x(), pt.y())
                 self._drawbox = False
-            if self._state == self.MODE_VIEW:
-                pass
-            elif self._state == self.MODE_DESIGN:
-                pass
-            elif self._state == self.MODE_SKETCH:
-                pass
-            self.viewManager.transform(pt.x(),pt.y())
-
-
-        # DYNAMIC ZOOM
-        elif (buttons == QtCore.Qt.RightButton and
-              not modifiers == QtCore.Qt.ShiftModifier):
-            self.cursor = "zoom"
-            self._display.Repaint()
-            self._display.DynamicZoom(abs(self.dragStartPosX),
-                                      abs(self.dragStartPosY), abs(pt.x()),
-                                      abs(pt.y()))
-            self.dragStartPosX = pt.x()
-            self.dragStartPosY = pt.y()
-            self._drawbox = False
-        # PAN
-        elif buttons == QtCore.Qt.MidButton:
-            dx = pt.x() - self.dragStartPosX
-            dy = pt.y() - self.dragStartPosY
-            self.dragStartPosX = pt.x()
-            self.dragStartPosY = pt.y()
-            self.cursor = "pan"
-            self._display.Pan(dx, -dy)
-            self._drawbox = False
-        # DRAW BOX
-        # ZOOM WINDOW
-        elif (buttons == QtCore.Qt.RightButton and
-              modifiers == QtCore.Qt.ShiftModifier):
-            self._zoom_area = True
-            self.cursor = "zoom-area"
-            self.DrawBox(evt)
-            self.update()
+                if self._state == self.MODE_VIEW:
+                    pass
+                elif self._state == self.MODE_DESIGN:
+                    pass
+                elif self._state == self.MODE_SKETCH:
+                    pass
+                self.viewManager.transform(pt.x(),pt.y())
+            # PAN
+            elif modifiers == QtCore.Qt.ShiftModifier:
+                dx = pt.x() - self.dragStartPosX
+                dy = pt.y() - self.dragStartPosY
+                self.dragStartPosX = pt.x()
+                self.dragStartPosY = pt.y()
+                self.cursor = "pan"
+                self._display.Pan(dx, -dy)
+                self._drawbox = False
+        # # DYNAMIC ZOOM
+        # elif (buttons == QtCore.Qt.RightButton and
+        #       not modifiers == QtCore.Qt.ShiftModifier):
+        #     self.cursor = "zoom"
+        #     self._display.Repaint()
+        #     self._display.DynamicZoom(abs(self.dragStartPosX),
+        #                               abs(self.dragStartPosY), abs(pt.x()),
+        #                               abs(pt.y()))
+        #     self.dragStartPosX = pt.x()
+        #     self.dragStartPosY = pt.y()
+        #     self._drawbox = False
+        #
+        # # DRAW BOX
+        # # ZOOM WINDOW
+        # elif (buttons == QtCore.Qt.RightButton and
+        #       modifiers == QtCore.Qt.ShiftModifier):
+        #     self._zoom_area = True
+        #     self.cursor = "zoom-area"
+        #     self.DrawBox(evt)
+        #     self.update()
         # SELECT AREA
         elif (buttons == QtCore.Qt.LeftButton and
               modifiers == QtCore.Qt.ShiftModifier):

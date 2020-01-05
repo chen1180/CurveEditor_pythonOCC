@@ -13,10 +13,10 @@ class Sketch_SnapCenter(Sketch_Snap):
         for idx in range(len(self.data)):
             mySObject: Sketch_Object = self.data[idx]
             myGeometryType = mySObject.GetGeometryType()
-            if myGeometryType == Sketch_ObjectGeometryType.PointSketcherObject or \
-                    myGeometryType == Sketch_ObjectGeometryType.LineSketcherObject:
+            if myGeometryType == Sketch_GeometryType.PointSketcherObject or \
+                    myGeometryType == Sketch_GeometryType.LineSketcherObject:
                 pass
-            elif myGeometryType == Sketch_ObjectGeometryType.CircleSketcherObject or myGeometryType == Sketch_ObjectGeometryType.ArcSketcherObject:
+            elif myGeometryType == Sketch_GeometryType.CircleSketcherObject or myGeometryType == Sketch_GeometryType.ArcSketcherObject:
                 self.curGeom2d_Circle: Geom2d_Circle = mySObject.GetGeometry()
                 self.ProjectOnCurve.Init(self.curPnt2d, self.curGeom2d_Circle)
                 if self.countProject():

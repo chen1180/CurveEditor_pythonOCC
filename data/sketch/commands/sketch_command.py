@@ -2,12 +2,11 @@ from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
 from data.sketch.sketch_object import Sketch_Object
 from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp
-from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject
+from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp,gp_Pnt
+from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject,AIS_Shape
 from OCC.Core.Aspect import Aspect_TOL_SOLID
 from OCC.Core.Prs3d import Prs3d_LineAspect
 from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1,Quantity_Color
-from OCC.Core.TColStd import TColStd_HSequenceOfTransient
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
 class Sketch_Command(object):
@@ -59,7 +58,7 @@ class Sketch_Command(object):
         self.myStyle=theLineStyle
 
     def AddObject(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
-                  theGeometryType: Sketch_ObjectGeometryType):
+                  theGeometryType: Sketch_GeometryType):
         self.objectCounter += 1
         numString = TCollection_ExtendedString(self.objectCounter)
         currentName = TCollection_ExtendedString(self.objectName)

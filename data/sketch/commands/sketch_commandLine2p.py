@@ -39,7 +39,7 @@ class Sketch_CommandLine2P(Sketch_Command):
             Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))
             Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), thePnt2d))
             myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
-            self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_ObjectGeometryType.LineSketcherObject)
+            self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketcherObject)
             self.myContext.Display(myAIS_Line, True)
             if self.myPolylineMode:
                 self.myFirstgp_Pnt2d = self.curPnt2d
