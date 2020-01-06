@@ -28,7 +28,10 @@ def qt_message_handler(mode, context, message):
     print('  %s: %s\n' % (mode, message))
 if __name__ == '__main__':
     qInstallMessageHandler(qt_message_handler)
-    app = QApplication([])
+    # following couple of lines is a tweak to enable ipython --gui='qt'
+    app = QApplication.instance()  # checks if QApplication already exists
+    if not app:  # create QApplication if it doesnt exist
+        app = QApplication(sys.argv)
     mainWin = mainWindowController.Window()
     mainWin.showMaximized()
     sys.exit(app.exec_())

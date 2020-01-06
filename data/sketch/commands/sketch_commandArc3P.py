@@ -24,7 +24,7 @@ class Arc3PAction(Enum):
     Input_PolylineArc = 4
 
 
-SKETCH_RADIUS = 10.0
+
 
 
 class Sketch_CommandArc3P(Sketch_Command):

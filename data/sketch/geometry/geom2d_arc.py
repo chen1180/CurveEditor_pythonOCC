@@ -55,6 +55,8 @@ class Geom2d_Arc(Geom2d_Circle):
     def LastPnt(self):
         return elclib.Value(self.myLastParam, self.Circ2d())
 
+
+
     def MiddlePnt(self):
         return elclib.Value((self.myLastParam + self.myFirstParam) / 2, self.Circ2d())
 

@@ -11,7 +11,7 @@ class Window(QtWidgets.QMainWindow):
         self._ui = mainWindow.Ui_MainWindow()
         self._ui.setupUi(self)
         # opengl window
-        self._glWindow = openglWindowController.OpenGLEditor()
+        self._glWindow = openglWindowController.OpenGLEditor(self)
         self.setCentralWidget(self._glWindow)
         # setup tool bar
         self.createDrawActions()
@@ -130,6 +130,7 @@ class Window(QtWidgets.QMainWindow):
         self._sketchToolBar.addAction(self._action_sketchMode_addLine)
         self._sketchToolBar.addAction(self._action_sketchMode_addBezierCurve)
         self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
+        self._sketchToolBar.addAction(self._action_sketchMode_addArc)
         self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
         self._sketchToolBar.addSeparator()
         self._sketchToolBar.addAction(self._action_sketchMode_addBezierSurface)
@@ -204,10 +205,13 @@ class Window(QtWidgets.QMainWindow):
                                                                    triggered=self._glWindow.sketchBezier)
         self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Add BSpline Curve", self,
                                                                statusTip="Add a B Spline curve",
-                                                               triggered=self._glWindow.sketchManager.action_bSpline)
+                                                               triggered=self._glWindow.sketchBSpline)
+        self._action_sketchMode_addArc = QtWidgets.QAction(QtGui.QIcon(""), "Add Arc", self,
+                                                           statusTip="Add an arc",
+                                                           triggered=self._glWindow.sketchArc3P)
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
-                                                              statusTip="Add a circle",
-                                                              triggered=self._glWindow.sketchArc3P)
+                                                           statusTip="Add a circle",
+                                                           triggered=self._glWindow.sketchCircleCenterRadius)
         self._action_sketchMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
                                                                      self,
                                                                      statusTip="Create from two Bezier curve",

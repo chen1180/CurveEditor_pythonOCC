@@ -28,6 +28,7 @@ class Sketch_ObjectTypeOfMethod(enum.Enum):
     ArcCenter2P_Method = 9
     BezierCurve_Method = 10
     Trim_Method = 11
+    BSpline_Method=12
 
 
 class TangentType(enum.Enum):

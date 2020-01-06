@@ -2,13 +2,14 @@ from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
 from data.sketch.sketch_object import Sketch_Object
 from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp,gp_Pnt,gp_Circ,gp_Circ2d,gp_Lin2d
+from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp,gp_Pnt,gp_Circ,gp_Circ2d,gp_Lin2d,gp_Ax2d,gp_Dir2d
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject,AIS_Shape,AIS_Circle
 from OCC.Core.Aspect import Aspect_TOL_SOLID
 from OCC.Core.Prs3d import Prs3d_LineAspect
 from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1,Quantity_Color
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
+SKETCH_RADIUS = 10.0
 class Sketch_Command(object):
     def __init__(self, name):
         # self.myContext = AIS_InteractiveContext()

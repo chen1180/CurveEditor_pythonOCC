@@ -14,30 +14,6 @@ from OCC.Core.Prs3d import *
 class GLWidget(qtViewer3d):
     def __init__(self, parent=None):
         super(GLWidget, self).__init__(parent)
-        self.InitDriver()
-        self._cubeManip=AIS_ViewCube()
-        self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
-        self._display.Context.Display(self._cubeManip,True)
-        self.setReferenceAxe()
-        assert isinstance(self._display.Context, AIS_InteractiveContext)
-        # self._display.View.SetBgGradientColors(Quantity_Color(Quantity_NOC_SKYBLUE), Quantity_Color(Quantity_NOC_GRAY), 2, True)
-    def setReferenceAxe(self):
-        geom_axe = Geom_Axis2Placement(gp_XOY())
-        self._refrenceAxies = AIS_Trihedron(geom_axe)
-        self._refrenceAxies.SetSelectionPriority(Prs3d_DP_XOYAxis ,3)
-        self._display.Context.Display(self._refrenceAxies,True)
-        origin=Geom_CartesianPoint(gp_Pnt(0,0,0))
-        # ais_origin=AIS_Point(origin)
-        # ais_x=AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(50,0,0)))
-        # ais_x.SetColor(Quantity_Color(1.0,0,0,Quantity_TOC_RGB))
-        # ais_y = AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(0,50,0)))
-        # ais_y.SetColor(Quantity_Color(0, 1, 0, Quantity_TOC_RGB))
-        # ais_z = AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(0,0,50)))
-        # ais_z.SetColor(Quantity_Color(0, 0, 1.0, Quantity_TOC_RGB))
-        # self._display.Context.Display(ais_origin, True)
-        # self._display.Context.Display(ais_x, True)
-        # self._display.Context.Display(ais_y, True)
-        # self._display.Context.Display(ais_z, True)
 if __name__ == '__main__':
     def TestOverPainting():
         class AppFrame(QtWidgets.QWidget):

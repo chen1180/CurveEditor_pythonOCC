@@ -8,7 +8,10 @@ from data.sketch.sketch_gui import *
 from data.sketch.sketch_type import *
 from OCC.Core.gp import gp_Pnt2d
 HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
-
+from OCC.Core.Geom import Geom_Axis2Placement,Geom_Plane,Geom_Line,Geom_CartesianPoint
+from OCC.Core.Quantity import *
+from OCC.Core.Prs3d import *
+from OCC.Core.Graphic3d import *
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
@@ -21,12 +24,16 @@ class OpenGLEditor(GLWidget):
 
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
-        print(self._display._window_handle)
+        try:
+            self.InitDriver()
+        except Exception as e:
+            print(e)
         self._display.Context.SetAutoActivateSelection(False)
         self.sketchManager = toolController.SketchController(self._display)
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_GUI()
         self.sketch=Sketch(self._display,self.sketchUI)
+        self.sketchManager.interactive.prepareContext_find_edge()
 
         self._state = self.MODE_VIEW
 
@@ -52,6 +59,31 @@ class OpenGLEditor(GLWidget):
         # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketch.OnCancel)
         # self._display.Test()
+        self._cubeManip = AIS_ViewCube()
+        self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
+        # self._cubeManip.SetInfiniteState(True)
+        self._display.Context.Display(self._cubeManip, True)
+        self.setReferenceAxe()
+        assert isinstance(self._display.Context, AIS_InteractiveContext)
+        # self._display.View.SetBgGradientColors(Quantity_Color(Quantity_NOC_SKYBLUE), Quantity_Color(Quantity_NOC_GRAY), 2, True)
+
+    def setReferenceAxe(self):
+        geom_axe = Geom_Axis2Placement(gp_XOY())
+        self._refrenceAxies = AIS_Trihedron(geom_axe)
+        self._refrenceAxies.SetSelectionPriority(Prs3d_DP_XOYAxis, 3)
+        self._display.Context.Display(self._refrenceAxies, True)
+        origin = Geom_CartesianPoint(gp_Pnt(0, 0, 0))
+        # ais_origin=AIS_Point(origin)
+        # ais_x=AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(50,0,0)))
+        # ais_x.SetColor(Quantity_Color(1.0,0,0,Quantity_TOC_RGB))
+        # ais_y = AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(0,50,0)))
+        # ais_y.SetColor(Quantity_Color(0, 1, 0, Quantity_TOC_RGB))
+        # ais_z = AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(0,0,50)))
+        # ais_z.SetColor(Quantity_Color(0, 0, 1.0, Quantity_TOC_RGB))
+        # self._display.Context.Display(ais_origin, True)
+        # self._display.Context.Display(ais_x, True)
+        # self._display.Context.Display(ais_y, True)
+        # self._display.Context.Display(ais_z, True)
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
     def sketchLine(self):
@@ -60,6 +92,10 @@ class OpenGLEditor(GLWidget):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BezierCurve_Method)
     def sketchArc3P(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Arc3P_Method)
+    def sketchCircleCenterRadius(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.CircleCenterRadius_Method)
+    def sketchBSpline(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BSpline_Method)
     def addNewItem(self, item):
         self.modelUpdated.emit(item)
 
