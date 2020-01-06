@@ -66,7 +66,7 @@ class Sketch_CommandArc3P(Sketch_Command):
         if self.myArc3PAction == Arc3PAction.Nothing:
             pass
         elif self.myArc3PAction == Arc3PAction.Input_1ArcPoint:
-            self.myFirstgp_Pnt2d = self.curPnt2d
+            self.myFirstgp_Pnt2d = gp_Pnt2d(self.curPnt2d.X(),self.curPnt2d.Y())
             self.myFirstPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             if not self.myPolylineMode:
                 self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
@@ -76,7 +76,7 @@ class Sketch_CommandArc3P(Sketch_Command):
                 self.findlastSObject()
                 self.myContext.Display(self.myRubberCircle, True)
         elif self.myArc3PAction == Arc3PAction.Input_2ArcPoint:
-            self.mySecondgp_Pnt2d = self.curPnt2d
+            self.mySecondgp_Pnt2d =  gp_Pnt2d(self.curPnt2d.X(),self.curPnt2d.Y())
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             self.temp_Circ.SetLocation(self.myFirstPoint.Pnt().Scaled(self.mySecondPoint.Pnt(), 0.5))
             self.temp_Circ.SetRadius(self.myFirstgp_Pnt2d.Distance(self.curPnt2d) / 2)
@@ -100,40 +100,40 @@ class Sketch_CommandArc3P(Sketch_Command):
             self.myArc3PAction = Arc3PAction.Input_3ArcPoint
 
         elif self.myArc3PAction == Arc3PAction.Input_3ArcPoint:
-            # Geom2d_Point1 = Geom2d_CartesianPoint(self.myFirstgp_Pnt2d)
-            # Geom2d_Point2 = Geom2d_CartesianPoint(self.mySecondgp_Pnt2d)
-            # Geom2d_Point3 = Geom2d_CartesianPoint(self.curPnt2d)
-            # tempGcc_Circ2d3Tan = Geom2dGcc_Circ2d3Tan(Geom2d_Point1, Geom2d_Point2, Geom2d_Point3, 1.0e-10)
-            # if tempGcc_Circ2d3Tan.IsDone() and tempGcc_Circ2d3Tan.NbSolutions() > 0:
-            #     myGeom2d_Arc = Geom2d_Arc(tempGcc_Circ2d3Tan.ThisSolution(1))
-            #     myGeom2d_Arc.SetParam(self.myFirstgp_Pnt2d, self.mySecondgp_Pnt2d, self.curPnt2d)
-            #
-            #     Geom_Circle1 = Geom_Circle(elclib.To3d(self.curCoordinateSystem.Ax2(), myGeom2d_Arc.Circ2d()))
-            #     myAIS_Circle = AIS_Circle(Geom_Circle1)
-            #
-            #     myAIS_Circle.SetFirstParam(myGeom2d_Arc.FirstParameter())
-            #     myAIS_Circle.SetLastParam(myGeom2d_Arc.LastParameter())
-            #
-            #     self.AddObject(myGeom2d_Arc, myAIS_Circle, Sketch_ObjectTypeOfMethod.Arc3P_Method)
-            #     self.myContext.Remove(self.myRubberCircle, True)
-            #     self.myContext.Display(myAIS_Circle, True)
-            #
-            #     self.myArc3PAction = Arc3PAction.Input_1ArcPoint
-            self.third_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
-            tempMakeCirc = gce_MakeCirc(self.myFirstPoint.Pnt(), self.mySecondPoint.Pnt(), self.third_Pnt)
-            if tempMakeCirc.Status() == gce_Done:
+            Geom2d_Point1 = Geom2d_CartesianPoint(self.myFirstgp_Pnt2d)
+            Geom2d_Point2 = Geom2d_CartesianPoint(self.mySecondgp_Pnt2d)
+            Geom2d_Point3 = Geom2d_CartesianPoint(self.curPnt2d)
+            tempGcc_Circ2d3Tan = Geom2dGcc_Circ2d3Tan(Geom2d_Point1, Geom2d_Point2, Geom2d_Point3, 1.0e-10)
+            if tempGcc_Circ2d3Tan.IsDone() and tempGcc_Circ2d3Tan.NbSolutions() > 0:
+                myGeom2d_Arc = Geom2d_Arc(tempGcc_Circ2d3Tan.ThisSolution(1))
+                myGeom2d_Arc.SetParam(self.myFirstgp_Pnt2d, self.mySecondgp_Pnt2d, self.curPnt2d)
 
-                Geom_Circle1 = Geom_Circle(tempMakeCirc.Value())
+                Geom_Circle1 = Geom_Circle(elclib.To3d(self.curCoordinateSystem.Ax2(), myGeom2d_Arc.Circ2d()))
                 myAIS_Circle = AIS_Circle(Geom_Circle1)
 
-                myAIS_Circle.SetFirstParam(
-                    elclib.Parameter(Geom_Circle1.Circ(), self.myFirstPoint.Pnt()))
-                myAIS_Circle.SetLastParam(elclib.Parameter(Geom_Circle1.Circ(), self.third_Pnt))
+                myAIS_Circle.SetFirstParam(myGeom2d_Arc.FirstParameter())
+                myAIS_Circle.SetLastParam(myGeom2d_Arc.LastParameter())
 
-                self.AddObject(Geom_Circle, myAIS_Circle, Sketch_ObjectTypeOfMethod.Arc3P_Method)
+                self.AddObject(myGeom2d_Arc, myAIS_Circle, Sketch_ObjectTypeOfMethod.Arc3P_Method)
                 self.myContext.Remove(self.myRubberCircle, True)
                 self.myContext.Display(myAIS_Circle, True)
+
                 self.myArc3PAction = Arc3PAction.Input_1ArcPoint
+            # self.third_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
+            # tempMakeCirc = gce_MakeCirc(self.myFirstPoint.Pnt(), self.mySecondPoint.Pnt(), self.third_Pnt)
+            # if tempMakeCirc.Status() == gce_Done:
+            #
+            #     Geom_Circle1 = Geom_Circle(tempMakeCirc.Value())
+            #     myAIS_Circle = AIS_Circle(Geom_Circle1)
+            #
+            #     myAIS_Circle.SetFirstParam(
+            #         elclib.Parameter(Geom_Circle1.Circ(), self.myFirstPoint.Pnt()))
+            #     myAIS_Circle.SetLastParam(elclib.Parameter(Geom_Circle1.Circ(), self.third_Pnt))
+            #
+            #     self.AddObject(Geom_Circle, myAIS_Circle, Sketch_ObjectTypeOfMethod.Arc3P_Method)
+            #     self.myContext.Remove(self.myRubberCircle, True)
+            #     self.myContext.Display(myAIS_Circle, True)
+            #     self.myArc3PAction = Arc3PAction.Input_1ArcPoint
 
         elif self.myArc3PAction == Arc3PAction.Input_PolylineArc:
             self.TempGeom2d_Point.SetPnt2d(self.curPnt2d)

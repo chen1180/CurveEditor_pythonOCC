@@ -2,7 +2,7 @@ from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
 from data.sketch.sketch_object import Sketch_Object
 from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp,gp_Pnt,gp_Circ,gp_Circ2d
+from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp,gp_Pnt,gp_Circ,gp_Circ2d,gp_Lin2d
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject,AIS_Shape,AIS_Circle
 from OCC.Core.Aspect import Aspect_TOL_SOLID
 from OCC.Core.Prs3d import Prs3d_LineAspect

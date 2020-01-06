@@ -22,34 +22,35 @@ class Sketch_CommandLine2P(Sketch_Command):
         self.myLine2PAction = Line2PAction.Input_FirstPointLine
 
     def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+
         if self.myLine2PAction == Line2PAction.Nothing:
             pass
         elif self.myLine2PAction == Line2PAction.Input_FirstPointLine:
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(thePnt2d, thePnt2d, TangentType.Line_FirstPnt, True)
-            self.myFirstgp_Pnt2d = self.curPnt2d
+            self.myFirstgp_Pnt2d = gp_Pnt2d(self.curPnt2d.X(),self.curPnt2d.Y()) # important to create new instance otherwise, this varible will be the copy of self.curPnt2d
             self.myFirstPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
             self.myContext.Display(self.myRubberLine, True)
             self.myLine2PAction = Line2PAction.Input_SecondPointLine
         elif self.myLine2PAction == Line2PAction.Input_SecondPointLine:
+
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                     TangentType.Line_SecondPnt, False)
             newGeom2d_Edge = Geom2d_Edge()
-            # if newGeom2d_Edge.SetPoints(self.myFirstgp_Pnt2d, self.curPnt2d):
-            Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))
-            Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), thePnt2d))
-            myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
-            self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketcherObject)
-            self.myContext.Display(myAIS_Line, True)
-            if self.myPolylineMode:
-                self.myFirstgp_Pnt2d = self.curPnt2d
-                self.myFirstPoint.SetPnt(self.mySecondPoint.Pnt())
-                self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
-                self.myContext.Redisplay(self.myRubberLine,True,False)
-            else:
-                self.myContext.Remove(self.myRubberLine,True)
-                self.myLine2PAction = Line2PAction.Input_FirstPointLine
-
+            if newGeom2d_Edge.SetPoints(self.myFirstgp_Pnt2d, self.curPnt2d):
+                Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))
+                Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), thePnt2d))
+                myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
+                self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketcherObject)
+                self.myContext.Display(myAIS_Line, True)
+                if self.myPolylineMode:
+                    self.myFirstgp_Pnt2d = self.curPnt2d
+                    self.myFirstPoint.SetPnt(self.mySecondPoint.Pnt())
+                    self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
+                    self.myContext.Redisplay(self.myRubberLine,True)
+                else:
+                    self.myContext.Remove(self.myRubberLine,True)
+                    self.myLine2PAction = Line2PAction.Input_FirstPointLine
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
@@ -62,6 +63,7 @@ class Sketch_CommandLine2P(Sketch_Command):
             self.curPnt2d = self.myAnalyserSnap.MouseMoveException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                    TangentType.Line_SecondPnt, False)
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
+
             self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
 
             self.myContext.Redisplay(self.myRubberLine,True)

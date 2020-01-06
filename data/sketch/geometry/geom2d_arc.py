@@ -14,9 +14,9 @@ class Geom2d_Arc(Geom2d_Circle):
         self.myLastParam = 2.0 * M_PI
 
     def SetParam(self, start: gp_Pnt2d, mid: gp_Pnt2d, end: gp_Pnt2d):
-        self.myFirstParam = elclib.Parameter(gp_Circ2d(), start)
-        self.myLastParam = elclib.Parameter(gp_Circ2d(), end)
-        u = elclib.Parameter(gp_Circ2d(), mid)
+        self.myFirstParam = elclib.Parameter(self.Circ2d(), start)
+        self.myLastParam = elclib.Parameter(self.Circ2d(), end)
+        u = elclib.Parameter(self.Circ2d(), mid)
         self.CheckParam()
         if self.myFirstParam < u and u < self.myLastParam or self.myLastParam < u + 2 * M_PI and u + 2 * M_PI < self.myLastParam:
             pass
@@ -33,14 +33,14 @@ class Geom2d_Arc(Geom2d_Circle):
         if type(u1) == float:
             self.myFirstParam = u1
         elif type(u1) == gp_Pnt2d:
-            self.myFirstParam = elclib.Parameter(gp_Circ2d(), u1)
+            self.myFirstParam = elclib.Parameter(self.Circ2d(), u1)
         self.CheckParam()
 
     def SetLastParam(self, u2):
         if type(u2) == float:
             self.myLastParam = u2
         elif type(u2) == gp_Pnt2d:
-            self.myLastParam = elclib.Parameter(gp_Circ2d(), u2)
+            self.myLastParam = elclib.Parameter(self.Circ2d(), u2)
         self.CheckParam()
 
     def FirstParameter(self):
@@ -50,13 +50,13 @@ class Geom2d_Arc(Geom2d_Circle):
         return self.myLastParam
 
     def FirstPnt(self):
-        return elclib.Value(self.myFirstParam, gp_Circ2d())
+        return elclib.Value(self.myFirstParam, self.Circ2d())
 
     def LastPnt(self):
-        return elclib.Value(self.myLastParam, gp_Circ2d())
+        return elclib.Value(self.myLastParam, self.Circ2d())
 
     def MiddlePnt(self):
-        return elclib.Value((self.myLastParam + self.myFirstParam) / 2, gp_Circ2d())
+        return elclib.Value((self.myLastParam + self.myFirstParam) / 2, self.Circ2d())
 
     def CheckParam(self):
         while self.myFirstParam > 2 * M_PI:
