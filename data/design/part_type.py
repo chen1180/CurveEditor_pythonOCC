@@ -1,6 +1,4 @@
-import enum
-
-class Part_ObjectTypeOfMethod(enum.Enum):
+class Part_ObjectTypeOfMethod:
     Nothing_Method = 0
     BezierSurface_Method = 1
     BSplineSurface_Method = 2

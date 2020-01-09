@@ -4,19 +4,16 @@ from view.openglWindow import GLWidget
 from controller import toolController
 import logging
 from data.sketch.sketch import *
-from data.sketch.sketch_gui import *
+from data.sketch.sketch_qtgui import Sketch_QTGUI
 from data.sketch.sketch_type import *
 from data.design.part import *
-from OCC.Core.gp import gp_Pnt2d
 
 HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
 from OCC.Core.Geom import Geom_Axis2Placement, Geom_Plane, Geom_Line, Geom_CartesianPoint
-from OCC.Core.Quantity import *
 from OCC.Core.Prs3d import *
 from OCC.Core.Graphic3d import *
 from controller.editorController import Sketch_NewSketchEditor
 from data.node import *
-from OCC.Core.Aspect import Aspect_GFM_VER
 from OCC.Core.V3d import V3d_Viewer
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -36,12 +33,13 @@ class OpenGLEditor(GLWidget):
         except Exception as e:
             print(e)
 
+        self.parent=parent
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
         # Acitivate selection automaticlly
         self._display.Context.SetAutoActivateSelection(False)
         # self.sketchManager = toolController.SketchController(self._display)
         self.viewManager = toolController.ViewController(self._display)
-        self.sketchUI = Sketch_GUI()
+        self.sketchUI = Sketch_QTGUI()
         self.sketch = Sketch(self._display, self.sketchUI)
         self.part = Part(self._display)
 
@@ -133,17 +131,19 @@ class OpenGLEditor(GLWidget):
     def createNewSketch(self):
         self.new_sketch = Sketch_NewSketchEditor(None, self._display)
         self.new_sketch.ui.uiOk.accepted.connect(self.createSketchNode)
-        assert isinstance(self._display.Viewer, V3d_Viewer)
-        self.sketch.SetCoordinateSystem(self._display.Viewer.PrivilegedPlane())
-        print(self._display.Viewer.PrivilegedPlane())
 
     def createSketchNode(self):
         self.new_sketch.constructGrid()
         self._sketch = SketchNode("Sketch")
         self.modelUpdated.emit(self._sketch)
-
-    def addNewItem(self, item):
-        self.modelUpdated.emit(item)
+        assert isinstance(self._display.Viewer, V3d_Viewer)
+        coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
+        direction = coordinate_system.Direction()
+        print(direction.X(), direction.Y(), direction.Z())
+        self.sketch.SetCoordinateSystem(coordinate_system)
+        coordinate_system: gp_Ax3 = self.sketch.GetCoordinateSystem()
+        direction = coordinate_system.Direction()
+        print(direction.X(), direction.Y(), direction.Z())
 
     def setScene(self, scene):
         self._sceneGraph = scene
@@ -203,6 +203,7 @@ class OpenGLEditor(GLWidget):
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
+        self.sketch.ViewProperties()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 self.dragStartPosX = pt.x()

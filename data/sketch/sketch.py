@@ -1,4 +1,3 @@
-from data.sketch.sketch_gui import *
 from data.sketch.commands.sketch_command import Sketch_Command
 from data.sketch.commands.sketch_commandPoint import Sketch_CommandPoint
 from data.sketch.commands.sketch_commandLine2p import Sketch_CommandLine2P
@@ -7,6 +6,7 @@ from data.sketch.commands.sketch_commandArc3P import Sketch_CommandArc3P
 from data.sketch.commands.sketch_commandCircleCenterRadius import Sketch_CommandCircleCenterRadius
 from data.sketch.commands.sketch_commandBSpline import Sketch_CommandBSpline
 from data.sketch.commands.sketch_commandPointToBSpline import Sketch_CommandPointToBSpline
+from data.sketch.sketch_qtgui import Sketch_QTGUI
 from data.sketch.snaps.sketch_analyserSnap import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
@@ -15,7 +15,7 @@ from OCC.Core.Prs3d import Prs3d_LineAspect
 
 
 class Sketch(object):
-    def __init__(self, theDisplay, sg: Sketch_GUI = None):
+    def __init__(self, theDisplay, sg: Sketch_QTGUI = None):
         self.myCoordinateSystem = gp_Ax3(gp.XOY())
         self.myContext: AIS_InteractiveContext = theDisplay.Context
         self.myView: V3d_View = theDisplay.View
@@ -137,6 +137,7 @@ class Sketch(object):
         theX, theY = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
+        print(theX,theY,v3dX,v3dY,v3dZ)
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d):
@@ -177,8 +178,8 @@ class Sketch(object):
         for idx in range(len(self.myData)):
             myCurObject: Sketch_Object = self.myData[idx]
             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                self.myContext.ClearSelected()
-                self.myGUI.SetSketcher_Object(myCurObject)
+                self.myContext.ClearSelected(True)
+                self.myGUI.SetSketch_Object(myCurObject)
                 break
 
     def RedrawAll(self):

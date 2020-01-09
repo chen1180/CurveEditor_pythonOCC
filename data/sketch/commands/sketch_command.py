@@ -43,10 +43,7 @@ class Sketch_Command(object):
         self.data = theData
 
     def SetAx3(self, theAx3: gp_Ax3):
-        dir = theAx3.Direction()
-        location = theAx3.Location()
-        self.curCoordinateSystem.SetDirection(dir)
-        self.curCoordinateSystem.SetLocation(location)
+        self.curCoordinateSystem=theAx3
 
     def SetAnalyserSnap(self, theAnalyserSnap):
         self.myAnalyserSnap: Sketch_AnalyserSnap = theAnalyserSnap
@@ -66,8 +63,8 @@ class Sketch_Command(object):
     def AddObject(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
                   theGeometryType: Sketch_GeometryType):
         self.objectCounter += 1
-        numString = TCollection_ExtendedString(self.objectCounter)
-        currentName = TCollection_ExtendedString(self.objectName)
+        numString =str(self.objectCounter)
+        currentName = self.objectName
         currentName += numString
         if self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.Point_Method:
             theAIS_InteractiveObject.SetColor(self.myColor)

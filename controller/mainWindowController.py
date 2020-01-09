@@ -5,7 +5,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
 from data.model import *
 
-
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)

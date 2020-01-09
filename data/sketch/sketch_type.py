@@ -1,7 +1,7 @@
 import enum
 
 
-class Sketch_GeometryType(enum.Enum):
+class Sketch_GeometryType:
     PointSketcherObject = 0
     LineSketcherObject = 1
     CircleSketcherObject = 2
@@ -9,12 +9,12 @@ class Sketch_GeometryType(enum.Enum):
     CurveSketcherObject = 3
 
 
-class Sketch_ObjectType(enum.Enum):
+class Sketch_ObjectType:
     MainSketcherType = 0
     AuxiliarySketcherType = 1
 
 
-class Sketch_ObjectTypeOfMethod(enum.Enum):
+class Sketch_ObjectTypeOfMethod:
     Nothing_Method = 0
     Point_Method = 1
     Line2P_Method = 2
@@ -32,14 +32,14 @@ class Sketch_ObjectTypeOfMethod(enum.Enum):
     PointsToBSpline_Method = 13
 
 
-class TangentType(enum.Enum):
+class TangentType:
     NothingTangent = 0
     Line_FirstPnt = 1
     Line_SecondPnt = 2
     Circle_CenterPnt = 3
 
 
-class Sketcher_SnapType(enum.Enum):
+class Sketcher_SnapType:
     SnapNothing = 0
     SnapEnd = 1
     SnapMiddle = 2

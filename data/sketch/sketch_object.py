@@ -1,4 +1,3 @@
-
 from OCC.Core.AIS import *
 from OCC.Core.Aspect import *
 
@@ -12,7 +11,7 @@ from data.sketch.sketch_type import *
 
 class Sketch_Object(object):
     def __init__(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
-                 theName: TCollection_ExtendedString, theGeometryType: Sketch_GeometryType,
+                 theName: str, theGeometryType: Sketch_GeometryType,
                  theTypeOfMethod: Sketch_ObjectTypeOfMethod):
         self.myGeometry = theGeom2d_Geometry
         self.myAIS_InteractiveObject = theAIS_InteractiveObject
@@ -75,3 +74,9 @@ class Sketch_Object(object):
 
     def GetWidth(self):
         return self.myWidth
+
+    def SetObjectName(self, theName):
+        self.myNameOfColor = theName
+
+    def GetObjectName(self):
+        return self.myName

@@ -218,8 +218,6 @@ class Sketch_NewSketchEditor(QtWidgets.QWidget):
         theAx3=self._display.Viewer.PrivilegedPlane()
         dir = theAx3.Direction()
         # print(dir.X(), dir.Y(), dir.Z())
-        location = theAx3.Location()
-        # print(location.X(), location.Y(), location.Z())
         self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
         self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
