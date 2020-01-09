@@ -4,7 +4,6 @@ from OCC.Core.ElCLib import elclib
 from OCC.Core.AIS import AIS_Point
 from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BSplineCurve
 from OCC.Core.Geom import Geom_BSplineCurve
-from OCC.Core.GeomAPI import GeomAPI_PointsToBSpline
 from enum import Enum
 from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.TColgp import TColgp_Array1OfPnt2d, TColgp_Array1OfPnt
@@ -53,7 +52,6 @@ def setMultiplicities(poles_size:int,degree:int):
     #calculate number of vectors in the middle of knots vector
     middle_size=knots_size-2*(degree+1)
     multipicities=[]
-
     if middle_size>0:
         multipicities=[degree+1]
         for i in range(middle_size):
@@ -231,7 +229,8 @@ class Sketch_CommandBSpline(Sketch_Command):
     def storePoles(self):
         myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
         self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-        myAIS_Point = AIS_Point(self.mySecondPoint)
+        myGeom_Point = Geom_CartesianPoint(self.mySecondPoint.X(), self.mySecondPoint.Y(), self.mySecondPoint.Z())
+        myAIS_Point = AIS_Point(myGeom_Point)
         self.myContext.Display(myAIS_Point, True)
         self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
 

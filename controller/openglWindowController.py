@@ -6,12 +6,19 @@ import logging
 from data.sketch.sketch import *
 from data.sketch.sketch_gui import *
 from data.sketch.sketch_type import *
+from data.design.part import *
 from OCC.Core.gp import gp_Pnt2d
+
 HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
-from OCC.Core.Geom import Geom_Axis2Placement,Geom_Plane,Geom_Line,Geom_CartesianPoint
+from OCC.Core.Geom import Geom_Axis2Placement, Geom_Plane, Geom_Line, Geom_CartesianPoint
 from OCC.Core.Quantity import *
 from OCC.Core.Prs3d import *
 from OCC.Core.Graphic3d import *
+from controller.editorController import Sketch_NewSketchEditor
+from data.node import *
+from OCC.Core.Aspect import Aspect_GFM_VER
+from OCC.Core.V3d import V3d_Viewer
+
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
@@ -28,13 +35,20 @@ class OpenGLEditor(GLWidget):
             self.InitDriver()
         except Exception as e:
             print(e)
+
+        # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
+        # Acitivate selection automaticlly
         self._display.Context.SetAutoActivateSelection(False)
-        self.sketchManager = toolController.SketchController(self._display)
+        # self.sketchManager = toolController.SketchController(self._display)
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_GUI()
-        self.sketch=Sketch(self._display,self.sketchUI)
-        self.sketchManager.interactive.prepareContext_find_edge()
+        self.sketch = Sketch(self._display, self.sketchUI)
+        self.part = Part(self._display)
 
+        # self.sketchManager.interactive.prepareContext_find_edge()
+        # self._display.Context.RemoveFilters()
+        # self._display.Context.Deactivate()
+        # self._display.Context.Activate(0)
         self._state = self.MODE_VIEW
 
         self._mousePress_callback = []
@@ -42,22 +56,22 @@ class OpenGLEditor(GLWidget):
         self._mouseRelease_callback = []
 
         # callback functions
-        self._display.register_select_callback(self.sketchManager.recognize_clicked)
+        # self._display.register_select_callback(self.sketchManager.recognize_clicked)
 
-        self.register_mousePress_callback(self.sketchManager.mousePress)
-        self.register_mouseMove_callback(self.sketchManager.mouseMove)
-        self.register_mouseRelease_callback(self.sketchManager.mouseRelease)
-
+        # self.register_mousePress_callback(self.sketchManager.mousePress)
+        # self.register_mouseMove_callback(self.sketchManager.mouseMove)
+        # self.register_mouseRelease_callback(self.sketchManager.mouseRelease)
 
         self.register_mousePress_callback(self.viewManager.selectAIS_Shape)
         self.register_mousePress_callback(self.viewManager.startTransform)
 
-        #signals and slots
-        self.sketchManager.modelUpdate.connect(self.addNewItem)
+        # signals and slots
+        # self.sketchManager.modelUpdate.connect(self.addNewItem)
 
-        self._key_map.setdefault(QtCore.Qt.Key_Escape,[]).append(self.sketchManager.ExitDrawingMode)
-        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
+        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketchManager.ExitDrawingMode)
+        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
         self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketch.OnCancel)
+        self._key_map.setdefault(QtCore.Qt.Key_Delete, []).append(self.sketch.DeleteSelectedObject)
         # self._display.Test()
         self._cubeManip = AIS_ViewCube()
         self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
@@ -84,18 +98,50 @@ class OpenGLEditor(GLWidget):
         # self._display.Context.Display(ais_x, True)
         # self._display.Context.Display(ais_y, True)
         # self._display.Context.Display(ais_z, True)
+
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
+        self.part.SetData(self.sketch.myData)
+
     def sketchLine(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Line2P_Method)
+
     def sketchBezier(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BezierCurve_Method)
+
     def sketchArc3P(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Arc3P_Method)
+
     def sketchCircleCenterRadius(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.CircleCenterRadius_Method)
+
     def sketchBSpline(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BSpline_Method)
+
+    def sketchPointsToBSpline(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.PointsToBSpline_Method)
+
+    def partRevolveSurface(self):
+        self.part.ObjectAction(Part_ObjectTypeOfMethod.RevolvedSurface_Method)
+
+    def partExtrudedSurface(self):
+        self.part.ObjectAction(Part_ObjectTypeOfMethod.ExtrudedSurface_Method)
+
+    def fitSelection(self):
+        self._display.Context.FitSelected(self._display.View, 0.0, True)
+
+    def createNewSketch(self):
+        self.new_sketch = Sketch_NewSketchEditor(None, self._display)
+        self.new_sketch.ui.uiOk.accepted.connect(self.createSketchNode)
+        assert isinstance(self._display.Viewer, V3d_Viewer)
+        self.sketch.SetCoordinateSystem(self._display.Viewer.PrivilegedPlane())
+        print(self._display.Viewer.PrivilegedPlane())
+
+    def createSketchNode(self):
+        self.new_sketch.constructGrid()
+        self._sketch = SketchNode("Sketch")
+        self.modelUpdated.emit(self._sketch)
+
     def addNewItem(self, item):
         self.modelUpdated.emit(item)
 
@@ -116,7 +162,8 @@ class OpenGLEditor(GLWidget):
         elif self._state == self.MODE_DESIGN:
             pass
         elif self._state == self.MODE_SKETCH:
-            self.sketchManager.EnterDrawingMode()
+            # self.sketchManager.EnterDrawingMode()
+            pass
         self._display.Repaint()
 
     def paintEvent(self, event):
@@ -127,19 +174,18 @@ class OpenGLEditor(GLWidget):
             self.processActions()
             self.update()
 
-
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         code = event.key()
         if code in self._key_map:
-            functions=self._key_map[code]
-            if type(functions)==list:
+            functions = self._key_map[code]
+            # print(functions)
+            if type(functions) == list:
                 for func in functions:
                     func()
             else:
                 functions()
         else:
             log.info('key: code %i not mapped to any function' % code)
-
 
     def wheelEvent(self, event):
         try:  # PyQt4/PySide
@@ -175,6 +221,7 @@ class OpenGLEditor(GLWidget):
             callback(pt.x(), pt.y())
 
         self.sketch.OnMouseInputEvent(pt.x(), pt.y())
+        self.part.OnMouseInputEvent(pt.x(), pt.y())
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()
@@ -182,7 +229,7 @@ class OpenGLEditor(GLWidget):
 
         if event.button() == QtCore.Qt.LeftButton:
             if self._select_area:
-                if type(self._drawbox)==list:
+                if type(self._drawbox) == list:
                     [Xmin, Ymin, dx, dy] = self._drawbox
                     self._display.SelectArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
                     self._select_area = False
@@ -223,11 +270,12 @@ class OpenGLEditor(GLWidget):
         buttons = int(evt.buttons())
         modifiers = evt.modifiers()
         self.sketch.OnMouseMoveEvent(pt.x(), pt.y())
+        self.part.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
             callback(pt.x(), pt.y())
 
         if buttons == QtCore.Qt.MiddleButton:
-            if  modifiers != QtCore.Qt.ShiftModifier:
+            if modifiers != QtCore.Qt.ShiftModifier:
                 # ROTATE
                 self.cursor = "rotate"
                 self._display.Rotation(pt.x(), pt.y())
@@ -238,7 +286,7 @@ class OpenGLEditor(GLWidget):
                     pass
                 elif self._state == self.MODE_SKETCH:
                     pass
-                self.viewManager.transform(pt.x(),pt.y())
+                self.viewManager.transform(pt.x(), pt.y())
             # PAN
             elif modifiers == QtCore.Qt.ShiftModifier:
                 dx = pt.x() - self.dragStartPosX
@@ -248,17 +296,17 @@ class OpenGLEditor(GLWidget):
                 self.cursor = "pan"
                 self._display.Pan(dx, -dy)
                 self._drawbox = False
-        # DYNAMIC ZOOM
-        elif (buttons == QtCore.Qt.RightButton and
-              not modifiers == QtCore.Qt.ShiftModifier):
-            self.cursor = "zoom"
-            self._display.Repaint()
-            self._display.DynamicZoom(abs(self.dragStartPosX),
-                                      abs(self.dragStartPosY), abs(pt.x()),
-                                      abs(pt.y()))
-            self.dragStartPosX = pt.x()
-            self.dragStartPosY = pt.y()
-            self._drawbox = False
+        # # DYNAMIC ZOOM
+        # elif (buttons == QtCore.Qt.RightButton and
+        #       not modifiers == QtCore.Qt.ShiftModifier):
+        #     self.cursor = "zoom"
+        #     self._display.Repaint()
+        #     self._display.DynamicZoom(abs(self.dragStartPosX),
+        #                               abs(self.dragStartPosY), abs(pt.x()),
+        #                               abs(pt.y()))
+        #     self.dragStartPosX = pt.x()
+        #     self.dragStartPosY = pt.y()
+        #     self._drawbox = False
 
         # DRAW BOX
         # ZOOM WINDOW
@@ -268,7 +316,7 @@ class OpenGLEditor(GLWidget):
             self.cursor = "zoom-area"
             self.DrawBox(evt)
             self.update()
-        #SELECT AREA
+        # SELECT AREA
         elif (buttons == QtCore.Qt.LeftButton and
               modifiers == QtCore.Qt.ShiftModifier):
             self._select_area = True

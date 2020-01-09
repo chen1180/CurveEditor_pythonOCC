@@ -3,7 +3,8 @@ from data.sketch.geometry.geom2d_edge import *
 from OCC.Core.ElCLib import elclib
 from OCC.Core.AIS import AIS_Point
 from OCC.Core.Geom2d import Geom2d_CartesianPoint
-from OCC.Core.Geom import Geom_CartesianPoint
+from OCC.Core.Geom import Geom_CartesianPoint,Geom_Line
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from enum import Enum
 
 
@@ -40,7 +41,10 @@ class Sketch_CommandLine2P(Sketch_Command):
             if newGeom2d_Edge.SetPoints(self.myFirstgp_Pnt2d, self.curPnt2d):
                 Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))
                 Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), thePnt2d))
-                myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
+                # Line=Geom_Line(Geom_Point1,gp_Dir(gp_Vec(Geom_Point1.Pnt(),Geom_Point2.Pnt())))
+                # myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
+                edge = BRepBuilderAPI_MakeEdge(Geom_Point1.Pnt(), Geom_Point2.Pnt())
+                myAIS_Line=AIS_Shape(edge.Shape())
                 self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketcherObject)
                 self.myContext.Display(myAIS_Line, True)
                 if self.myPolylineMode:

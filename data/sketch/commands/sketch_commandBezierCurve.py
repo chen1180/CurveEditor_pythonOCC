@@ -3,7 +3,7 @@ from data.sketch.geometry.geom2d_edge import Geom2d_Edge
 from OCC.Core.ElCLib import elclib
 from OCC.Core.AIS import AIS_Point
 from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BezierCurve
-from OCC.Core.Geom import  Geom_BezierCurve
+from OCC.Core.Geom import Geom_BezierCurve
 from enum import Enum
 from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.TColgp import TColgp_Array1OfPnt2d, TColgp_Array1OfPnt
@@ -51,7 +51,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
         if self.myBezierCurveAction == BezierCurveAction.Nothing:
             pass
         elif self.myBezierCurveAction == BezierCurveAction.Input_1Point:
-            self.myFirstgp_Pnt2d =gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
+            self.myFirstgp_Pnt2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.myFirstgp_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
             self.myFirstPoint.SetPnt(self.myFirstgp_Pnt)
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
@@ -102,11 +102,11 @@ class Sketch_CommandBezierCurve(Sketch_Command):
                     self.closeBezierCurve()
                 else:
                     self.myRubberAIS_Shape.Set(self.curEdge)
-                    self.myContext.Redisplay(self.myRubberAIS_Shape,True)
+                    self.myContext.Redisplay(self.myRubberAIS_Shape, True)
 
-                    self.myGeom2d_BezierCurve.InsertPoleAfter (self.IndexCounter, self.curPnt2d)
-                    self.myGeom_BezierCurve.InsertPoleAfter (self.IndexCounter, self.tempPnt)
-                    self.tempPnt2d =gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
+                    self.myGeom2d_BezierCurve.InsertPoleAfter(self.IndexCounter, self.curPnt2d)
+                    self.myGeom_BezierCurve.InsertPoleAfter(self.IndexCounter, self.tempPnt)
+                    self.tempPnt2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
                     self.IndexCounter += 1
         return False
 
@@ -119,7 +119,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
         elif self.myBezierCurveAction == BezierCurveAction.Input_2Point:
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
-            self.myContext.Redisplay(self.myRubberLine,True)
+            self.myContext.Redisplay(self.myRubberLine, True)
         elif self.myBezierCurveAction == BezierCurveAction.Input_OtherPoints:
             self.myGeom2d_BezierCurve.SetPole(self.IndexCounter, self.curPnt2d)
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
@@ -128,9 +128,10 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             if ME.IsDone():
                 self.curEdge = ME.Edge()
                 self.myRubberAIS_Shape.Set(self.curEdge)
-                self.myContext.Redisplay(self.myRubberAIS_Shape,True)
+                self.myContext.Redisplay(self.myRubberAIS_Shape, True)
             else:
                 self.IndexCounter -= 1
+
 
     def CancelEvent(self):
         if self.myBezierCurveAction == BezierCurveAction.Nothing:
@@ -138,7 +139,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
         elif self.myBezierCurveAction == BezierCurveAction.Input_1Point:
             pass
         elif self.myBezierCurveAction == BezierCurveAction.Input_2Point:
-            self.myContext.Remove(self.myRubberLine,True)
+            self.myContext.Remove(self.myRubberLine, True)
         elif self.myBezierCurveAction == BezierCurveAction.Input_OtherPoints:
             self.myGeom2d_BezierCurve.RemovePole(self.IndexCounter)
             self.myGeom_BezierCurve.RemovePole(self.IndexCounter)
@@ -155,17 +156,18 @@ class Sketch_CommandBezierCurve(Sketch_Command):
     def storePoles(self):
         myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
         self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-        myAIS_Point = AIS_Point(self.mySecondPoint)
+        myGeom_Point = Geom_CartesianPoint(self.mySecondPoint.X(), self.mySecondPoint.Y(), self.mySecondPoint.Z())
+        myAIS_Point = AIS_Point(myGeom_Point)
         self.myContext.Display(myAIS_Point, True)
         self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
 
     def closeBezierCurve(self):
-        self.myContext.Remove(self.myRubberAIS_Shape,True)
-        myGeom2d_BezierCurve:Geom2d_BezierCurve=Geom2d_BezierCurve.DownCast(self.myGeom2d_BezierCurve.Copy())
+        self.myContext.Remove(self.myRubberAIS_Shape, True)
+        myGeom2d_BezierCurve: Geom2d_BezierCurve = Geom2d_BezierCurve.DownCast(self.myGeom2d_BezierCurve.Copy())
         myAIS_Shape = AIS_Shape(self.curEdge)
         self.AddObject(myGeom2d_BezierCurve, myAIS_Shape, Sketch_GeometryType.CurveSketcherObject)
         self.myContext.Display(myAIS_Shape, True)
-        #create new object
+        # create new object
         curgp_Array1CurvePoles2d = TColgp_Array1OfPnt2d(1, 2)
         curgp_Array1CurvePoles2d.SetValue(1, gp.Origin2d())
         curgp_Array1CurvePoles2d.SetValue(2, gp.Origin2d())

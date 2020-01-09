@@ -29,6 +29,7 @@ class Sketch_ObjectTypeOfMethod(enum.Enum):
     BezierCurve_Method = 10
     Trim_Method = 11
     BSpline_Method=12
+    PointsToBSpline_Method = 13
 
 
 class TangentType(enum.Enum):

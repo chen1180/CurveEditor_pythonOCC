@@ -181,8 +181,9 @@ class CurveEditor(QtWidgets.QWidget):
         parent = current.parent()
         self._dataMapper.setRootIndex(parent)
         self._dataMapper.setCurrentModelIndex(current)
-from OCC.Core.gp import gp_Pnt,gp_Pln,gp_Dir,gp_Ax3
+from OCC.Core.gp import gp_Pnt,gp_Pln,gp_Dir,gp_Ax3,gp
 from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
+from OCC.Core.V3d import V3d_Viewer
 class Sketch_NewSketchEditor(QtWidgets.QWidget):
     def __init__(self,parent=None,display=None):
         super(Sketch_NewSketchEditor, self).__init__(parent)
@@ -193,6 +194,7 @@ class Sketch_NewSketchEditor(QtWidgets.QWidget):
         self.ui.uiOk.rejected.connect(self.close)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.show()
+
     def constructGrid(self):
         self.dir=gp_Dir()
         if self.ui.uiXYPlane.isChecked():
@@ -205,7 +207,6 @@ class Sketch_NewSketchEditor(QtWidgets.QWidget):
             self.dir=gp_Dir(1.0,0.0,0.0)
             self._display.View_Right()
         aPlane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), self.dir)
-
         self.displayGrid(aPlane, 0.0, 0.0, 1.0, 1.0, 0.0, 100, 100, self.ui.uiOffset.value())
         self.close()
 
@@ -213,6 +214,12 @@ class Sketch_NewSketchEditor(QtWidgets.QWidget):
     def displayGrid(self, aPlane, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
         ax3 = gp_Ax3(aPlane.Location(), aPlane.Axis().Direction())
         self._display.Viewer.SetPrivilegedPlane(ax3)
+        assert isinstance(self._display.Viewer,V3d_Viewer)
+        theAx3=self._display.Viewer.PrivilegedPlane()
+        dir = theAx3.Direction()
+        # print(dir.X(), dir.Y(), dir.Z())
+        location = theAx3.Location()
+        # print(location.X(), location.Y(), location.Z())
         self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
         self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)

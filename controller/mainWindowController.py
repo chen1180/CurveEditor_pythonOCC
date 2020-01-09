@@ -5,6 +5,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
 from data.model import *
 
+
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
@@ -17,11 +18,17 @@ class Window(QtWidgets.QMainWindow):
         self.createDrawActions()
         self.createViewActions()
         self.createModeActions()
+        self.createPartActions()
         self.createToolBars()
 
         # setup data
         self._rootNode = Node("Scene")
-        # setup model
+        self._sketch = SketchNode("Sketch", self._rootNode)
+        self._node = TransformNode("Transform", self._sketch)
+        self._light = LightNode("Light", self._sketch)
+        self._model = ModelNode("Model", self._sketch)
+        self._model2 = ModelNode("Model2", self._model)
+        # setup design
         self._model = SceneGraphModel(self._rootNode)
         self._glWindow.setScene(self._model)
 
@@ -57,8 +64,8 @@ class Window(QtWidgets.QMainWindow):
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self._propertyDock)
 
         # create tool dock widget
-        self._toolBarDock = QtWidgets.QDockWidget("Tool", self)
-        self._toolBarDock.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
+        # self._toolBarDock = QtWidgets.QDockWidget("Tool", self)
+        # self._toolBarDock.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
 
         # set two vertical toolbar in the tool widget
         self._toolBarLayout = QtWidgets.QVBoxLayout()
@@ -69,8 +76,8 @@ class Window(QtWidgets.QMainWindow):
         self._toolBarContainer = QtWidgets.QWidget()
         self._toolBarContainer.setLayout(self._toolBarLayout)
 
-        self._toolBarDock.setWidget(self._toolBarContainer)
-        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self._toolBarDock)
+        # self._toolBarDock.setWidget(self._toolBarContainer)
+        # self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self._toolBarDock)
 
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
@@ -130,11 +137,9 @@ class Window(QtWidgets.QMainWindow):
         self._sketchToolBar.addAction(self._action_sketchMode_addLine)
         self._sketchToolBar.addAction(self._action_sketchMode_addBezierCurve)
         self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
+        self._sketchToolBar.addAction(self._action_sketchMode_pointsToBSpline)
         self._sketchToolBar.addAction(self._action_sketchMode_addArc)
         self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
-        self._sketchToolBar.addSeparator()
-        self._sketchToolBar.addAction(self._action_sketchMode_addBezierSurface)
-        self._sketchToolBar.addAction(self._action_sketchMode_revolutedSurface)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
@@ -143,6 +148,9 @@ class Window(QtWidgets.QMainWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         self._designToolBar = QtWidgets.QToolBar("Design")
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        self._designToolBar.addAction(self._action_partMode_addBezierSurface)
+        self._designToolBar.addAction(self._action_partMode_revolutedSurface)
+        self._designToolBar.addAction(self._action_partMode_extrudedSurface)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
         self._sketchToolBar.setVisible(False)
         self._designToolBar.setVisible(False)
@@ -154,9 +162,10 @@ class Window(QtWidgets.QMainWindow):
             else:
                 self._glWindow._display.SetOrthographicProjection()
             self._glWindow._display.Repaint()
-        self._action_transform=QtWidgets.QAction(QtGui.QIcon(""), "Transform", self,
-                                                statusTip="Transform a object",
-                                                triggered=self._glWindow.viewManager.setActive)
+
+        self._action_transform = QtWidgets.QAction(QtGui.QIcon(""), "Transform", self,
+                                                   statusTip="Transform a object",
+                                                   triggered=self._glWindow.viewManager.setActive)
         self._action_fitAll = QtWidgets.QAction(QtGui.QIcon(""), "Fit all shape on screen", self,
                                                 statusTip="Fit all shapes on screen",
                                                 triggered=self._glWindow._display.FitAll)
@@ -193,32 +202,28 @@ class Window(QtWidgets.QMainWindow):
         #                               triggered=self.deleteItem)
         self._action_sketchMode_createNewSketch = QtWidgets.QAction(QtGui.QIcon(""), "create a new sketch", self,
                                                                     statusTip="create a new sketch",
-                                                                    triggered=self._glWindow.sketchManager.createNewSketch)
+                                                                    triggered=self._glWindow.createNewSketch)
         self._action_sketchMode_addPoint = QtWidgets.QAction(QtGui.QIcon(""), "add points", self,
-                                                                    statusTip="add points on sketch",
-                                                                    triggered=self._glWindow.sketchPoint)
+                                                             statusTip="add points on sketch",
+                                                             triggered=self._glWindow.sketchPoint)
         self._action_sketchMode_addLine = QtWidgets.QAction(QtGui.QIcon(""), "add lines", self,
-                                                             statusTip="add a line",
-                                                             triggered=self._glWindow.sketchLine)
+                                                            statusTip="add a line",
+                                                            triggered=self._glWindow.sketchLine)
         self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(""), "Add Bezier Curve", self,
                                                                    statusTip="Add a cubic Bezier curve",
                                                                    triggered=self._glWindow.sketchBezier)
         self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Add BSpline Curve", self,
                                                                statusTip="Add a B Spline curve",
                                                                triggered=self._glWindow.sketchBSpline)
+        self._action_sketchMode_pointsToBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Interpolate BSpline", self,
+                                                                    statusTip="Interpolate points with BSpline",
+                                                                    triggered=self._glWindow.sketchPointsToBSpline)
         self._action_sketchMode_addArc = QtWidgets.QAction(QtGui.QIcon(""), "Add Arc", self,
                                                            statusTip="Add an arc",
                                                            triggered=self._glWindow.sketchArc3P)
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
-                                                           statusTip="Add a circle",
-                                                           triggered=self._glWindow.sketchCircleCenterRadius)
-        self._action_sketchMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
-                                                                     self,
-                                                                     statusTip="Create from two Bezier curve",
-                                                                     triggered=self._glWindow.sketchManager.action_bezierSurface)
-        self._action_sketchMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
-                                                                     statusTip="Create surface of revolution based on a selected shape",
-                                                                     triggered=self._glWindow.sketchManager.action_revolutedSurface)
+                                                              statusTip="Add a circle",
+                                                              triggered=self._glWindow.sketchCircleCenterRadius)
 
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",
@@ -226,6 +231,18 @@ class Window(QtWidgets.QMainWindow):
         # self.addNurbsPatch = QtWidgets.QAction(QtGui.QIcon(":images/nurbs_patch.png"), "Add a NURB patch", self,
         #                         statusTip="Add a Nurb patch",
         #                         triggered=self.drawNurbsPatch)
+
+    def createPartActions(self):
+        self._action_partMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
+                                                                   self,
+                                                                   statusTip="Create from two Bezier curve",
+                                                                   triggered=self._glWindow.sketchCircleCenterRadius)
+        self._action_partMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
+                                                                   statusTip="Create surface of revolution based on a selected shape",
+                                                                   triggered=self._glWindow.partRevolveSurface)
+        self._action_partMode_extrudedSurface = QtWidgets.QAction(QtGui.QIcon(""), "extrude a shape", self,
+                                                                  statusTip="Create extruded surface based on a selected shape",
+                                                                  triggered=self._glWindow.partExtrudedSurface)
 
     def createModeActions(self):
         self._action_switchViewMode = QtWidgets.QAction(QtGui.QIcon(""), "View", self,
