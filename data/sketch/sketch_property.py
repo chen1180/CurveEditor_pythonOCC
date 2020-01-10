@@ -6,7 +6,7 @@ from OCC.Core.Prs3d import *
 from OCC.Core.Quantity import *
 from OCC.Core.gp import *
 from OCC.Core.AIS import *
-from OCC.Core.BRepBuilderAPI import  *
+from OCC.Core.BRepBuilderAPI import *
 from data.sketch.sketch_object import Sketch_Object
 from view.sketchProperty import Ui_SketchProperty
 
@@ -93,6 +93,11 @@ class Sketch_Property(QWidget):
                 self.CheckAttributies()
             self.GetName()
 
+    def keyPressEvent(self, a0: QKeyEvent) -> None:
+        button = a0.key()
+        if button == Qt.Key_Escape:
+            self.close()
+
     def SetID(self):
         self.ui.LineEditID.setText(self.myID)
 
@@ -111,7 +116,7 @@ class Sketch_Property(QWidget):
             x = NumName[0]
             y = NumName[1]
             try:
-                x =float(x)
+                x = float(x)
                 y = float(y)
                 p.SetCoord(x, y)
                 return True
@@ -285,6 +290,7 @@ class Sketch_Property(QWidget):
 
     def SetWidth(self):
         self.ui.ComboBoxWidth.setCurrentIndex(int(self.myWidth) - 1)
+
     def GetWidth(self):
         if self.isPointWindow:
             return 1.0

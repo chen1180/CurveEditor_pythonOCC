@@ -204,7 +204,7 @@ class OpenGLEditor(GLWidget):
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
-        # self.sketch.ViewProperties()
+        self.sketch.ViewProperties()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 self.dragStartPosX = pt.x()
