@@ -40,11 +40,10 @@ class Sketch_CommandLine2P(Sketch_Command):
             newGeom2d_Edge = Geom2d_Edge()
             if newGeom2d_Edge.SetPoints(self.myFirstgp_Pnt2d, self.curPnt2d):
                 Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))
-                Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), thePnt2d))
-                # Line=Geom_Line(Geom_Point1,gp_Dir(gp_Vec(Geom_Point1.Pnt(),Geom_Point2.Pnt())))
-                # myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
-                edge = BRepBuilderAPI_MakeEdge(Geom_Point1.Pnt(), Geom_Point2.Pnt())
-                myAIS_Line=AIS_Shape(edge.Shape())
+                Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
+                myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
+                # edge = BRepBuilderAPI_MakeEdge(Geom_Point1.Pnt(), Geom_Point2.Pnt())
+                # myAIS_Line=AIS_Shape(edge.Shape())
                 self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketcherObject)
                 self.myContext.Display(myAIS_Line, True)
                 if self.myPolylineMode:

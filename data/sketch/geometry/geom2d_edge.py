@@ -35,7 +35,3 @@ class Geom2d_Edge(Geom2d_Line):
 
     def EndParameter(self):
         return elclib.Parameter(self.Lin2d(), self.EndPnt)
-
-
-# Register Geom2d_Line in _Geom2d:
-Geom2d_Line_swigregister(Geom2d_Edge)

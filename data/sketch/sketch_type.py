@@ -6,7 +6,7 @@ class Sketch_GeometryType:
     LineSketcherObject = 1
     CircleSketcherObject = 2
     ArcSketcherObject = 3
-    CurveSketcherObject = 3
+    CurveSketcherObject = 4
 
 
 class Sketch_ObjectType:

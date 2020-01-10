@@ -41,6 +41,7 @@ class OpenGLEditor(GLWidget):
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_QTGUI()
         self.sketch = Sketch(self._display, self.sketchUI)
+        self.sketch.SetSnap(Sketcher_SnapType.SnapCenter)
         self.part = Part(self._display)
 
         # self.sketchManager.interactive.prepareContext_find_edge()

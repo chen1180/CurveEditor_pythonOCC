@@ -65,7 +65,7 @@ class Sketch_Snap(object):
             self.myGeom_Point.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.bestPnt2d))
             self.myAIS_Point.SetComponent(self.myGeom_Point)
             if self.firstDisplay:
-                self.myContext.Display(self.myAIS_Point, False)
+                self.myContext.Display(self.myAIS_Point, True)
                 self.DrawRelation()
                 self.firstDisplay = False
             else:
@@ -78,7 +78,7 @@ class Sketch_Snap(object):
         return self.bestPnt2d
 
     def EraseSnap(self):
-        self.firstDisplay = False
+        self.firstDisplay = True
         self.myContext.Remove(self.myAIS_Point,True)
         self.EraseRelation()
 
@@ -91,14 +91,14 @@ class Sketch_Snap(object):
         return self.findbestPnt2d,newPnt2d,dist,type
 
     def DrawRelation(self):
-        self.myContext.SetSelected(self.curHilightedObj)
+        self.myContext.SetSelected(self.curHilightedObj,True)
 
     def EraseRelation(self):
         self.myContext.ClearSelected(True)
 
     def countProject(self):
         if self.ProjectOnCurve.NbPoints() > 0:
-            objectPnt2d = self.ProjectOnCurve.NearestPoint()
+            self.objectPnt2d = self.ProjectOnCurve.NearestPoint()
             return self.count()
         else:
             return False

@@ -46,24 +46,20 @@
     </spacer>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="GroupBoxGP">
      <property name="title">
       <string>Geometry Properties</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="TextLabelPoint1">
-          <property name="text">
-           <string>Point</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="LineEditPoint1"/>
-        </item>
-       </layout>
+     <layout class="QGridLayout" name="GroupBoxGPLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="TextLabelPoint1">
+        <property name="text">
+         <string>Point</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="LineEditPoint1"/>
       </item>
      </layout>
     </widget>
@@ -82,170 +78,154 @@
     </spacer>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="GroupBoxAttributes">
      <property name="title">
       <string>Attributes</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="TextLabelColor">
-          <property name="text">
-           <string>Color</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="ComboBoxColor">
-          <item>
-           <property name="text">
-            <string>BLACK</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>BROWN</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>RED</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>ORANGE</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>YELLOW</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
+     <layout class="QGridLayout" name="GroupBoxAttributesLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="TextLabelColor">
+        <property name="text">
+         <string>Color</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item row="0" column="1">
+       <widget class="QComboBox" name="ComboBoxColor">
         <item>
-         <widget class="QLabel" name="TextLabelType">
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </widget>
+         <property name="text">
+          <string>BLACK</string>
+         </property>
         </item>
         <item>
-         <widget class="QComboBox" name="ComboBoxType">
-          <item>
-           <property name="text">
-            <string>Main</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Auxiliary</string>
-           </property>
-          </item>
-         </widget>
+         <property name="text">
+          <string>BROWN</string>
+         </property>
         </item>
-       </layout>
+        <item>
+         <property name="text">
+          <string>RED</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ORANGE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>YELLOW</string>
+         </property>
+        </item>
+       </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="TextLabelStyle">
-          <property name="text">
-           <string>Style</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="ComboBoxStyle">
-          <item>
-           <property name="text">
-            <string>SOLID</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>DASH</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>DOT</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>DOTDASH</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
+      <item row="1" column="0">
+       <widget class="QLabel" name="TextLabelType">
+        <property name="text">
+         <string>Type</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item row="1" column="1">
+       <widget class="QComboBox" name="ComboBoxType">
         <item>
-         <widget class="QLabel" name="TextLabelWidth">
-          <property name="text">
-           <string>Width</string>
-          </property>
-         </widget>
+         <property name="text">
+          <string>Main</string>
+         </property>
         </item>
         <item>
-         <widget class="QComboBox" name="ComboBoxWidth">
-          <item>
-           <property name="text">
-            <string>1.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>3.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>4.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>5.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>6.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>7.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>8.0</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>9.0</string>
-           </property>
-          </item>
-         </widget>
+         <property name="text">
+          <string>Auxiliary</string>
+         </property>
         </item>
-       </layout>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="TextLabelStyle">
+        <property name="text">
+         <string>Style</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="ComboBoxStyle">
+        <item>
+         <property name="text">
+          <string>SOLID</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DASH</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DOT</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DOTDASH</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="TextLabelWidth">
+        <property name="text">
+         <string>Width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="ComboBoxWidth">
+        <item>
+         <property name="text">
+          <string>1.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>3.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>4.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>5.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>6.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>7.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>8.0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>9.0</string>
+         </property>
+        </item>
+       </widget>
       </item>
      </layout>
     </widget>

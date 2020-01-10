@@ -6,15 +6,15 @@ class Sketch_SnapCenter(Sketch_Snap):
     def __init__(self):
         super(Sketch_SnapCenter, self).__init__()
 
-
     def SelectEvent(self):
         self.findbestPnt2d = False
         self.minDistance = self.minimumSnapDistance
         for idx in range(len(self.data)):
             mySObject: Sketch_Object = self.data[idx]
             myGeometryType = mySObject.GetGeometryType()
-            if myGeometryType == Sketch_GeometryType.PointSketcherObject or \
-                    myGeometryType == Sketch_GeometryType.LineSketcherObject:
+            if myGeometryType == Sketch_GeometryType.PointSketcherObject:
+                pass
+            elif myGeometryType == Sketch_GeometryType.LineSketcherObject:
                 pass
             elif myGeometryType == Sketch_GeometryType.CircleSketcherObject or myGeometryType == Sketch_GeometryType.ArcSketcherObject:
                 self.curGeom2d_Circle: Geom2d_Circle = mySObject.GetGeometry()
@@ -22,9 +22,9 @@ class Sketch_SnapCenter(Sketch_Snap):
                 if self.countProject():
                     self.bestPnt2d = self.curGeom2d_Circle.Location()
                     self.curHilightedObj = mySObject.GetAIS_Object()
-                objectPnt2d = self.curGeom2d_Circle.Location()
+                self.objectPnt2d = self.curGeom2d_Circle.Location()
                 if self.count():
-                    self.bestPnt2d = objectPnt2d.Location()
+                    self.bestPnt2d = self.objectPnt2d
                     self.curHilightedObj = mySObject.GetAIS_Object()
         if self.minDistance == self.minimumSnapDistance:
             self.bestPnt2d = self.curPnt2d

@@ -137,7 +137,6 @@ class Sketch(object):
         theX, theY = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
-        print(theX,theY,v3dX,v3dY,v3dZ)
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d):
