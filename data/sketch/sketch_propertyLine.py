@@ -31,12 +31,15 @@ class Sketch_PropertyLine(Sketch_Property):
     def SetGeometry(self, *__args):
         self.curGeom2d_Edge: Geom2d_Edge = self.mySObject.GetGeometry()
         # must use constructor otherwise the vairable will be the pointer to the edge point
-        self.firstPnt2d = gp_Pnt2d(self.curGeom2d_Edge.GetStart_Pnt().X(), self.curGeom2d_Edge.GetStart_Pnt().Y())
-        self.secondPnt2d = gp_Pnt2d(self.curGeom2d_Edge.GetEnd_Pnt().X(), self.curGeom2d_Edge.GetEnd_Pnt().Y())
-        print("set geometry 1st point", self.firstPnt2d.X(), self.firstPnt2d.Y(), self.tempPnt2d.X(),
-              self.tempPnt2d.Y())
-        print("set geometry 2nd point", self.secondPnt2d.X(), self.secondPnt2d.Y(), self.temp2Pnt2d.X(),
-              self.temp2Pnt2d.Y())
+        self.firstPnt2d.SetX(self.curGeom2d_Edge.GetStart_Pnt().X())
+        self.firstPnt2d.SetY(self.curGeom2d_Edge.GetStart_Pnt().Y())
+        # self.firstPnt2d = gp_Pnt2d(, self.curGeom2d_Edge.GetStart_Pnt().Y())
+        self.secondPnt2d.SetX(self.curGeom2d_Edge.GetEnd_Pnt().X())
+        self.secondPnt2d.SetY(self.curGeom2d_Edge.GetEnd_Pnt().Y())
+        # print("set geometry 1st point", self.firstPnt2d.X(), self.firstPnt2d.Y(), self.tempPnt2d.X(),
+        #       self.tempPnt2d.Y())
+        # print("set geometry 2nd point", self.secondPnt2d.X(), self.secondPnt2d.Y(), self.temp2Pnt2d.X(),
+        #       self.temp2Pnt2d.Y())
         self.SetCoord(self.ui.LineEditPoint1, self.firstPnt2d)
         self.SetCoord(self.LineEditPoint2, self.secondPnt2d)
         self.SetLineLength()
@@ -51,13 +54,15 @@ class Sketch_PropertyLine(Sketch_Property):
             return False
 
     def GetGeometry(self):
-        print("first point", self.firstPnt2d.X(), self.firstPnt2d.Y(), self.tempPnt2d.X(), self.tempPnt2d.Y())
-        print("second point", self.secondPnt2d.X(), self.secondPnt2d.Y(), self.temp2Pnt2d.X(), self.temp2Pnt2d.Y())
+        # print("first point", self.firstPnt2d.X(), self.firstPnt2d.Y(), self.tempPnt2d.X(), self.tempPnt2d.Y())
+        # print("second point", self.secondPnt2d.X(), self.secondPnt2d.Y(), self.temp2Pnt2d.X(), self.temp2Pnt2d.Y())
         if (not self.firstPnt2d.IsEqual(self.tempPnt2d, 1.0e-6)) or (
-        not self.secondPnt2d.IsEqual(self.temp2Pnt2d, 1.0e-6)):
+                not self.secondPnt2d.IsEqual(self.temp2Pnt2d, 1.0e-6)):
             if self.curGeom2d_Edge.SetPoints(self.tempPnt2d, self.temp2Pnt2d):
-                self.firstPnt2d = gp_Pnt2d(self.tempPnt2d.X(), self.tempPnt2d.Y())
-                self.secondPnt2d = gp_Pnt2d(self.temp2Pnt2d.X(), self.temp2Pnt2d.Y())
+                self.firstPnt2d.SetX(self.tempPnt2d.X())
+                self.firstPnt2d.SetY(self.tempPnt2d.Y())
+                self.secondPnt2d.SetX(self.temp2Pnt2d.X())
+                self.secondPnt2d.SetY(self.temp2Pnt2d.Y())
                 Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), self.firstPnt2d))
                 Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), self.secondPnt2d))
                 myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
