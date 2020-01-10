@@ -33,7 +33,7 @@ class OpenGLEditor(GLWidget):
         except Exception as e:
             print(e)
 
-        self.parent=parent
+        self.parent = parent
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
         # Acitivate selection automaticlly
         self._display.Context.SetAutoActivateSelection(False)
@@ -41,7 +41,7 @@ class OpenGLEditor(GLWidget):
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_QTGUI()
         self.sketch = Sketch(self._display, self.sketchUI)
-        self.sketch.SetSnap(Sketcher_SnapType.SnapCenter)
+        self.sketch.SetSnap(Sketcher_SnapType.SnapNearest)
         self.part = Part(self._display)
 
         # self.sketchManager.interactive.prepareContext_find_edge()
@@ -140,11 +140,11 @@ class OpenGLEditor(GLWidget):
         assert isinstance(self._display.Viewer, V3d_Viewer)
         coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
         direction = coordinate_system.Direction()
-        print(direction.X(), direction.Y(), direction.Z())
+        # print(direction.X(), direction.Y(), direction.Z())
         self.sketch.SetCoordinateSystem(coordinate_system)
-        coordinate_system: gp_Ax3 = self.sketch.GetCoordinateSystem()
-        direction = coordinate_system.Direction()
-        print(direction.X(), direction.Y(), direction.Z())
+        # coordinate_system: gp_Ax3 = self.sketch.GetCoordinateSystem()
+        # direction = coordinate_system.Direction()
+        # print(direction.X(), direction.Y(), direction.Z())
 
     def setScene(self, scene):
         self._sceneGraph = scene
@@ -204,7 +204,7 @@ class OpenGLEditor(GLWidget):
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
-        self.sketch.ViewProperties()
+        # self.sketch.ViewProperties()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 self.dragStartPosX = pt.x()

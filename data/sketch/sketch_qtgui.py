@@ -20,7 +20,7 @@ class Sketch_QTGUI(object):
             self.prop_point.close()
         if not self.prop_line.isHidden():
             self.prop_line.close()
-        if CurObject.GetGeometryType() == Sketch_GeometryType.PointSketcherObject:
+        if CurObject.GetGeometryType() == Sketch_GeometryType.PointSketchObject:
             self.prop_point.SetObject(CurObject)
-        elif CurObject.GetGeometryType() == Sketch_GeometryType.LineSketcherObject:
+        elif CurObject.GetGeometryType() == Sketch_GeometryType.LineSketchObject:
             self.prop_line.SetObject(CurObject)

@@ -13,6 +13,7 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 SKETCH_DEGREE = 2
 MAXIMUMPOLES = 16
 
+
 class BSplineCurveAction(Enum):
     Nothing = 0
     Input_1Point = 1
@@ -46,31 +47,32 @@ def float_list_to_TColStd_Array1OfReal(li):
     for n, i in enumerate(li):
         pts.SetValue(n + 1, i)
     return pts
-def setMultiplicities(poles_size:int,degree:int):
-    #total knots vector size
-    knots_size=poles_size+degree+1
-    #calculate number of vectors in the middle of knots vector
-    middle_size=knots_size-2*(degree+1)
-    multipicities=[]
-    if middle_size>0:
-        multipicities=[degree+1]
+
+
+def setMultiplicities(poles_size: int, degree: int):
+    # total knots vector size
+    knots_size = poles_size + degree + 1
+    # calculate number of vectors in the middle of knots vector
+    middle_size = knots_size - 2 * (degree + 1)
+    multipicities = []
+    if middle_size > 0:
+        multipicities = [degree + 1]
         for i in range(middle_size):
             multipicities.append(1)
-        multipicities+=[degree+1]
+        multipicities += [degree + 1]
     else:
-        first_point_multiplicities=knots_size-(degree+1)
-        if first_point_multiplicities>0:
-            multipicities=[degree+1]
+        first_point_multiplicities = knots_size - (degree + 1)
+        if first_point_multiplicities > 0:
+            multipicities = [degree + 1]
             for i in range(first_point_multiplicities):
                 multipicities.append(1)
         else:
             for i in range(knots_size):
                 multipicities.append(1)
-    knots=[]
+    knots = []
     for i in range(len(multipicities)):
         knots.append(float(i))
-    return (multipicities,knots)
-
+    return (multipicities, knots)
 
 
 class Sketch_CommandBSpline(Sketch_Command):
@@ -86,7 +88,7 @@ class Sketch_CommandBSpline(Sketch_Command):
         self.myBSplineCurveAction = BSplineCurveAction.Nothing
         self.Poles2d = [gp.Origin2d()] * 2
         self.Poles = [gp.Origin()] * 2
-        self.Multi,self.Knots =setMultiplicities(len(self.Poles),self.myDegree)
+        self.Multi, self.Knots = setMultiplicities(len(self.Poles), self.myDegree)
 
         curgp_Array1CurvePoles2d = point_list_to_TColgp_Array1OfPnt2d(self.Poles2d)
         curgp_Array1CurveMulti = int_list_to_TColStd_Array1OfInteger(self.Multi)
@@ -125,23 +127,23 @@ class Sketch_CommandBSpline(Sketch_Command):
             self.myFirstPoint.SetPnt(self.myFirstgp_Pnt)
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
 
-            self.Poles2d[0]=gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
-            self.Poles[0]=gp_Pnt(self.myFirstgp_Pnt.X(),self.myFirstgp_Pnt.Y(),self.myFirstgp_Pnt.Z())
+            self.Poles2d[0] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
+            self.Poles[0] = gp_Pnt(self.myFirstgp_Pnt.X(), self.myFirstgp_Pnt.Y(), self.myFirstgp_Pnt.Z())
             self.find_new_bspline()
 
             myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
             myAIS_Point = AIS_Point(self.myFirstPoint)
             self.myContext.Display(myAIS_Point, True)
-            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
+            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
 
             self.myContext.Display(self.myRubberLine, True)
             self.myBSplineCurveAction = BSplineCurveAction.Input_2Point
             self.IndexCounter = 2
 
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
-            self.Poles2d[1] = self.curPnt2d
+            self.Poles2d[1] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.tempPnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
-            self.Poles[1]=self.tempPnt
+            self.Poles[1] = gp_Pnt(self.tempPnt.X(), self.tempPnt.Y(), self.tempPnt.Z())
             self.mySecondPoint.SetPnt(self.tempPnt)
             self.find_new_bspline()
 
@@ -157,14 +159,14 @@ class Sketch_CommandBSpline(Sketch_Command):
 
                 self.Poles2d.append(self.curPnt2d)
                 self.Poles.append(self.tempPnt)
-                self.Multi,self.Knots =setMultiplicities(len(self.Poles),self.myDegree)
+                self.Multi, self.Knots = setMultiplicities(len(self.Poles), self.myDegree)
                 self.find_new_bspline()
 
                 self.myBSplineCurveAction = BSplineCurveAction.Input_OtherPoints
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
-            self.Poles2d[self.IndexCounter-1] = self.curPnt2d
+            self.Poles2d[self.IndexCounter - 1] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.tempPnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
-            self.Poles[self.IndexCounter-1] = self.tempPnt
+            self.Poles[self.IndexCounter - 1] = gp_Pnt(self.tempPnt.X(), self.tempPnt.Y(), self.tempPnt.Z())
             self.find_new_bspline()
 
             self.mySecondPoint.SetPnt(self.tempPnt)
@@ -214,7 +216,7 @@ class Sketch_CommandBSpline(Sketch_Command):
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
-            self.myContext.Remove(self.myRubberLine,True)
+            self.myContext.Remove(self.myRubberLine, True)
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
             if ME.IsDone():
@@ -232,13 +234,13 @@ class Sketch_CommandBSpline(Sketch_Command):
         myGeom_Point = Geom_CartesianPoint(self.mySecondPoint.X(), self.mySecondPoint.Y(), self.mySecondPoint.Z())
         myAIS_Point = AIS_Point(myGeom_Point)
         self.myContext.Display(myAIS_Point, True)
-        self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
+        self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
 
     def closeBSpline(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)
         self.storePoles()
         myAIS_Shape = AIS_Shape(self.curEdge)
-        self.AddObject(self.myGeom2d_BSplineCurve, myAIS_Shape, Sketch_GeometryType.CurveSketcherObject)
+        self.AddObject(self.myGeom2d_BSplineCurve, myAIS_Shape, Sketch_GeometryType.CurveSketchObject)
         self.myContext.Display(myAIS_Shape, True)
 
         self.Poles2d = [gp.Origin2d()] * 2

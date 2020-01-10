@@ -2,7 +2,8 @@ from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
 from data.sketch.sketch_object import Sketch_Object
 from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp, gp_Pnt, gp_Circ, gp_Circ2d, gp_Lin2d, gp_Ax2d, gp_Dir2d,gp_Dir,gp_Vec
+from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp, gp_Pnt, gp_Circ, gp_Circ2d, gp_Lin2d, gp_Ax2d, gp_Dir2d, \
+    gp_Dir, gp_Vec
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject, AIS_Shape, AIS_Circle
 from OCC.Core.Aspect import Aspect_TOL_SOLID
 from OCC.Core.Prs3d import Prs3d_LineAspect
@@ -21,7 +22,7 @@ class Sketch_Command(object):
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
 
-        self.myType = Sketch_ObjectType.MainSketcherType
+        self.myType = Sketch_ObjectType.MainSketchType
         self.myColor = Quantity_Color(Quantity_NOC_YELLOW)
         self.myStyle = Aspect_TOL_SOLID
         self.myWidth = 1.0
@@ -30,6 +31,7 @@ class Sketch_Command(object):
         self.myPolylineMode = False
         self.curPnt2d = gp.Origin2d()
         self.myFirstgp_Pnt2d = gp.Origin2d()
+        self.mySecondgp_Pn2d = gp.Origin2d()
 
         self.myFirstPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
         self.mySecondPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
@@ -43,7 +45,7 @@ class Sketch_Command(object):
         self.data = theData
 
     def SetAx3(self, theAx3: gp_Ax3):
-        self.curCoordinateSystem=theAx3
+        self.curCoordinateSystem = theAx3
 
     def SetAnalyserSnap(self, theAnalyserSnap):
         self.myAnalyserSnap: Sketch_AnalyserSnap = theAnalyserSnap
@@ -63,7 +65,7 @@ class Sketch_Command(object):
     def AddObject(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
                   theGeometryType: Sketch_GeometryType):
         self.objectCounter += 1
-        numString =str(self.objectCounter)
+        numString = str(self.objectCounter)
         currentName = self.objectName
         currentName += numString
         if self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.Point_Method:

@@ -2,16 +2,16 @@ import enum
 
 
 class Sketch_GeometryType:
-    PointSketcherObject = 0
-    LineSketcherObject = 1
-    CircleSketcherObject = 2
-    ArcSketcherObject = 3
-    CurveSketcherObject = 4
+    PointSketchObject = 0
+    LineSketchObject = 1
+    CircleSketchObject = 2
+    ArcSketchObject = 3
+    CurveSketchObject = 4
 
 
 class Sketch_ObjectType:
-    MainSketcherType = 0
-    AuxiliarySketcherType = 1
+    MainSketchType = 0
+    AuxiliarySketchType = 1
 
 
 class Sketch_ObjectTypeOfMethod:

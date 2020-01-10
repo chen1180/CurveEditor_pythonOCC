@@ -69,7 +69,7 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
             myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
             myAIS_Point = AIS_Point(self.myFirstPoint)
             self.myContext.Display(myAIS_Point, True)
-            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
+            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
 
             self.myContext.Display(self.myRubberLine, True)
             self.myBSplineCurveAction = BSplineCurveAction.Input_2Point
@@ -170,13 +170,13 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
         myGeom_Point = Geom_CartesianPoint(self.mySecondPoint.X(), self.mySecondPoint.Y(), self.mySecondPoint.Z())
         myAIS_Point = AIS_Point(myGeom_Point)
         self.myContext.Display(myAIS_Point, True)
-        self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketcherObject)
+        self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
 
     def closeBSpline(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)
         self.storePoles()
         myAIS_Shape = AIS_Shape(self.curEdge)
-        self.AddObject(self.myGeom2d_BSplineCurve, myAIS_Shape, Sketch_GeometryType.CurveSketcherObject)
+        self.AddObject(self.myGeom2d_BSplineCurve, myAIS_Shape, Sketch_GeometryType.CurveSketchObject)
         self.myContext.Display(myAIS_Shape, True)
 
         self.Poles2d = [gp.Origin2d()] * 2

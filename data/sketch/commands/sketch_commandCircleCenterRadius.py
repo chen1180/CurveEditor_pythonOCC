@@ -53,7 +53,7 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
 
             Geom_Circle1 = Geom_Circle(elclib.To3d(self.curCoordinateSystem.Ax2(), myGeom2d_Circle.Circ2d()))
             myAIS_Circle = AIS_Circle(Geom_Circle1)
-            self.AddObject(myGeom2d_Circle, myAIS_Circle, Sketch_GeometryType.CircleSketcherObject)
+            self.AddObject(myGeom2d_Circle, myAIS_Circle, Sketch_GeometryType.CircleSketchObject)
 
             self.myContext.Remove(self.myRubberCircle, True)
             self.myContext.Remove(self.myRubberLine, True)

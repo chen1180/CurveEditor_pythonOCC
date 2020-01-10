@@ -20,7 +20,7 @@ class Sketch_Object(object):
         self.myTypeOfMethod = theTypeOfMethod
 
         self.myNameOfColor = Quantity_NOC_YELLOW
-        self.myObjectType = Sketch_ObjectType.MainSketcherType
+        self.myObjectType = Sketch_ObjectType.MainSketchType
         self.myLineStyle = Aspect_TOL_SOLID
         self.myWidth = 1.0
 

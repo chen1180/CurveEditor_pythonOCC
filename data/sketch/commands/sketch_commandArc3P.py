@@ -114,7 +114,7 @@ class Sketch_CommandArc3P(Sketch_Command):
                 myAIS_Circle.SetFirstParam(myGeom2d_Arc.FirstParameter())
                 myAIS_Circle.SetLastParam(myGeom2d_Arc.LastParameter())
 
-                self.AddObject(myGeom2d_Arc, myAIS_Circle, Sketch_ObjectTypeOfMethod.Arc3P_Method)
+                self.AddObject(myGeom2d_Arc, myAIS_Circle, Sketch_GeometryType.ArcSketchObject)
                 self.myContext.Remove(self.myRubberCircle, True)
                 self.myContext.Display(myAIS_Circle, True)
 
@@ -165,7 +165,7 @@ class Sketch_CommandArc3P(Sketch_Command):
                 myAIS_Circle.SetLastParam(myGeom2d_Arc.LastParameter())
                 self.myContext.Display(myAIS_Circle, True)
 
-                self.AddObject(myGeom2d_Arc, myAIS_Circle, Sketch_GeometryType.ArcSketcherObject)
+                self.AddObject(myGeom2d_Arc, myAIS_Circle, Sketch_GeometryType.ArcSketchObject)
 
                 self.midpoint2d = myGeom2d_Arc.MiddlePnt()
                 self.tempGeom2d_Circle.SetCirc2d(myGeom2d_Arc.Circ2d())
@@ -249,7 +249,7 @@ class Sketch_CommandArc3P(Sketch_Command):
         self.midpoint2d = gp.Origin2d()
         if len(self.data) > 0:
             lastSObject: Sketch_Object = self.data[-1]
-            if lastSObject.GetGeometryType() == Sketch_GeometryType.LineSketcherObject:
+            if lastSObject.GetGeometryType() == Sketch_GeometryType.LineSketchObject:
                 last2d_Edge: Geom2d_Edge = lastSObject.GetGeometry()
                 if last2d_Edge.GetStart_Pnt().IsEqual(self.myFirstgp_Pnt2d, 1.0e-6) or last2d_Edge.GetEnd_Pnt().IsEqual(
                         self.myFirstgp_Pnt2d, 1.0e-6):
@@ -258,7 +258,7 @@ class Sketch_CommandArc3P(Sketch_Command):
                     self.temp2dAdaptor_Curve.Load(self.tempGeom2d_Line)
                 else:
                     self.setTempLine()
-            elif lastSObject.GetGeometryType() == Sketch_GeometryType.ArcSketcherObject:
+            elif lastSObject.GetGeometryType() == Sketch_GeometryType.ArcSketchObject:
                 last2d_Arc: Geom2d_Arc = lastSObject.GetGeometry()
                 if last2d_Arc.FirstPnt().IsEqual(self.myFirstgp_Pnt2d, 1.0e-6) or last2d_Arc.LastPnt().IsEqual(
                         self.myFirstgp_Pnt2d, 1.0e-6):

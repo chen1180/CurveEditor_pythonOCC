@@ -4,6 +4,8 @@ from OCC.Core.AIS import *
 from OCC.Core.TColStd import *
 from data.sketch.sketch_type import *
 from data.sketch.snaps.sketch_snapCenter import Sketch_SnapCenter
+from data.sketch.snaps.sketch_snapEnd import Sketch_SnapEnd
+from data.sketch.snaps.sketch_snapNearest import Sketch_SnapNearest
 from OCC.Core.TColgp import *
 
 
@@ -39,11 +41,12 @@ class Sketch_AnalyserSnap(object):
         self.mySnapType = TColStd_SequenceOfInteger()
 
         self.addSnap(Sketch_SnapCenter())
-
+        self.addSnap(Sketch_SnapEnd())
+        self.addSnap(Sketch_SnapNearest())
     def SetContext(self, theContext):
         self.myContext = theContext
         for idx in range(len(self.mySnaps)):
-            self.CurSnap =self.mySnaps[idx]
+            self.CurSnap = self.mySnaps[idx]
             self.CurSnap.SetContext(self.myContext)
 
     def SetData(self, thedata):
