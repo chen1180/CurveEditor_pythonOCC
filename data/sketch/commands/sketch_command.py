@@ -18,7 +18,7 @@ SKETCH_RADIUS = 10.0
 class Sketch_Command(object):
     def __init__(self, name):
         self.data = []
-        self.rootNode = None
+        self.rootNode:Node = None
         self.objectName = name
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
@@ -46,7 +46,7 @@ class Sketch_Command(object):
         self.data = theData
 
     def SetRootNode(self, theNode: Node):
-        self.rootNode = theNode
+        self.rootNode:Node = theNode
 
     def insertNode(self, node):
         '''
@@ -85,10 +85,17 @@ class Sketch_Command(object):
         currentName += numString
         if self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.Point_Method:
             theAIS_InteractiveObject.SetColor(self.myColor)
+            node = PointNode(currentName, self.rootNode)
         else:
             self.myPrs3dAspect.SetColor(self.myColor)
             self.myPrs3dAspect.SetTypeOfLine(self.myStyle)
             self.myPrs3dAspect.SetWidth(self.myWidth)
+            if self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.Line2P_Method:
+                LineNode(currentName, self.rootNode)
+            elif self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.BezierCurve_Method:
+                BezierNode(currentName, self.rootNode)
+            elif self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.BSpline_Method:
+                BsplineNode(currentName, self.rootNode)
         so = Sketch_Object(theGeom2d_Geometry, theAIS_InteractiveObject, currentName, theGeometryType,
                            self.GetTypeOfMethod())
         so.SetColor(self.myColor)

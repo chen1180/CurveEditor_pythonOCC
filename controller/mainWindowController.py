@@ -26,11 +26,10 @@ class Window(QtWidgets.QMainWindow):
         # self._proxyModel.setFilterRole(SceneGraphModel.filterRole)
 
         # opengl window
-        self._glWindow = openglWindowController.OpenGLEditor(self._model,self)
+        self._glWindow = openglWindowController.OpenGLEditor(self._model, self)
         self._glWindow.sketchController.setRootNode(self._rootNode)
         self.setCentralWidget(self._glWindow)
         # setup tool bar
-        self.createDrawActions()
         self.createViewActions()
         self.createModeActions()
         self.createPartActions()
@@ -86,7 +85,11 @@ class Window(QtWidgets.QMainWindow):
         Returns:
 
         '''
-        self._model.insertNode(item, 0, 1)
+        position = self._rootNode.childCount()
+        self._model.insertNode(item, position, 1)
+        #select latest row
+        self._uiTreeView.setCurrentIndex(self._model.index(position,0,QtCore.QModelIndex()))
+        self._uiTreeView.expandAll()
 
     def createToolBars(self):
         # Curve tool bar
@@ -126,23 +129,23 @@ class Window(QtWidgets.QMainWindow):
 
     def createSketchToolBar(self):
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
-        self._sketchToolBar.addAction(self._action_sketchMode_createNewSketch)
-        self._sketchToolBar.addAction(self._action_sketchMode_addPoint)
-        self._sketchToolBar.addAction(self._action_sketchMode_addLine)
-        self._sketchToolBar.addAction(self._action_sketchMode_addBezierCurve)
-        self._sketchToolBar.addAction(self._action_sketchMode_addBSpline)
-        self._sketchToolBar.addAction(self._action_sketchMode_pointsToBSpline)
-        self._sketchToolBar.addAction(self._action_sketchMode_addArc)
-        self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_createNewSketch)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addPoint)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addLine)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addBezierCurve)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addBSpline)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_pointsToBSpline)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addArc)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addCircle)
         self._sketchToolBar.addSeparator()
         self._snapModeButton = customToolButton.CustomToolButton()
         self._snapModeMenu = QtWidgets.QMenu()
-        self._snapModeMenu.addAction(self._action_sketchMode_snapNothing)
-        self._snapModeMenu.addAction(self._action_sketchMode_snapCenter)
-        self._snapModeMenu.addAction(self._action_sketchMode_snapEnd)
-        self._snapModeMenu.addAction(self._action_sketchMode_snapNearest)
+        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapNothing)
+        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapCenter)
+        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapEnd)
+        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapNearest)
         self._snapModeButton.setMenu(self._snapModeMenu)
-        self._snapModeButton.setDefaultAction(self._action_sketchMode_snapNothing)
+        self._snapModeButton.setDefaultAction(self._glWindow.sketchController.action_snapNothing)
         self._sketchToolBar.addWidget(self._snapModeButton)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
@@ -199,53 +202,6 @@ class Window(QtWidgets.QMainWindow):
         self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
                                                  statusTip="Change view point",
                                                  triggered=self._glWindow._display.View_Iso)
-
-    def createDrawActions(self):
-        # self.deleteItem_action = QtWidgets.QAction(QtGui.QIcon(":images/delete.png"), "Delete a selection", self,
-        #                               statusTip="Delete an item",
-        #                               triggered=self.deleteItem)
-        self._action_sketchMode_createNewSketch = QtWidgets.QAction(QtGui.QIcon(""), "create a new sketch", self,
-                                                                    statusTip="create a new sketch",
-                                                                    triggered=self._glWindow.sketchController.createNewSketch)
-        self._action_sketchMode_addPoint = QtWidgets.QAction(QtGui.QIcon(""), "add points", self,
-                                                             statusTip="add points on sketch",
-                                                             triggered=self._glWindow.sketchController.sketchPoint)
-        self._action_sketchMode_addLine = QtWidgets.QAction(QtGui.QIcon(""), "add lines", self,
-                                                            statusTip="add a line",
-                                                            triggered=self._glWindow.sketchController.sketchLine)
-        self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(""), "Add Bezier Curve", self,
-                                                                   statusTip="Add a cubic Bezier curve",
-                                                                   triggered=self._glWindow.sketchController.sketchBezier)
-        self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Add BSpline Curve", self,
-                                                               statusTip="Add a B Spline curve",
-                                                               triggered=self._glWindow.sketchController.sketchBSpline)
-        self._action_sketchMode_pointsToBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Interpolate BSpline", self,
-                                                                    statusTip="Interpolate points with BSpline",
-                                                                    triggered=self._glWindow.sketchController.sketchPointsToBSpline)
-        self._action_sketchMode_addArc = QtWidgets.QAction(QtGui.QIcon(""), "Add Arc", self,
-                                                           statusTip="Add an arc",
-                                                           triggered=self._glWindow.sketchController.sketchArc3P)
-        self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
-                                                              statusTip="Add a circle",
-                                                              triggered=self._glWindow.sketchController.sketchCircleCenterRadius)
-        self._action_sketchMode_snapEnd = QtWidgets.QAction(QtGui.QIcon(""), "Snap End", self,
-                                                            statusTip="Snap to the end points",
-                                                            triggered=self._glWindow.sketchController.snapEnd)
-        self._action_sketchMode_snapCenter = QtWidgets.QAction(QtGui.QIcon(""), "Snap Center", self,
-                                                               statusTip="Snap to the center of circle or arc",
-                                                               triggered=self._glWindow.sketchController.snapCenter)
-        self._action_sketchMode_snapNearest = QtWidgets.QAction(QtGui.QIcon(""), "Snap Nearest", self,
-                                                                statusTip="Snap to the nearest points on the geometry",
-                                                                triggered=self._glWindow.sketchController.snapNearest)
-        self._action_sketchMode_snapNothing = QtWidgets.QAction(QtGui.QIcon(""), "No Snap", self,
-                                                                statusTip="No Snap mode",
-                                                                triggered=self._glWindow.sketchController.snapNothing)
-        # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
-        #                               statusTip="Add a cubic Bezier patch",
-        #                               triggered=self.drawBezierPatch)
-        # self.addNurbsPatch = QtWidgets.QAction(QtGui.QIcon(":images/nurbs_patch.png"), "Add a NURB patch", self,
-        #                         statusTip="Add a Nurb patch",
-        #                         triggered=self.drawNurbsPatch)
 
     def createPartActions(self):
         self._action_partMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",

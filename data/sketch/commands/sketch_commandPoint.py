@@ -28,13 +28,14 @@ class Sketch_CommandPoint(Sketch_Command):
             myAIS_Point = AIS_Point(myGeom_Point)
             self.myContext.Display(myAIS_Point, True)
             self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
-            PointNode("point", self.rootNode)
+            # self.rootNode.insertChild(0, PointNode("point node"))
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
 
     def CancelEvent(self):
+        # self.rootNode.removeChild(self.rootNode.childCount() - 1)
         self.myPointAction = PointAction.Nothing
 
     def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:

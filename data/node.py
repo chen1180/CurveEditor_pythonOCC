@@ -284,6 +284,12 @@ class PointNode(SketchObjectNode):
         super(PointNode, self).__init__(name, parent)
         self._points = None
 
+    def setPoints(self, points):
+        self._points = points
+
+    def setColor(self, colors):
+        self._color = colors
+
     def data(self, column):
         r = super(PointNode, self).data(column)
 
@@ -314,3 +320,120 @@ class PointNode(SketchObjectNode):
 
     def typeInfo(self):
         return "Point"
+
+
+class LineNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(LineNode, self).__init__(name, parent)
+        self._points = None
+
+    def setPoints(self, points):
+        self._points = points
+
+    def setColor(self, colors):
+        self._color = colors
+
+    def data(self, column):
+        r = super(LineNode, self).data(column)
+
+        if column == 2:
+            r = self._color
+        elif column == 3:
+            r = self._style
+        elif column == 4:
+            r = self._width
+        elif column == 5:
+            r = self._type
+        return r
+
+    def setData(self, column, value):
+        super(LineNode, self).setData(column, value)
+        if column == 2:
+            self._color = value
+        elif column == 3:
+            self._style = value
+        elif column == 4:
+            self._width = value
+        elif column == 5:
+            self._type = value
+
+    def typeInfo(self):
+        return "Line"
+
+
+class BezierNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(BezierNode, self).__init__(name, parent)
+        self._points = None
+
+    def setPoints(self, points):
+        self._points = points
+
+    def setColor(self, colors):
+        self._color = colors
+
+    def data(self, column):
+        r = super(BezierNode, self).data(column)
+
+        if column == 2:
+            r = self._color
+        elif column == 3:
+            r = self._style
+        elif column == 4:
+            r = self._width
+        elif column == 5:
+            r = self._type
+        return r
+
+    def setData(self, column, value):
+        super(BezierNode, self).setData(column, value)
+        if column == 2:
+            self._color = value
+        elif column == 3:
+            self._style = value
+        elif column == 4:
+            self._width = value
+        elif column == 5:
+            self._type = value
+
+    def typeInfo(self):
+        return "Bezier curve"
+
+
+class BsplineNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(BsplineNode, self).__init__(name, parent)
+        self._points = None
+
+    def setPoints(self, points):
+        self._points = points
+
+    def setColor(self, colors):
+        self._color = colors
+
+    def data(self, column):
+        r = super(BsplineNode, self).data(column)
+
+        if column == 2:
+            r = self._color
+        elif column == 3:
+            r = self._style
+        elif column == 4:
+            r = self._width
+        elif column == 5:
+            r = self._type
+        return r
+
+    def setData(self, column, value):
+        super(BsplineNode, self).setData(column, value)
+        if column == 2:
+            self._color = value
+        elif column == 3:
+            self._style = value
+        elif column == 4:
+            self._width = value
+        elif column == 5:
+            self._type = value
+
+    def typeInfo(self):
+        return "BSpline"

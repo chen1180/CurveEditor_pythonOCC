@@ -2,6 +2,7 @@ from PyQt5 import QtGui, QtWidgets, QtCore, uic
 import sys
 from view import lightProperty, nodeProperty, property, transformProperty, cameraProperty, curveProperty, \
     newSketchProperty
+from data.model import SceneGraphModel
 
 
 class PropertyEditor(QtWidgets.QWidget):
@@ -89,6 +90,7 @@ class PropertyEditor(QtWidgets.QWidget):
         self._lightEditor.setSelection(current)
         self._transformEditor.setSelection(current)
         self._curveEditor.setSelection(current)
+        self._pointEditor.setSelection(current)
 
 
 class NodeEditor(QtWidgets.QWidget):
@@ -216,10 +218,10 @@ class PointEditor(QtWidgets.QWidget):
         self._dataMapper = QtWidgets.QDataWidgetMapper()
 
     def setModel(self, model):
-        self._model = model
+        self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.ComboBoxColor, 2)
-        # self._dataMapper.addMapping(self.ui.LineEditPoint1, 3)
+        self._dataMapper.addMapping(self.ui.LineEditPoint1, 3)
 
     """INPUTS: QModelIndex"""
 
