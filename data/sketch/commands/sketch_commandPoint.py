@@ -4,6 +4,7 @@ from OCC.Core.AIS import AIS_Point
 from OCC.Core.Geom2d import Geom2d_CartesianPoint
 from enum import Enum
 
+
 class PointAction(Enum):
     Nothing = 0
     Input_Point = 1
@@ -23,10 +24,11 @@ class Sketch_CommandPoint(Sketch_Command):
             pass
         elif self.myPointAction == PointAction.Input_Point:
             myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
-            myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(),self.curPnt2d))
+            myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             myAIS_Point = AIS_Point(myGeom_Point)
-            self.myContext.Display(myAIS_Point,True )
+            self.myContext.Display(myAIS_Point, True)
             self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
+            PointNode("point", self.rootNode)
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):

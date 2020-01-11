@@ -10,6 +10,7 @@ from OCC.Core.Prs3d import Prs3d_LineAspect
 from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1, Quantity_Color
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
+from data.node import *
 
 SKETCH_RADIUS = 10.0
 
@@ -17,7 +18,7 @@ SKETCH_RADIUS = 10.0
 class Sketch_Command(object):
     def __init__(self, name):
         self.data = []
-
+        self.rootNode = None
         self.objectName = name
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
@@ -43,6 +44,20 @@ class Sketch_Command(object):
 
     def SetData(self, theData: list):
         self.data = theData
+
+    def SetRootNode(self, theNode: Node):
+        self.rootNode = theNode
+
+    def insertNode(self, node):
+        '''
+
+        Args:
+            item: Mesh node (usually represent shape node)
+
+        Returns:
+
+        '''
+        self.rootNode.insertNode(node, 0, 1)
 
     def SetAx3(self, theAx3: gp_Ax3):
         self.curCoordinateSystem = theAx3

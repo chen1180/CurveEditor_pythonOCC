@@ -88,6 +88,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return QtCore.QModelIndex()
 
     def getNode(self, index):
+
         if index.isValid():
             node = index.internalPointer()
             if node:

@@ -10,7 +10,7 @@ class PropertyEditor(QtWidgets.QWidget):
         self.ui = property.Ui_Form()
         self.ui.setupUi(self)
 
-        self._proxyModel = None
+        self._model = None
 
         self._nodeEditor = NodeEditor(self)
         self._lightEditor = LightEditor(self)
@@ -32,17 +32,16 @@ class PropertyEditor(QtWidgets.QWidget):
         self._curveEditor.setVisible(False)
         self._pointEditor.setVisible(False)
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._nodeEditor.setModel(proxyModel)
-        self._lightEditor.setModel(proxyModel)
-        self._cameraEditor.setModel(proxyModel)
-        self._transformEditor.setModel(proxyModel)
-        self._curveEditor.setModel(proxyModel)
-        self._pointEditor.setModel(proxyModel)
+    def setModel(self, model):
+        self._model = model
+        self._nodeEditor.setModel(model)
+        self._lightEditor.setModel(model)
+        self._cameraEditor.setModel(model)
+        self._transformEditor.setModel(model)
+        self._curveEditor.setModel(model)
+        self._pointEditor.setModel(model)
 
     def setSelection(self, current: QtCore.QModelIndex, old: QtCore.QModelIndex):
-        current = self._proxyModel.mapToSource(current)
         node = current.internalPointer()
 
         if node is not None:
@@ -99,9 +98,9 @@ class NodeEditor(QtWidgets.QWidget):
         self.ui.setupUi(self)
         self._dataMapper = QtWidgets.QDataWidgetMapper()
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._dataMapper.setModel(proxyModel.sourceModel())
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiName, 0)
         self._dataMapper.addMapping(self.ui.uiTypeInfo, 1)
 
@@ -118,9 +117,9 @@ class LightEditor(QtWidgets.QWidget):
         self.ui.setupUi(self)
         self._dataMapper = QtWidgets.QDataWidgetMapper()
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._dataMapper.setModel(proxyModel.sourceModel())
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
 
         self._dataMapper.addMapping(self.ui.uiLightIntensity, 2)
         self._dataMapper.addMapping(self.ui.uiNear, 3)
@@ -142,9 +141,9 @@ class CameraEditor(QtWidgets.QWidget):
         self.ui.setupUi(self)
         self._dataMapper = QtWidgets.QDataWidgetMapper()
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._dataMapper.setModel(proxyModel.sourceModel())
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
 
         self._dataMapper.addMapping(self.ui.uiBlur, 2)
         self._dataMapper.addMapping(self.ui.uiShakeIntensity, 3)
@@ -164,9 +163,9 @@ class TransformEditor(QtWidgets.QWidget):
         self.ui.setupUi(self)
         self._dataMapper = QtWidgets.QDataWidgetMapper()
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._dataMapper.setModel(proxyModel.sourceModel())
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
 
         self._dataMapper.addMapping(self.ui.uiX, 2)
         self._dataMapper.addMapping(self.ui.uiY, 3)
@@ -190,9 +189,9 @@ class CurveEditor(QtWidgets.QWidget):
         # set submission policy. The data will be updated until certain action is compelte (No enter press is required)
         # https://www.qtcentre.org/threads/45754-How-can-I-work-with-QDataWidgetMapper
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._dataMapper.setModel(proxyModel.sourceModel())
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiCurveOrder, 2)
         self._dataMapper.addMapping(self.ui.uiCurveSubdivision, 3)
         self._dataMapper.addMapping(self.ui.uiCurveKnots, 4)
@@ -216,9 +215,9 @@ class PointEditor(QtWidgets.QWidget):
         self.ui.setupUi(self)
         self._dataMapper = QtWidgets.QDataWidgetMapper()
 
-    def setModel(self, proxyModel):
-        self._proxyModel = proxyModel
-        self._dataMapper.setModel(proxyModel.sourceModel())
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.ComboBoxColor, 2)
         # self._dataMapper.addMapping(self.ui.LineEditPoint1, 3)
 

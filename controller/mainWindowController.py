@@ -11,8 +11,23 @@ class Window(QtWidgets.QMainWindow):
         super(Window, self).__init__(parent)
         self._ui = mainWindow.Ui_MainWindow()
         self._ui.setupUi(self)
+
+        # setup data
+        self._rootNode = Node("Scene")
+        self._model = SceneGraphModel(self._rootNode)
+        # """VIEW <------> PROXY MODEL <------> DATA MODEL"""
+        # self._proxyModel = QtCore.QSortFilterProxyModel()
+        # self._proxyModel.setSourceModel(self._model)
+
+        # self._proxyModel.setDynamicSortFilter(True)
+        # self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        #
+        # self._proxyModel.setSortRole(SceneGraphModel.sortRole)
+        # self._proxyModel.setFilterRole(SceneGraphModel.filterRole)
+
         # opengl window
-        self._glWindow = openglWindowController.OpenGLEditor(self)
+        self._glWindow = openglWindowController.OpenGLEditor(self._model,self)
+        self._glWindow.sketchController.setRootNode(self._rootNode)
         self.setCentralWidget(self._glWindow)
         # setup tool bar
         self.createDrawActions()
@@ -21,31 +36,9 @@ class Window(QtWidgets.QMainWindow):
         self.createPartActions()
         self.createToolBars()
 
-        # setup data
-        self._rootNode = Node("Scene")
-        self._sketch = SketchNode("Sketch", self._rootNode)
-        self._point=PointNode("Point",self._sketch)
-        # self._node = TransformNode("Transform", self._sketch)
-        # self._light = LightNode("Light", self._sketch)
-        # self._model = ModelNode("Model", self._sketch)
-        # self._model2 = ModelNode("Model2", self._model)
-        # setup design
-        self._model = SceneGraphModel(self._rootNode)
-        self._glWindow.setScene(self._model)
-
-        # """VIEW <------> PROXY MODEL <------> DATA MODEL"""
-        self._proxyModel = QtCore.QSortFilterProxyModel()
-        self._proxyModel.setSourceModel(self._model)
-
-        self._proxyModel.setDynamicSortFilter(True)
-        self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-
-        self._proxyModel.setSortRole(SceneGraphModel.sortRole)
-        self._proxyModel.setFilterRole(SceneGraphModel.filterRole)
-
         # setup sceneGraph editor
         self._uiTreeView = QtWidgets.QTreeView()
-        self._uiTreeView.setModel(self._proxyModel)
+        self._uiTreeView.setModel(self._model)
         self._uiTreeView.setSortingEnabled(True)
 
         # create sceneGraph dock widget
@@ -56,7 +49,7 @@ class Window(QtWidgets.QMainWindow):
 
         # setup property editor
         self._propEditor = editorController.PropertyEditor(self)
-        self._propEditor.setModel(self._proxyModel)
+        self._propEditor.setModel(self._model)
 
         # create property dock widget
         self._propertyDock = QtWidgets.QDockWidget("Scene", self)
@@ -82,7 +75,7 @@ class Window(QtWidgets.QMainWindow):
 
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
-        self._glWindow.modelUpdated.connect(self.updateModel)
+        self._glWindow.sketchController.modelUpdated.connect(self.updateModel)
 
     def updateModel(self, item):
         '''
@@ -213,40 +206,40 @@ class Window(QtWidgets.QMainWindow):
         #                               triggered=self.deleteItem)
         self._action_sketchMode_createNewSketch = QtWidgets.QAction(QtGui.QIcon(""), "create a new sketch", self,
                                                                     statusTip="create a new sketch",
-                                                                    triggered=self._glWindow.createNewSketch)
+                                                                    triggered=self._glWindow.sketchController.createNewSketch)
         self._action_sketchMode_addPoint = QtWidgets.QAction(QtGui.QIcon(""), "add points", self,
                                                              statusTip="add points on sketch",
-                                                             triggered=self._glWindow.sketchPoint)
+                                                             triggered=self._glWindow.sketchController.sketchPoint)
         self._action_sketchMode_addLine = QtWidgets.QAction(QtGui.QIcon(""), "add lines", self,
                                                             statusTip="add a line",
-                                                            triggered=self._glWindow.sketchLine)
+                                                            triggered=self._glWindow.sketchController.sketchLine)
         self._action_sketchMode_addBezierCurve = QtWidgets.QAction(QtGui.QIcon(""), "Add Bezier Curve", self,
                                                                    statusTip="Add a cubic Bezier curve",
-                                                                   triggered=self._glWindow.sketchBezier)
+                                                                   triggered=self._glWindow.sketchController.sketchBezier)
         self._action_sketchMode_addBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Add BSpline Curve", self,
                                                                statusTip="Add a B Spline curve",
-                                                               triggered=self._glWindow.sketchBSpline)
+                                                               triggered=self._glWindow.sketchController.sketchBSpline)
         self._action_sketchMode_pointsToBSpline = QtWidgets.QAction(QtGui.QIcon(""), "Interpolate BSpline", self,
                                                                     statusTip="Interpolate points with BSpline",
-                                                                    triggered=self._glWindow.sketchPointsToBSpline)
+                                                                    triggered=self._glWindow.sketchController.sketchPointsToBSpline)
         self._action_sketchMode_addArc = QtWidgets.QAction(QtGui.QIcon(""), "Add Arc", self,
                                                            statusTip="Add an arc",
-                                                           triggered=self._glWindow.sketchArc3P)
+                                                           triggered=self._glWindow.sketchController.sketchArc3P)
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
                                                               statusTip="Add a circle",
-                                                              triggered=self._glWindow.sketchCircleCenterRadius)
+                                                              triggered=self._glWindow.sketchController.sketchCircleCenterRadius)
         self._action_sketchMode_snapEnd = QtWidgets.QAction(QtGui.QIcon(""), "Snap End", self,
                                                             statusTip="Snap to the end points",
-                                                            triggered=self._glWindow.snapEnd)
+                                                            triggered=self._glWindow.sketchController.snapEnd)
         self._action_sketchMode_snapCenter = QtWidgets.QAction(QtGui.QIcon(""), "Snap Center", self,
                                                                statusTip="Snap to the center of circle or arc",
-                                                               triggered=self._glWindow.snapCenter)
+                                                               triggered=self._glWindow.sketchController.snapCenter)
         self._action_sketchMode_snapNearest = QtWidgets.QAction(QtGui.QIcon(""), "Snap Nearest", self,
                                                                 statusTip="Snap to the nearest points on the geometry",
-                                                                triggered=self._glWindow.snapNearest)
+                                                                triggered=self._glWindow.sketchController.snapNearest)
         self._action_sketchMode_snapNothing = QtWidgets.QAction(QtGui.QIcon(""), "No Snap", self,
                                                                 statusTip="No Snap mode",
-                                                                triggered=self._glWindow.snapNothing)
+                                                                triggered=self._glWindow.sketchController.snapNothing)
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",
         #                               triggered=self.drawBezierPatch)
@@ -258,7 +251,7 @@ class Window(QtWidgets.QMainWindow):
         self._action_partMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
                                                                    self,
                                                                    statusTip="Create from two Bezier curve",
-                                                                   triggered=self._glWindow.sketchCircleCenterRadius)
+                                                                   triggered=self._glWindow.sketchController.sketchCircleCenterRadius)
         self._action_partMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
                                                                    statusTip="Create surface of revolution based on a selected shape",
                                                                    triggered=self._glWindow.partRevolveSurface)
