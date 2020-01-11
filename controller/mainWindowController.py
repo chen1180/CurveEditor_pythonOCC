@@ -5,6 +5,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
 from data.model import *
 
+
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
@@ -23,10 +24,11 @@ class Window(QtWidgets.QMainWindow):
         # setup data
         self._rootNode = Node("Scene")
         self._sketch = SketchNode("Sketch", self._rootNode)
-        self._node = TransformNode("Transform", self._sketch)
-        self._light = LightNode("Light", self._sketch)
-        self._model = ModelNode("Model", self._sketch)
-        self._model2 = ModelNode("Model2", self._model)
+        self._point=PointNode("Point",self._sketch)
+        # self._node = TransformNode("Transform", self._sketch)
+        # self._light = LightNode("Light", self._sketch)
+        # self._model = ModelNode("Model", self._sketch)
+        # self._model2 = ModelNode("Model2", self._model)
         # setup design
         self._model = SceneGraphModel(self._rootNode)
         self._glWindow.setScene(self._model)
@@ -139,6 +141,16 @@ class Window(QtWidgets.QMainWindow):
         self._sketchToolBar.addAction(self._action_sketchMode_pointsToBSpline)
         self._sketchToolBar.addAction(self._action_sketchMode_addArc)
         self._sketchToolBar.addAction(self._action_sketchMode_addCircle)
+        self._sketchToolBar.addSeparator()
+        self._snapModeButton = customToolButton.CustomToolButton()
+        self._snapModeMenu = QtWidgets.QMenu()
+        self._snapModeMenu.addAction(self._action_sketchMode_snapNothing)
+        self._snapModeMenu.addAction(self._action_sketchMode_snapCenter)
+        self._snapModeMenu.addAction(self._action_sketchMode_snapEnd)
+        self._snapModeMenu.addAction(self._action_sketchMode_snapNearest)
+        self._snapModeButton.setMenu(self._snapModeMenu)
+        self._snapModeButton.setDefaultAction(self._action_sketchMode_snapNothing)
+        self._sketchToolBar.addWidget(self._snapModeButton)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
@@ -223,7 +235,18 @@ class Window(QtWidgets.QMainWindow):
         self._action_sketchMode_addCircle = QtWidgets.QAction(QtGui.QIcon(""), "Add Circle", self,
                                                               statusTip="Add a circle",
                                                               triggered=self._glWindow.sketchCircleCenterRadius)
-
+        self._action_sketchMode_snapEnd = QtWidgets.QAction(QtGui.QIcon(""), "Snap End", self,
+                                                            statusTip="Snap to the end points",
+                                                            triggered=self._glWindow.snapEnd)
+        self._action_sketchMode_snapCenter = QtWidgets.QAction(QtGui.QIcon(""), "Snap Center", self,
+                                                               statusTip="Snap to the center of circle or arc",
+                                                               triggered=self._glWindow.snapCenter)
+        self._action_sketchMode_snapNearest = QtWidgets.QAction(QtGui.QIcon(""), "Snap Nearest", self,
+                                                                statusTip="Snap to the nearest points on the geometry",
+                                                                triggered=self._glWindow.snapNearest)
+        self._action_sketchMode_snapNothing = QtWidgets.QAction(QtGui.QIcon(""), "No Snap", self,
+                                                                statusTip="No Snap mode",
+                                                                triggered=self._glWindow.snapNothing)
         # self.addBezierPatch = QtWidgets.QAction(QtGui.QIcon(":images/bezier_patch.png"),"Add Bezier patch", self,
         #                               statusTip="Add a cubic Bezier patch",
         #                               triggered=self.drawBezierPatch)

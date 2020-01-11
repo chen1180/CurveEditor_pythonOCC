@@ -41,7 +41,6 @@ class OpenGLEditor(GLWidget):
         self.viewManager = toolController.ViewController(self._display)
         self.sketchUI = Sketch_QTGUI()
         self.sketch = Sketch(self._display, self.sketchUI)
-        self.sketch.SetSnap(Sketcher_SnapType.SnapNearest)
         self.part = Part(self._display)
 
         # self.sketchManager.interactive.prepareContext_find_edge()
@@ -98,9 +97,21 @@ class OpenGLEditor(GLWidget):
         # self._display.Context.Display(ais_y, True)
         # self._display.Context.Display(ais_z, True)
 
+    def snapEnd(self):
+        self.sketch.SetSnap(Sketcher_SnapType.SnapEnd)
+
+    def snapNearest(self):
+        self.sketch.SetSnap(Sketcher_SnapType.SnapNearest)
+
+    def snapCenter(self):
+        self.sketch.SetSnap(Sketcher_SnapType.SnapCenter)
+
+    def snapNothing(self):
+        self.sketch.SetSnap(Sketcher_SnapType.SnapNothing)
+
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)
-        self.part.SetData(self.sketch.myData)
+        # self.part.SetData(self.sketch.myData)
 
     def sketchLine(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Line2P_Method)

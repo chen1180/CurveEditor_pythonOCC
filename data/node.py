@@ -1,4 +1,6 @@
 import resources.icon.icon
+
+
 class Node(object):
     def __init__(self, name, parent=None):
         '''
@@ -82,12 +84,14 @@ class Node(object):
     def resource(self):
         return None
 
+
 class TransformNode(Node):
     def __init__(self, name, parent=None):
         super(TransformNode, self).__init__(name, parent)
         self._x = 0
         self._y = 0
         self._z = 0
+
     def typeInfo(self):
         return "Transform"
 
@@ -155,6 +159,7 @@ class CameraNode(Node):
 
     def setShakeIntensity(self, intensity):
         self._shakeIntensity = intensity
+
     def data(self, column):
         r = super(CameraNode, self).data(column)
 
@@ -235,27 +240,77 @@ class LightNode(Node):
             self._farRange = value
         elif column == 5:
             self._castShadows = value
+
     def resource(self):
         return ":/light.png"
+
 
 class ModelNode(Node):
     def __init__(self, name, parent=None):
         super(ModelNode, self).__init__(name, parent)
-        self._vertices=None
-        self._edges=None
-        self._faces=None
+        self._vertices = None
+        self._edges = None
+        self._faces = None
+
     def typeInfo(self):
         return "Geometry"
+
+
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
-        self._sketch_plane=None
-        self._vertices=None
-        self._edges=None
+        self._sketch_plane = None
+        self._vertices = None
+        self._edges = None
+
     def typeInfo(self):
         return "Sketch"
 
 
+class SketchObjectNode(Node):
+    def __init__(self, name, parent=None):
+        super(SketchObjectNode, self).__init__(name, parent)
+        self._color = None
+        self._style = None
+        self._width = None
+        self._type = None
+
+    def typeInfo(self):
+        return "SketchObject"
 
 
+class PointNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(PointNode, self).__init__(name, parent)
+        self._points = None
 
+    def data(self, column):
+        r = super(PointNode, self).data(column)
+
+        if column == 2:
+            r = self._color
+        # elif column == 3:
+        #     r = self._style
+        # elif column == 4:
+        #     r = self._width
+        # elif column == 5:
+        #     r = self._type
+        elif column == 3:
+            r = self._points
+        return r
+
+    def setData(self, column, value):
+        super(PointNode, self).setData(column, value)
+        if column == 2:
+            self._color = value
+        # elif column == 3:
+        #     self._style = value
+        # elif column == 4:
+        #     self._width = value
+        # elif column == 5:
+        #     self._type = value
+        elif column == 3:
+            self._points = value
+
+    def typeInfo(self):
+        return "Point"
