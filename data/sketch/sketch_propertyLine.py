@@ -46,8 +46,6 @@ class Sketch_PropertyLine(Sketch_Property):
     def CheckGeometry(self):
         if self.CheckCoord(self.ui.LineEditPoint1, self.tempPnt2d):
             if self.CheckCoord(self.LineEditPoint2, self.temp2Pnt2d):
-                print(self.tempPnt2d.X(), self.tempPnt2d.Y())
-                print(self.temp2Pnt2d.X(), self.temp2Pnt2d.Y())
                 return True
         else:
             return False

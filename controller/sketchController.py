@@ -152,6 +152,9 @@ class SketchController(QObject):
     def OnMouseMoveEvent(self, *kargs):
         self.sketch.OnMouseMoveEvent(*kargs)
 
+    def editGeometry(self):
+        self.sketch.ViewProperties()
+
     def OnCancel(self):
         self.sketch.OnCancel()
 

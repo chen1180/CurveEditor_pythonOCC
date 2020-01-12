@@ -245,17 +245,6 @@ class LightNode(Node):
         return ":/light.png"
 
 
-class ModelNode(Node):
-    def __init__(self, name, parent=None):
-        super(ModelNode, self).__init__(name, parent)
-        self._vertices = None
-        self._edges = None
-        self._faces = None
-
-    def typeInfo(self):
-        return "Geometry"
-
-
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
@@ -269,6 +258,7 @@ class SketchNode(Node):
 
 from OCC.Core.Geom2d import Geom2d_CartesianPoint
 from OCC.Core.Geom import Geom_CartesianPoint
+from data.sketch.geometry import *
 from OCC.Core.AIS import *
 from OCC.Core.ElCLib import elclib
 
@@ -308,12 +298,6 @@ class PointNode(SketchObjectNode):
 
         if column == 2:
             r = self._color
-        # elif column == 3:
-        #     r = self._style
-        # elif column == 4:
-        #     r = self._width
-        # elif column == 5:
-        #     r = self._type
         elif column == 3:
             r = str(round(self.geometry.X(), 1)) + "," + str(round(self.geometry.Y(), 1))
         return r
@@ -322,12 +306,6 @@ class PointNode(SketchObjectNode):
         super(PointNode, self).setData(column, value)
         if column == 2:
             self._color = value
-        # elif column == 3:
-        #     self._style = value
-        # elif column == 4:
-        #     self._width = value
-        # elif column == 5:
-        #     self._type = value
         elif column == 3:
             x, y = value.split(",")
             self.geometry.SetCoord(float(x), float(y))
@@ -342,13 +320,8 @@ class PointNode(SketchObjectNode):
 class LineNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(LineNode, self).__init__(name, parent)
-        self._points = None
-
-    def setPoints(self, points):
-        self._points = points
-
-    def setColor(self, colors):
-        self._color = colors
+        self.geometry: Geom2d_Edge = None
+        self.ais_geometry: AIS_Line = None
 
     def data(self, column):
         r = super(LineNode, self).data(column)

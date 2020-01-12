@@ -11,14 +11,13 @@ class Sketch_PropertyPoint(Sketch_Property):
             self.setObjectName("Property Points")
         self.ui.TextLabelPoint1.setText("Point")
         self.isPointWindow = True
-        # UI
+        #UI
         self.ui.TextLabelWidth.close()
         self.ui.ComboBoxWidth.close()
         self.ui.TextLabelStyle.close()
         self.ui.ComboBoxStyle.close()
         self.ui.TextLabelType.close()
         self.ui.ComboBoxType.close()
-
     def SetGeometry(self, *__args):
         self.curGeom2d_Point: Geom2d_CartesianPoint = Geom2d_CartesianPoint.DownCast(self.mySObject.GetGeometry())
         self.firstPnt2d = self.curGeom2d_Point.Pnt2d()

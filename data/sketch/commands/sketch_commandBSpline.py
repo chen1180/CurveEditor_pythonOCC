@@ -6,8 +6,7 @@ from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BSplineCurve
 from OCC.Core.Geom import Geom_BSplineCurve
 from enum import Enum
 from OCC.Core.TopoDS import TopoDS_Edge
-from OCC.Core.TColgp import TColgp_Array1OfPnt2d, TColgp_Array1OfPnt
-from OCC.Core.TColStd import TColStd_Array1OfReal, TColStd_Array1OfInteger
+
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 
 SKETCH_DEGREE = 2
@@ -21,32 +20,6 @@ class BSplineCurveAction(Enum):
     Input_OtherPoints = 3
 
 
-def point_list_to_TColgp_Array1OfPnt(li):
-    pts = TColgp_Array1OfPnt(1, len(li))
-    for n, i in enumerate(li):
-        pts.SetValue(n + 1, i)
-    return pts
-
-
-def point_list_to_TColgp_Array1OfPnt2d(li):
-    pts = TColgp_Array1OfPnt2d(1, len(li))
-    for n, i in enumerate(li):
-        pts.SetValue(n + 1, i)
-    return pts
-
-
-def int_list_to_TColStd_Array1OfInteger(li):
-    pts = TColStd_Array1OfInteger(1, len(li))
-    for n, i in enumerate(li):
-        pts.SetValue(n + 1, i)
-    return pts
-
-
-def float_list_to_TColStd_Array1OfReal(li):
-    pts = TColStd_Array1OfReal(1, len(li))
-    for n, i in enumerate(li):
-        pts.SetValue(n + 1, i)
-    return pts
 
 
 def setMultiplicities(poles_size: int, degree: int):

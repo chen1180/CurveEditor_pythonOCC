@@ -1,7 +1,7 @@
 from PyQt5 import QtGui, QtWidgets, QtCore, uic
 import sys
 from view import lightProperty, nodeProperty, property, transformProperty, cameraProperty, curveProperty, \
-    newSketchProperty
+    newSketchProperty, lineProperty
 from data.model import SceneGraphModel
 
 
@@ -12,35 +12,36 @@ class PropertyEditor(QtWidgets.QWidget):
         self.ui.setupUi(self)
 
         self._model = None
+        self._editor_dict = {}
 
         self._nodeEditor = NodeEditor(self)
-        self._lightEditor = LightEditor(self)
-        self._cameraEditor = CameraEditor(self)
-        self._transformEditor = TransformEditor(self)
-        self._curveEditor = CurveEditor(self)
         self._pointEditor = PointEditor(self)
+        self._lineEditor = LineEditor(self)
+        self.addEditor(self._nodeEditor, "Node")
+        self.addEditor(self._pointEditor, "Point")
+        self.addEditor(self._lineEditor, "Line")
 
-        self.ui.layoutNode.addWidget(self._nodeEditor)
-        self.ui.layoutSpec.addWidget(self._lightEditor)
-        self.ui.layoutSpec.addWidget(self._cameraEditor)
-        self.ui.layoutSpec.addWidget(self._transformEditor)
-        self.ui.layoutSpec.addWidget(self._curveEditor)
-        self.ui.layoutSpec.addWidget(self._pointEditor)
-
-        self._lightEditor.setVisible(False)
-        self._cameraEditor.setVisible(False)
-        self._transformEditor.setVisible(False)
-        self._curveEditor.setVisible(False)
-        self._pointEditor.setVisible(False)
+    def addEditor(self, editor: QtWidgets.QWidget, type: str):
+        if type == "Node":
+            self.ui.layoutNode.addWidget(editor)
+        else:
+            self.ui.layoutSpec.addWidget(editor)
+            editor.setVisible(False)
+        self._editor_dict[type] = editor
 
     def setModel(self, model):
         self._model = model
-        self._nodeEditor.setModel(model)
-        self._lightEditor.setModel(model)
-        self._cameraEditor.setModel(model)
-        self._transformEditor.setModel(model)
-        self._curveEditor.setModel(model)
-        self._pointEditor.setModel(model)
+        for type, editor in self._editor_dict.items():
+            editor.setModel(self._model)
+
+    def showEditor(self, typeInfo):
+        for type, editor in self._editor_dict.items():
+            if type == "Node":
+                continue
+            if type == typeInfo:
+                editor.setVisible(True)
+            else:
+                editor.setVisible(False)
 
     def setSelection(self, current: QtCore.QModelIndex, old: QtCore.QModelIndex):
         node = current.internalPointer()
@@ -48,49 +49,10 @@ class PropertyEditor(QtWidgets.QWidget):
         if node is not None:
             typeInfo = node.typeInfo()
 
-        if typeInfo == "Camera":
-            self._cameraEditor.setVisible(True)
-            self._lightEditor.setVisible(False)
-            self._transformEditor.setVisible(False)
-            self._curveEditor.setVisible(False)
-            self._pointEditor.setVisible(False)
-        elif typeInfo == "Light":
-            self._cameraEditor.setVisible(False)
-            self._lightEditor.setVisible(True)
-            self._transformEditor.setVisible(False)
-            self._curveEditor.setVisible(False)
-            self._pointEditor.setVisible(False)
-        elif typeInfo == "Transform":
-            self._cameraEditor.setVisible(False)
-            self._lightEditor.setVisible(False)
-            self._transformEditor.setVisible(True)
-            self._curveEditor.setVisible(False)
-            self._pointEditor.setVisible(False)
-        elif typeInfo == "Curve":
-            self._cameraEditor.setVisible(False)
-            self._lightEditor.setVisible(False)
-            self._transformEditor.setVisible(False)
-            self._curveEditor.setVisible(True)
-            self._pointEditor.setVisible(False)
-        elif typeInfo == "Point":
-            self._cameraEditor.setVisible(False)
-            self._lightEditor.setVisible(False)
-            self._transformEditor.setVisible(False)
-            self._curveEditor.setVisible(False)
-            self._pointEditor.setVisible(True)
-        else:
-            self._cameraEditor.setVisible(False)
-            self._lightEditor.setVisible(False)
-            self._transformEditor.setVisible(False)
-            self._curveEditor.setVisible(False)
-            self._pointEditor.setVisible(False)
+        self.showEditor(typeInfo)
 
-        self._nodeEditor.setSelection(current)
-        self._cameraEditor.setSelection(current)
-        self._lightEditor.setSelection(current)
-        self._transformEditor.setSelection(current)
-        self._curveEditor.setSelection(current)
-        self._pointEditor.setSelection(current)
+        for type, editor in self._editor_dict.items():
+            editor.setSelection(current)
 
 
 class NodeEditor(QtWidgets.QWidget):
@@ -109,76 +71,6 @@ class NodeEditor(QtWidgets.QWidget):
     def setSelection(self, current: QtCore.QModelIndex):
         parent = current.parent()
         self._dataMapper.setRootIndex(parent)
-        self._dataMapper.setCurrentModelIndex(current)
-
-
-class LightEditor(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(LightEditor, self).__init__(parent)
-        self.ui = lightProperty.Ui_uiLightEditor()
-        self.ui.setupUi(self)
-        self._dataMapper = QtWidgets.QDataWidgetMapper()
-
-    def setModel(self, model):
-        self._model = model
-        self._dataMapper.setModel(model)
-
-        self._dataMapper.addMapping(self.ui.uiLightIntensity, 2)
-        self._dataMapper.addMapping(self.ui.uiNear, 3)
-        self._dataMapper.addMapping(self.ui.uiFar, 4)
-        self._dataMapper.addMapping(self.ui.uiShadows, 5)
-
-    """INPUTS: QModelIndex"""
-
-    def setSelection(self, current):
-        parent = current.parent()
-        self._dataMapper.setRootIndex(parent)
-        self._dataMapper.setCurrentModelIndex(current)
-
-
-class CameraEditor(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(CameraEditor, self).__init__(parent)
-        self.ui = cameraProperty.Ui_form()
-        self.ui.setupUi(self)
-        self._dataMapper = QtWidgets.QDataWidgetMapper()
-
-    def setModel(self, model):
-        self._model = model
-        self._dataMapper.setModel(model)
-
-        self._dataMapper.addMapping(self.ui.uiBlur, 2)
-        self._dataMapper.addMapping(self.ui.uiShakeIntensity, 3)
-
-    """INPUTS: QModelIndex"""
-
-    def setSelection(self, current):
-        parent = current.parent()
-        self._dataMapper.setRootIndex(parent)
-        self._dataMapper.setCurrentModelIndex(current)
-
-
-class TransformEditor(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(TransformEditor, self).__init__(parent)
-        self.ui = transformProperty.Ui_uiTransfromEditor()
-        self.ui.setupUi(self)
-        self._dataMapper = QtWidgets.QDataWidgetMapper()
-
-    def setModel(self, model):
-        self._model = model
-        self._dataMapper.setModel(model)
-
-        self._dataMapper.addMapping(self.ui.uiX, 2)
-        self._dataMapper.addMapping(self.ui.uiY, 3)
-        self._dataMapper.addMapping(self.ui.uiZ, 4)
-
-    """INPUTS: QModelIndex"""
-
-    def setSelection(self, current):
-        parent = current.parent()
-        self._dataMapper.setRootIndex(parent)
-
         self._dataMapper.setCurrentModelIndex(current)
 
 
@@ -222,6 +114,26 @@ class PointEditor(QtWidgets.QWidget):
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.ComboBoxColor, 2)
         self._dataMapper.addMapping(self.ui.LineEditPoint1, 3)
+
+    """INPUTS: QModelIndex"""
+
+    def setSelection(self, current):
+        parent = current.parent()
+        self._dataMapper.setRootIndex(parent)
+        self._dataMapper.setCurrentModelIndex(current)
+
+
+class LineEditor(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(LineEditor, self).__init__(parent)
+        self.ui = lineProperty.Ui_uiLineEditor()
+        self.ui.setupUi(self)
+        self._dataMapper = QtWidgets.QDataWidgetMapper()
+
+    def setModel(self, model):
+        self._model: SceneGraphModel = model
+        self._dataMapper.setModel(model)
+        self._dataMapper.addMapping(self.ui.geometryTreeView, 2)
 
     """INPUTS: QModelIndex"""
 

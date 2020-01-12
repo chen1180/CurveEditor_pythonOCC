@@ -9,6 +9,7 @@ from OCC.Core.AIS import *
 from OCC.Core.BRepBuilderAPI import *
 from data.sketch.sketch_object import Sketch_Object
 from view.sketchProperty import Ui_SketchProperty
+from data.sketch.sketch_utils import *
 
 
 class Sketch_Property(QWidget):
@@ -26,7 +27,7 @@ class Sketch_Property(QWidget):
 
         if not name:
             self.setObjectName("Sketch_Property")
-        self.resize(288, 369)
+        self.resize(400, 800)
         self.setMaximumSize(QSize(400, 400))
         self.setWindowTitle("Property")
 

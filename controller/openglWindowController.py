@@ -20,12 +20,11 @@ log = logging.getLogger(__name__)
 
 
 class OpenGLEditor(GLWidget):
-
     MODE_SKETCH = 0
     MODE_DESIGN = 1
     MODE_VIEW = 2
 
-    def __init__(self, model,parent=None):
+    def __init__(self, model, parent=None):
         super(OpenGLEditor, self).__init__(parent)
         try:
             self.InitDriver()
@@ -107,7 +106,6 @@ class OpenGLEditor(GLWidget):
     def fitSelection(self):
         self._display.Context.FitSelected(self._display.View, 0.0, True)
 
-
     def state(self):
         return self._state
 
@@ -158,12 +156,16 @@ class OpenGLEditor(GLWidget):
             zoom_factor = 0.5
         self._display.ZoomFactor(zoom_factor)
 
+    def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
+        buttons = int(event.buttons())
+        if buttons == QtCore.Qt.LeftButton:
+            self.sketchController.editGeometry()
+
     def mousePressEvent(self, event):
         self.setFocus()
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
-        self.sketchController.sketch.ViewProperties()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 self.dragStartPosX = pt.x()

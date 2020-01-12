@@ -11,6 +11,7 @@ from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1, Quan
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
 from data.node import *
+from data.sketch.sketch_utils import *
 
 SKETCH_RADIUS = 10.0
 

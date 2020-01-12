@@ -32,4 +32,5 @@ class Sketch_QTGUI(object):
         elif CurObject.GetGeometryType() == Sketch_GeometryType.LineSketchObject:
             self.prop_line.SetObject(CurObject)
         elif CurObject.GetGeometryType() == Sketch_GeometryType.CurveSketchObject:
-            self.prop_bezierCurve.SetObject(CurObject)
+            if CurObject.GetTypeOfMethod()==Sketch_ObjectTypeOfMethod.BezierCurve_Method:
+                self.prop_bezierCurve.SetObject(CurObject)
