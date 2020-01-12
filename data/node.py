@@ -19,6 +19,7 @@ class Node(object):
 
     def addChild(self, child):
         self._children.append(child)
+        child._parent=self
 
     def name(self):
         return self._name

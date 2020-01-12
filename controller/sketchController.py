@@ -147,10 +147,11 @@ class SketchController(QObject):
 
     def OnMouseInputEvent(self, *kargs):
         self.sketch.OnMouseInputEvent(*kargs)
-        self.model.layoutChanged.emit()
+
 
     def OnMouseMoveEvent(self, *kargs):
         self.sketch.OnMouseMoveEvent(*kargs)
+        self.model.layoutChanged.emit()
 
     def editGeometry(self):
         self.sketch.ViewProperties()

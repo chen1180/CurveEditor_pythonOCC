@@ -21,8 +21,9 @@ class Sketch_Command(object):
         self.data = []
         self.rootNode: Node = None
         self.objectName = name
-        self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
+        self.curCoordinateSystem = gp_Ax3(gp.XOY())
+        self.childrenObjects = []
 
         self.myType = Sketch_ObjectType.MainSketchType
         self.myColor = Quantity_Color(Quantity_NOC_YELLOW)
@@ -97,12 +98,14 @@ class Sketch_Command(object):
         so.SetType(self.myType)
         so.SetStyle(self.myStyle)
         so.SetWidth(self.myWidth)
+        so.SetChildren(self.childrenObjects)
         self.data.append(so)
 
     def AddNode(self, node: SketchObjectNode, theGeometry, theAIS_Object):
         node.setGeometry(theGeometry)
         node.setAisGeometry(theAIS_Object)
         node.setAxis(self.curCoordinateSystem)
+
     def GetTypeOfMethod(self):
         raise NotImplementedError()
 

@@ -24,6 +24,7 @@ class Sketch_Property(QWidget):
         self.isPointWindow = False
         self.ui = Ui_SketchProperty()
         self.ui.setupUi(self)
+        self.setWindowModality(Qt.ApplicationModal)
 
         if not name:
             self.setObjectName("Sketch_Property")
@@ -54,7 +55,7 @@ class Sketch_Property(QWidget):
         self.myCoordinateSystem = theAx3
 
     def SetObject(self, CurObject: Sketch_Object):
-        self.mySObject = CurObject
+        self.mySObject:Sketch_Object = CurObject
         self.myAIS_Object = self.mySObject.GetAIS_Object()
         self.myID = self.mySObject.GetObjectName()
         self.myNameOfColor = self.mySObject.GetColor()

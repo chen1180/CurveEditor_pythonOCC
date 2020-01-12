@@ -42,12 +42,23 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             y = pole.child(1)
             coordinate_x: QDoubleSpinBox = self.tree.itemWidget(x, 1)
             coordinate_y: QDoubleSpinBox = self.tree.itemWidget(y, 1)
-            point2d = gp_Pnt2d(coordinate_x.value(), coordinate_y.value())
-            current_poles2d.append(point2d)
+            new_pole2d = gp_Pnt2d(coordinate_x.value(), coordinate_y.value())
+            current_poles2d.append(new_pole2d)
             # original pole coordinate
-            old_pole = self.geometry_dict["poles"][idx]
-            if not point2d.IsEqual(old_pole, 1.0e-6):
+            old_pole2d = self.geometry_dict["poles"][idx]
+            if not new_pole2d.IsEqual(old_pole2d, 1.0e-6):
                 needUpdate = True
+                # update old poles interactive points
+                if self.mySObject.GetChildren():
+                    child = self.mySObject.GetChild(idx)
+                    assert isinstance(child, Sketch_Object)
+                    ais_point = child.GetAIS_Object()
+                    self.myContext.Remove(ais_point, True)
+                    newGeom_Point = Geom_CartesianPoint(
+                        elclib.To3d(self.myCoordinateSystem.Ax2(), new_pole2d))
+                    ais_point = AIS_Point(newGeom_Point)
+                    self.myContext.Display(ais_point, True)
+
         current_weights = []
         for idx in range(self.weights.childCount()):
             weights = self.weights.child(idx)
@@ -70,6 +81,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
                 myAIS_shape = AIS_Shape(edge)
                 self.myContext.Remove(self.myAIS_Object, True)
                 self.myAIS_Object = myAIS_shape
+
                 self.updateUI()
             return True
         return False
@@ -86,7 +98,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.poles = QTreeWidgetItem(self.tree, ["poles", str(self.geometry_dict["nbPoles"])])
         self.poles.setData(0, Qt.UserRole, self.geometry_dict["poles"])
         for k, v in enumerate(self.geometry_dict["poles"]):
-            poles_children = QTreeWidgetItem(self.poles, [str(k), str((round(v.X(),2), round(v.Y(),2)))])
+            poles_children = QTreeWidgetItem(self.poles, [str(k), str((round(v.X(), 2), round(v.Y(), 2)))])
             coordinate_x = QTreeWidgetItem()
             coordinate_x.setText(0, "x")
             coordinate_y = QTreeWidgetItem()
@@ -122,5 +134,5 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         continuity = self.curGeom2d_BezierCurve.Continuity()
         self.degree.setText(1, str(degree))
         self.closed.setText(1, str(closed_flag))
-        self.rational.setText(1,str(rational_flag))
-        self.continuity.setText(1,str(continuity))
+        self.rational.setText(1, str(rational_flag))
+        self.continuity.setText(1, str(continuity))
