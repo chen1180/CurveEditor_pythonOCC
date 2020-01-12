@@ -28,7 +28,8 @@ class Sketch_CommandPoint(Sketch_Command):
             myAIS_Point = AIS_Point(myGeom_Point)
             self.myContext.Display(myAIS_Point, True)
             self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
-            # self.rootNode.insertChild(0, PointNode("point node"))
+            node = PointNode(self.objectName + str(self.objectCounter), self.rootNode)
+            self.AddNode(node, myGeom2d_Point, myAIS_Point)
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):

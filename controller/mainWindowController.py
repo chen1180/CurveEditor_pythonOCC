@@ -74,6 +74,7 @@ class Window(QtWidgets.QMainWindow):
 
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
+        self._uiTreeView.selectionModel().currentChanged.connect(self._glWindow.sketchController.highlightCurrentNode)
         self._glWindow.sketchController.modelUpdated.connect(self.updateModel)
 
     def updateModel(self, item):

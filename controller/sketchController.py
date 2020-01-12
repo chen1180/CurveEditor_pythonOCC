@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QObject, pyqtSignal
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, QModelIndex
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 from data.sketch.sketch import Sketch
@@ -24,6 +24,11 @@ class SketchController(QObject):
         self.sketch_list = []
         self.createActions()
         self.setActionEnabled(False)
+
+    def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
+        node: SketchObjectNode = current.internalPointer()
+        if isinstance(node, SketchObjectNode):
+            self._display.Context.SetSelected(node.ais_geometry, True)
 
     def createActions(self):
         self.action_createNewSketch = QAction(QIcon(""), "create a new sketch", self,

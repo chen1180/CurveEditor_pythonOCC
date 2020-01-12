@@ -267,6 +267,12 @@ class SketchNode(Node):
         return "Sketch"
 
 
+from OCC.Core.Geom2d import Geom2d_CartesianPoint
+from OCC.Core.Geom import Geom_CartesianPoint
+from OCC.Core.AIS import *
+from OCC.Core.ElCLib import elclib
+
+
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
@@ -274,6 +280,18 @@ class SketchObjectNode(Node):
         self._style = None
         self._width = None
         self._type = None
+        self.geometry = None
+        self.ais_geometry = None
+        self.curCoordinateSystem = None
+
+    def setGeometry(self, geom):
+        self.geometry = geom
+
+    def setAisGeometry(self, ais_geom):
+        self.ais_geometry = ais_geom
+
+    def setAxis(self, theAxis):
+        self.curCoordinateSystem = theAxis
 
     def typeInfo(self):
         return "SketchObject"
@@ -282,13 +300,8 @@ class SketchObjectNode(Node):
 class PointNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(PointNode, self).__init__(name, parent)
-        self._points = None
-
-    def setPoints(self, points):
-        self._points = points
-
-    def setColor(self, colors):
-        self._color = colors
+        self.geometry: Geom2d_CartesianPoint = None
+        self.ais_geometry: AIS_Point = None
 
     def data(self, column):
         r = super(PointNode, self).data(column)
@@ -302,7 +315,7 @@ class PointNode(SketchObjectNode):
         # elif column == 5:
         #     r = self._type
         elif column == 3:
-            r = self._points
+            r = str(round(self.geometry.X(), 1)) + "," + str(round(self.geometry.Y(), 1))
         return r
 
     def setData(self, column, value):
@@ -316,7 +329,11 @@ class PointNode(SketchObjectNode):
         # elif column == 5:
         #     self._type = value
         elif column == 3:
-            self._points = value
+            x, y = value.split(",")
+            self.geometry.SetCoord(float(x), float(y))
+            myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.geometry.Pnt2d()))
+            self.ais_geometry.SetComponent(myGeom_Point)
+            self.ais_geometry.Redisplay(True)
 
     def typeInfo(self):
         return "Point"

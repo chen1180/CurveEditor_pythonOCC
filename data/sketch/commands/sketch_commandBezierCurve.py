@@ -60,6 +60,8 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             myAIS_Point = AIS_Point(self.myFirstPoint)
             self.myContext.Display(myAIS_Point, True)
             self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
+            node = PointNode("poles" + str(self.IndexCounter), self.rootNode)
+            self.AddNode(node, myGeom2d_Point, myAIS_Point)
 
             self.myContext.Display(self.myRubberLine, True)
             self.myBezierCurveAction = BezierCurveAction.Input_2Point
@@ -132,7 +134,6 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             else:
                 self.IndexCounter -= 1
 
-
     def CancelEvent(self):
         if self.myBezierCurveAction == BezierCurveAction.Nothing:
             pass
@@ -156,16 +157,21 @@ class Sketch_CommandBezierCurve(Sketch_Command):
     def storePoles(self):
         myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
         self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-        myGeom_Point = Geom_CartesianPoint(self.mySecondPoint.X(), self.mySecondPoint.Y(), self.mySecondPoint.Z())
-        myAIS_Point = AIS_Point(myGeom_Point)
+        # myGeom_Point = Geom_CartesianPoint(self.mySecondPoint.X(), self.mySecondPoint.Y(), self.mySecondPoint.Z())
+        myAIS_Point = AIS_Point(self.mySecondPoint)
         self.myContext.Display(myAIS_Point, True)
         self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
+        node = PointNode("poles" + str(self.IndexCounter), self.rootNode)
+        self.AddNode(node, myGeom2d_Point, myAIS_Point)
 
     def closeBezierCurve(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)
         myGeom2d_BezierCurve: Geom2d_BezierCurve = Geom2d_BezierCurve.DownCast(self.myGeom2d_BezierCurve.Copy())
         myAIS_Shape = AIS_Shape(self.curEdge)
         self.AddObject(myGeom2d_BezierCurve, myAIS_Shape, Sketch_GeometryType.CurveSketchObject)
+        node = BezierNode(self.objectName + str(self.objectCounter), self.rootNode)
+        self.AddNode(node, myGeom2d_BezierCurve, myAIS_Shape)
+
         self.myContext.Display(myAIS_Shape, True)
         # create new object
         curgp_Array1CurvePoles2d = TColgp_Array1OfPnt2d(1, 2)

@@ -45,7 +45,9 @@ class Sketch_CommandLine2P(Sketch_Command):
                 myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
                 # edge = BRepBuilderAPI_MakeEdge(Geom_Point1.Pnt(), Geom_Point2.Pnt())
                 # myAIS_Line=AIS_Shape(edge.Shape())
-                self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketchObject,self.rootNode)
+                self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketchObject)
+                node = LineNode(self.objectName + str(self.objectCounter), self.rootNode)
+                self.AddNode(node, newGeom2d_Edge, myAIS_Line)
                 self.myContext.Display(myAIS_Line, True)
                 if self.myPolylineMode:
                     self.myFirstgp_Pnt2d = self.curPnt2d
