@@ -10,6 +10,7 @@ class Sketch_SnapNearest(Sketch_Snap):
     def SelectEvent(self):
         self.findbestPnt2d = False
         self.minDistance = self.minimumSnapDistance
+
         for idx in range(len(self.data)):
             mySObject: Sketch_Object = self.data[idx]
             myGeometryType = mySObject.GetGeometryType()

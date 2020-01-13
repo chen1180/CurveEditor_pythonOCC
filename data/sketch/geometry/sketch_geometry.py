@@ -11,6 +11,7 @@ class Sketch_Geometry:
 
     def __init__(self, name):
         self.myGeometry = None
+        self.myGeometry2d = None
         self.myAIS_InteractiveObject = None
         self.curCoordinateSystem: gp_Ax3 = None
 
@@ -30,8 +31,13 @@ class Sketch_Geometry:
 
     def GetGeometry(self):
         return self.myGeometry
+
+    def GetGeometry2d(self):
+        return self.myGeometry2d
+
     def GetName(self):
         return self.myName
+
     def Display(self, theContext: AIS_InteractiveContext):
         pass
 

@@ -175,13 +175,11 @@ class Sketch(object):
         self.myContext.Activate(0)
 
     def DeleteSelectedObject(self):
-        print(self.myData)
         for idx in range(len(self.myData)):
             myCurObject: Sketch_Object = self.myData[idx]
             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
                 self.myContext.Erase(myCurObject.GetAIS_Object(), True)
                 self.myData.remove(myCurObject)
-                print(self.myData)
                 break
 
     def ViewProperties(self):

@@ -180,9 +180,9 @@ class Sketch_CommandBezierCurve(Sketch_Command):
         self.bezierNode.setSketchObject(self.bezier_curve)
         # myGeom2d_BezierCurve: Geom2d_BezierCurve = Geom2d_BezierCurve.DownCast(self.myGeom2d_BezierCurve.Copy())
         # myAIS_Shape = AIS_Shape(self.curEdge)
-        # bezierObject = self.AddObject(myGeom2d_BezierCurve, myAIS_Shape, Sketch_GeometryType.CurveSketchObject)
+        bezierObject = self.AddObject(self.bezier_curve.myGeometry2d, self.bezier_curve.myAIS_InteractiveObject,
+                                      Sketch_GeometryType.CurveSketchObject)
         # self.bezierNode.setSketchObject(bezierObject)
-        #
         # self.myContext.Display(myAIS_Shape, True)
         # create new object
         curgp_Array1CurvePoles2d = TColgp_Array1OfPnt2d(1, 2)
