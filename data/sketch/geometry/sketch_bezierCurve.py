@@ -3,11 +3,15 @@ from .sketch_point import Sketch_Point
 
 
 class Sketch_BezierCurve(Sketch_Geometry):
+    IndexCounter = 0
+
     def __init__(self):
-        super(Sketch_BezierCurve, self).__init__()
+        super(Sketch_BezierCurve, self).__init__("Bezier curve")
         self.myGeometry: Geom_BezierCurve = None
         self.myAis_shape: AIS_Shape = None
         self.myPoles = []
+        Sketch_BezierCurve.IndexCounter += 1
+        self.myName = "Bezier curve" + str(self.IndexCounter)
 
     def AddPoles(self, thePnt2d):
         sketch_point = Sketch_Point()

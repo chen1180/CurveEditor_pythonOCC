@@ -63,7 +63,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             self.bezier_curve.SetContext(self.myContext)
             self.bezier_curve.SetAxis(self.curCoordinateSystem)
             self.bezier_curve.AddPoles(self.curPnt2d)
-            self.bezierNode = BezierNode(self.objectName + str(self.objectCounter), self.rootNode)
+            self.bezierNode = BezierNode(self.bezier_curve.GetName(), self.rootNode)
             # poleObject = self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
             # poleNode = PointNode("poles" + str(self.IndexCounter), self.bezierNode)
             # poleNode.setSketchObject(poleObject)

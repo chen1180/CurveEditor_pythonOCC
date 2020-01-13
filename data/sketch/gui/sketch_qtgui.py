@@ -1,6 +1,6 @@
-from data.sketch.sketch_propertyPoint import Sketch_PropertyPoint
-from data.sketch.sketch_propertyLine import Sketch_PropertyLine
-from data.sketch.sketch_propertyBezierCurve import Sketch_PropertyBezierCurve
+from data.sketch.gui.sketch_propertyPoint import Sketch_PropertyPoint
+from data.sketch.gui.sketch_propertyLine import Sketch_PropertyLine
+from data.sketch.gui.sketch_propertyBezierCurve import Sketch_PropertyBezierCurve
 from data.sketch.sketch_type import *
 
 

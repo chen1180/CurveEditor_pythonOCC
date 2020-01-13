@@ -1,5 +1,5 @@
 from data.sketch.commands import *
-from data.sketch.sketch_qtgui import Sketch_QTGUI
+from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
 from data.sketch.snaps.sketch_analyserSnap import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View

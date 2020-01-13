@@ -1,4 +1,4 @@
-from data.sketch.sketch_property import *
+from data.sketch.gui.sketch_property import *
 from OCC.Core.Geom import Geom_CartesianPoint
 from OCC.Core.ElCLib import *
 from data.sketch.geometry.geom2d_edge import Geom2d_Edge

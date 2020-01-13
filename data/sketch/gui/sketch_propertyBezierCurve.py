@@ -1,5 +1,5 @@
-from data.sketch.sketch_property import *
-from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_Line, Geom2d_BezierCurve
+from data.sketch.gui.sketch_property import *
+from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BezierCurve
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_BezierCurve
 from OCC.Core.ElCLib import *
 

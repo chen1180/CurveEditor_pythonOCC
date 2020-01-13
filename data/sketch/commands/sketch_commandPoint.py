@@ -35,7 +35,7 @@ class Sketch_CommandPoint(Sketch_Command):
             sketch_point.SetAxis(self.curCoordinateSystem)
             sketch_point.SetContext(self.myContext)
             sketch_point.Init(self.curPnt2d)
-            node = PointNode(self.objectName + str(self.objectCounter + 1), self.rootNode)
+            node = PointNode(sketch_point.GetName(), self.rootNode)
             node.setSketchObject(sketch_point)
         return False
 

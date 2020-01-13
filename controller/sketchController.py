@@ -1,8 +1,8 @@
-from PyQt5.QtCore import Qt, QObject, pyqtSignal, QModelIndex
+from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 from data.sketch.sketch import Sketch
-from data.sketch.sketch_qtgui import Sketch_QTGUI
+from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
 from data.sketch.sketch_type import *
 from controller.editorController import Sketch_NewSketchEditor
 from data.node import *

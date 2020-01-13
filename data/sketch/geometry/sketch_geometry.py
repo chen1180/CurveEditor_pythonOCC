@@ -8,10 +8,13 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 
 
 class Sketch_Geometry:
-    def __init__(self):
+
+    def __init__(self, name):
         self.myGeometry = None
         self.myAIS_InteractiveObject = None
         self.curCoordinateSystem: gp_Ax3 = None
+
+        self.myName = name
 
     def SetAxis(self, theAxis):
         self.curCoordinateSystem = theAxis
@@ -27,7 +30,8 @@ class Sketch_Geometry:
 
     def GetGeometry(self):
         return self.myGeometry
-
+    def GetName(self):
+        return self.myName
     def Display(self, theContext: AIS_InteractiveContext):
         pass
 
