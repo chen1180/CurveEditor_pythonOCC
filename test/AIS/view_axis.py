@@ -20,6 +20,7 @@ ais_plane=AIS_PlaneTrihedron(plane)
 
 point=Geom_CartesianPoint(2,2,2)
 ais_point=AIS_Point(point)
+ais_point.SetMarker(Aspect_TOM_BALL)
 
 geom_circle=Geom_Circle(gp.XOY(),10)
 ais_circle=AIS_Circle(geom_circle)

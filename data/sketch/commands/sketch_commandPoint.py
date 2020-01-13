@@ -26,10 +26,11 @@ class Sketch_CommandPoint(Sketch_Command):
             myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
             myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             myAIS_Point = AIS_Point(myGeom_Point)
+            myAIS_Point.SetMarker(Aspect_TOM_RING1)
             self.myContext.Display(myAIS_Point, True)
-            self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
-            node = PointNode(self.objectName + str(self.objectCounter), self.rootNode)
-            self.AddNode(node, myGeom2d_Point, myAIS_Point)
+            node = PointNode(self.objectName + str(self.objectCounter+1), self.rootNode)
+            sketchObject = self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
+            node.setSketchObject(sketchObject)
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):

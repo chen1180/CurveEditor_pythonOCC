@@ -1,11 +1,4 @@
-from data.sketch.commands.sketch_command import Sketch_Command
-from data.sketch.commands.sketch_commandPoint import Sketch_CommandPoint
-from data.sketch.commands.sketch_commandLine2p import Sketch_CommandLine2P
-from data.sketch.commands.sketch_commandBezierCurve import Sketch_CommandBezierCurve
-from data.sketch.commands.sketch_commandArc3P import Sketch_CommandArc3P
-from data.sketch.commands.sketch_commandCircleCenterRadius import Sketch_CommandCircleCenterRadius
-from data.sketch.commands.sketch_commandBSpline import Sketch_CommandBSpline
-from data.sketch.commands.sketch_commandPointToBSpline import Sketch_CommandPointToBSpline
+from data.sketch.commands import *
 from data.sketch.sketch_qtgui import Sketch_QTGUI
 from data.sketch.snaps.sketch_analyserSnap import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
@@ -69,7 +62,6 @@ class Sketch(object):
         for idx in range(len(self.myCommands)):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             self.CurCommand.SetRootNode(self.myNode)
-
 
     def GetData(self):
         return self.myData
@@ -158,6 +150,12 @@ class Sketch(object):
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d)
+
+    def GetCurPoint2D(self):
+        return self.myCurrentPnt2d
+
+    def GetCurPoint3D(self):
+        return elclib.To3d(self.myCoordinateSystem.Ax2(), self.myCurrentPnt2d)
 
     def OnCancel(self):
         self.SelectCurCommand()

@@ -90,6 +90,7 @@ class Window(QtWidgets.QMainWindow):
         self._model.insertNode(item, position, 1)
         #select latest row
         self._uiTreeView.setCurrentIndex(self._model.index(position,0,QtCore.QModelIndex()))
+        self._uiTreeView.updateEditorData()
         self._uiTreeView.expandAll()
 
     def createToolBars(self):

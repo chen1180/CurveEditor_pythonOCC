@@ -5,7 +5,7 @@ from OCC.Core.Geom import Geom_CartesianPoint
 from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp, gp_Pnt, gp_Circ, gp_Circ2d, gp_Lin2d, gp_Ax2d, gp_Dir2d, \
     gp_Dir, gp_Vec
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject, AIS_Shape, AIS_Circle
-from OCC.Core.Aspect import Aspect_TOL_SOLID
+from OCC.Core.Aspect import *
 from OCC.Core.Prs3d import Prs3d_LineAspect
 from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1, Quantity_Color
 from OCC.Core.Geom2d import Geom2d_Geometry
@@ -23,7 +23,6 @@ class Sketch_Command(object):
         self.objectName = name
         self.objectCounter = 0
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
-        self.childrenObjects = []
 
         self.myType = Sketch_ObjectType.MainSketchType
         self.myColor = Quantity_Color(Quantity_NOC_YELLOW)
@@ -49,17 +48,6 @@ class Sketch_Command(object):
 
     def SetRootNode(self, theNode: Node):
         self.rootNode: Node = theNode
-
-    def insertNode(self, node):
-        '''
-
-        Args:
-            item: Mesh node (usually represent shape node)
-
-        Returns:
-
-        '''
-        self.rootNode.insertNode(node, 0, 1)
 
     def SetAx3(self, theAx3: gp_Ax3):
         self.curCoordinateSystem = theAx3
@@ -98,8 +86,8 @@ class Sketch_Command(object):
         so.SetType(self.myType)
         so.SetStyle(self.myStyle)
         so.SetWidth(self.myWidth)
-        so.SetChildren(self.childrenObjects)
         self.data.append(so)
+        return so
 
     def AddNode(self, node: SketchObjectNode, theGeometry, theAIS_Object):
         node.setGeometry(theGeometry)

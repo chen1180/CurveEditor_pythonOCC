@@ -1,5 +1,5 @@
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_Plane
-from OCC.Core.gp import gp_Ax3, gp, gp_Pnt2d,gp_Pnt
+from OCC.Core.gp import gp_Ax3, gp, gp_Pnt2d, gp_Pnt
 from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.TColStd import TColStd_HSequenceOfTransient
 from OCC.Core.ElCLib import elclib
@@ -49,24 +49,24 @@ class Sketch_Snap(object):
     def SetAx3(self, theAx3: gp_Ax3):
         self.curCoordinateSystem = theAx3
         coordinate_system: gp_Ax3 = self.curCoordinateSystem
-        direction = coordinate_system.Direction()
-        print(direction.X(), direction.Y(), direction.Z())
+        # direction = coordinate_system.Direction()
+        # print(direction.X(), direction.Y(), direction.Z())
 
     def SetMinDistance(self, aPrecise):
         self.minDistance = aPrecise
 
     def MouseInputEvent(self, tempPnt2d: gp_Pnt2d):
-        self.curPnt2d =tempPnt2d
-        self.curPnt=elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
-        print("XY:",self.curPnt2d.X(),self.curPnt2d.Y())
-        print("XYZ",self.curPnt.X(),self.curPnt.Y(),self.curPnt.Z())
+        self.curPnt2d = tempPnt2d
+        self.curPnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
+        # print("XY:",self.curPnt2d.X(),self.curPnt2d.Y())
+        # print("XYZ",self.curPnt.X(),self.curPnt.Y(),self.curPnt.Z())
 
         self.SelectEvent()
         self.EraseSnap()
         return self.bestPnt2d
 
     def MouseMoveEvent(self, tempPnt2d: gp_Pnt2d):
-        self.curPnt2d =tempPnt2d
+        self.curPnt2d = tempPnt2d
         self.SelectEvent()
         if self.findbestPnt2d:
             self.myGeom_Point.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.bestPnt2d))

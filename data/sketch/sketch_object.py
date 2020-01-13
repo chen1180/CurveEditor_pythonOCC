@@ -23,8 +23,8 @@ class Sketch_Object(object):
         self.myObjectType = Sketch_ObjectType.MainSketchType
         self.myLineStyle = Aspect_TOL_SOLID
         self.myWidth = 1.0
-        # store temperary information about sketch object such as the poles of bezier curve or bspline
-        self.myChildren = []
+
+        self.parentNode = None
 
     def SetGeometry(self, theGeom2d_Geometry):
         self.myGeometry = theGeom2d_Geometry
@@ -83,17 +83,8 @@ class Sketch_Object(object):
     def GetObjectName(self):
         return self.myName
 
-    def AddChild(self, theObject):
-        self.myChildren.append(theObject)
+    def SetParentNode(self, theParent):
+        self.parentNode = theParent
 
-    def DeleteChild(self, theObject):
-        self.myChildren.remove(theObject)
-
-    def SetChildren(self, theChildren):
-        self.myChildren = list(theChildren)
-
-    def GetChildren(self) -> list:
-        return self.myChildren
-
-    def GetChild(self, index: int):
-        return self.myChildren[index]
+    def GetParentNode(self):
+        return self.parentNode

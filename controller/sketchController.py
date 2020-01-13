@@ -24,11 +24,12 @@ class SketchController(QObject):
         self.sketch_list = []
         self.createActions()
         self.setActionEnabled(False)
+        self.currentSObject: Sketch_Object = None
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
         node: SketchObjectNode = current.internalPointer()
         if isinstance(node, SketchObjectNode):
-            self._display.Context.SetSelected(node.ais_geometry, True)
+            self._display.Context.SetSelected(node.myAIS_Object, True)
 
     def createActions(self):
         self.action_createNewSketch = QAction(QIcon(""), "create a new sketch", self,
@@ -85,7 +86,7 @@ class SketchController(QObject):
         self.model = model
 
     def setRootNode(self, root):
-        self._root: Node = root
+        self.rootNode: Node = root
 
     def snapEnd(self):
         self.sketch.SetSnap(Sketcher_SnapType.SnapEnd)
@@ -148,10 +149,44 @@ class SketchController(QObject):
     def OnMouseInputEvent(self, *kargs):
         self.sketch.OnMouseInputEvent(*kargs)
 
-
     def OnMouseMoveEvent(self, *kargs):
         self.sketch.OnMouseMoveEvent(*kargs)
         self.model.layoutChanged.emit()
+        self.UpdateSelection()
+
+    def OnMoveSketchObject(self):
+        if self.currentSketchNode:
+            if self.sketch.myCurrentMethod == Sketch_ObjectTypeOfMethod.Nothing_Method:
+                if self.currentSObject is None:
+                    for obj in self.currentSketchNode.children():
+                        if type(obj) == PointNode:
+                            myCurObject: Sketch_Object = obj.getSketchObject()
+                            if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
+                                self.currentSObject = myCurObject
+                                break
+                        elif type(obj) == BezierNode:
+                            for sub_obj in obj.children():
+                                myCurObject: Sketch_Object = sub_obj.getSketchObject()
+                                if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
+                                    self.currentSObject = myCurObject
+                                    break
+
+    def UpdateSelection(self):
+        if self.currentSObject:
+            curPoint2d = self.sketch.GetCurPoint2D()
+            geometry: Geom2d_CartesianPoint = self.currentSObject.GetGeometry()
+            geometry.SetPnt2d(curPoint2d)
+            # print(geometry.X(), geometry.Y())
+            curPoint = self.sketch.GetCurPoint3D()
+            curGeom_Point = Geom_CartesianPoint(curPoint)
+            ais_point = self.currentSObject.GetAIS_Object()
+            ais_point.SetComponent(curGeom_Point)
+            ais_point.Redisplay(True)
+
+    def OnReleaseSketchObject(self):
+        if self.currentSObject:
+            self.currentSObject = None
+            self._display.Context.ClearSelected(True)
 
     def editGeometry(self):
         self.sketch.ViewProperties()

@@ -10,6 +10,7 @@ from OCC.Core.BRepBuilderAPI import *
 from data.sketch.sketch_object import Sketch_Object
 from view.sketchProperty import Ui_SketchProperty
 from data.sketch.sketch_utils import *
+from data.node import *
 
 
 class Sketch_Property(QWidget):
@@ -55,11 +56,12 @@ class Sketch_Property(QWidget):
         self.myCoordinateSystem = theAx3
 
     def SetObject(self, CurObject: Sketch_Object):
-        self.mySObject:Sketch_Object = CurObject
+        self.mySObject: Sketch_Object = CurObject
         self.myAIS_Object = self.mySObject.GetAIS_Object()
         self.myID = self.mySObject.GetObjectName()
         self.myNameOfColor = self.mySObject.GetColor()
         self.myObjectType = self.mySObject.GetType()
+        self.myNode: SketchObjectNode = self.mySObject.GetParentNode()
 
         if not self.isPointWindow:
             self.myObjectStyle = self.mySObject.GetStyle()

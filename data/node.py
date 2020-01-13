@@ -1,8 +1,12 @@
 import resources.icon.icon
+from PyQt5.QtCore import QObject, pyqtSignal
 
 
-class Node(object):
+class Node(QObject):
+    nodeModified = pyqtSignal()
+
     def __init__(self, name, parent=None):
+        super(Node, self).__init__(parent)
         '''
         Args:
             name: name of the node
@@ -19,7 +23,7 @@ class Node(object):
 
     def addChild(self, child):
         self._children.append(child)
-        child._parent=self
+        child._parent = self
 
     def name(self):
         return self._name
@@ -262,27 +266,27 @@ from OCC.Core.Geom import Geom_CartesianPoint
 from data.sketch.geometry import *
 from OCC.Core.AIS import *
 from OCC.Core.ElCLib import elclib
+from data.sketch.sketch_object import Sketch_Object
 
 
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
-        self._color = None
-        self._style = None
-        self._width = None
-        self._type = None
-        self.geometry = None
-        self.ais_geometry = None
-        self.curCoordinateSystem = None
+        self._sketchObject: Sketch_Object = None
 
-    def setGeometry(self, geom):
-        self.geometry = geom
+    def getAttribute(self, curSketchObject: Sketch_Object):
+        self.myAIS_Object = curSketchObject.GetAIS_Object()
+        self.myID = curSketchObject.GetObjectName()
+        self.myNameOfColor = curSketchObject.GetColor()
+        self.myObjectType = curSketchObject.GetType()
+        self.myGeometry = curSketchObject.GetGeometry()
 
-    def setAisGeometry(self, ais_geom):
-        self.ais_geometry = ais_geom
+    def setSketchObject(self, theObject: Sketch_Object):
+        self._sketchObject = theObject
+        self._sketchObject.SetParentNode(self)
 
-    def setAxis(self, theAxis):
-        self.curCoordinateSystem = theAxis
+    def getSketchObject(self):
+        return self._sketchObject
 
     def typeInfo(self):
         return "SketchObject"
@@ -291,16 +295,15 @@ class SketchObjectNode(Node):
 class PointNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(PointNode, self).__init__(name, parent)
-        self.geometry: Geom2d_CartesianPoint = None
-        self.ais_geometry: AIS_Point = None
 
     def data(self, column):
         r = super(PointNode, self).data(column)
-
+        if self._sketchObject:
+            self.getAttribute(self._sketchObject)
         if column == 2:
-            r = self._color
+            pass
         elif column == 3:
-            r = str(round(self.geometry.X(), 1)) + "," + str(round(self.geometry.Y(), 1))
+            r = str(round(self.myGeometry.X(), 1)) + "," + str(round(self.myGeometry.Y(), 1))
         return r
 
     def setData(self, column, value):
@@ -309,10 +312,7 @@ class PointNode(SketchObjectNode):
             self._color = value
         elif column == 3:
             x, y = value.split(",")
-            self.geometry.SetCoord(float(x), float(y))
-            myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.geometry.Pnt2d()))
-            self.ais_geometry.SetComponent(myGeom_Point)
-            self.ais_geometry.Redisplay(True)
+            self.myGeometry.SetCoord(float(x), float(y))
 
     def typeInfo(self):
         return "Point"
@@ -326,27 +326,14 @@ class LineNode(SketchObjectNode):
 
     def data(self, column):
         r = super(LineNode, self).data(column)
+        if self._sketchObject:
+            self.getAttribute(self._sketchObject)
 
-        if column == 2:
-            r = self._color
-        elif column == 3:
-            r = self._style
-        elif column == 4:
-            r = self._width
-        elif column == 5:
-            r = self._type
         return r
 
     def setData(self, column, value):
         super(LineNode, self).setData(column, value)
-        if column == 2:
-            self._color = value
-        elif column == 3:
-            self._style = value
-        elif column == 4:
-            self._width = value
-        elif column == 5:
-            self._type = value
+        pass
 
     def typeInfo(self):
         return "Line"
@@ -365,27 +352,14 @@ class BezierNode(SketchObjectNode):
 
     def data(self, column):
         r = super(BezierNode, self).data(column)
+        if self._sketchObject:
+            self.getAttribute(self._sketchObject)
 
-        if column == 2:
-            r = self._color
-        elif column == 3:
-            r = self._style
-        elif column == 4:
-            r = self._width
-        elif column == 5:
-            r = self._type
         return r
 
     def setData(self, column, value):
         super(BezierNode, self).setData(column, value)
-        if column == 2:
-            self._color = value
-        elif column == 3:
-            self._style = value
-        elif column == 4:
-            self._width = value
-        elif column == 5:
-            self._type = value
+        pass
 
     def typeInfo(self):
         return "Bezier curve"

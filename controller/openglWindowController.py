@@ -210,6 +210,7 @@ class OpenGLEditor(GLWidget):
                         self.sig_topods_selected.emit(self._display.selected_shapes)
             for callback in self._mouseRelease_callback:
                 callback(pt.x(), pt.y())
+            self.sketchController.OnReleaseSketchObject()
 
         # elif event.button() == QtCore.Qt.RightButton:
         #     if self._zoom_area:
@@ -236,7 +237,8 @@ class OpenGLEditor(GLWidget):
         self.part.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
             callback(pt.x(), pt.y())
-
+        if buttons == QtCore.Qt.LeftButton:
+            self.sketchController.OnMoveSketchObject()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 # ROTATE

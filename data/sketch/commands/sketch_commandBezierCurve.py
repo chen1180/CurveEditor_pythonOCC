@@ -59,16 +59,12 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
             myAIS_Point = AIS_Point(self.myFirstPoint)
             self.myContext.Display(myAIS_Point, True)
-            pole = Sketch_Object(myGeom2d_Point, myAIS_Point, "poles" + str(self.IndexCounter),
-                                 Sketch_GeometryType.PointSketchObject,
-                                 self.GetTypeOfMethod())
-            self.childrenObjects.append(pole)
-            # self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
             self.bezierNode = BezierNode(self.objectName + str(self.objectCounter), self.rootNode)
-            node = PointNode("poles" + str(self.IndexCounter), self.bezierNode)
-            self.AddNode(node, myGeom2d_Point, myAIS_Point)
-
+            poleObject = self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
+            poleNode = PointNode("poles" + str(self.IndexCounter), self.bezierNode)
+            poleNode.setSketchObject(poleObject)
             self.myContext.Display(self.myRubberLine, True)
+
             self.myBezierCurveAction = BezierCurveAction.Input_2Point
             self.IndexCounter = 2
 
@@ -143,11 +139,11 @@ class Sketch_CommandBezierCurve(Sketch_Command):
         if self.myBezierCurveAction == BezierCurveAction.Nothing:
             pass
         elif self.myBezierCurveAction == BezierCurveAction.Input_1Point:
-            self.rootNode.removeChild(self.rootNode.childCount()-1)
+            self.rootNode.removeChild(self.rootNode.childCount() - 1)
             del self.bezierNode
         elif self.myBezierCurveAction == BezierCurveAction.Input_2Point:
             self.myContext.Remove(self.myRubberLine, True)
-            self.rootNode.removeChild(self.rootNode.childCount()-1)
+            self.rootNode.removeChild(self.rootNode.childCount() - 1)
             del self.bezierNode
         elif self.myBezierCurveAction == BezierCurveAction.Input_OtherPoints:
             self.myGeom2d_BezierCurve.RemovePole(self.IndexCounter)
@@ -165,23 +161,20 @@ class Sketch_CommandBezierCurve(Sketch_Command):
     def storePoles(self):
         myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
         self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-        myAIS_Point = AIS_Point(self.mySecondPoint)
+        myGeom_Point = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
+        myAIS_Point = AIS_Point(myGeom_Point)
         self.myContext.Display(myAIS_Point, True)
 
-        pole = Sketch_Object(myGeom2d_Point, myAIS_Point, "poles" + str(self.IndexCounter),
-                             Sketch_GeometryType.PointSketchObject,
-                             self.GetTypeOfMethod())
-        self.childrenObjects.append(pole)
-        node = PointNode("poles" + str(self.IndexCounter), self.bezierNode)
-        self.AddNode(node, myGeom2d_Point, myAIS_Point)
+        poleObject = self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
+        poleNode = PointNode("poles" + str(self.IndexCounter), self.bezierNode)
+        poleNode.setSketchObject(poleObject)
 
     def closeBezierCurve(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)
         myGeom2d_BezierCurve: Geom2d_BezierCurve = Geom2d_BezierCurve.DownCast(self.myGeom2d_BezierCurve.Copy())
         myAIS_Shape = AIS_Shape(self.curEdge)
-        self.AddObject(myGeom2d_BezierCurve, myAIS_Shape, Sketch_GeometryType.CurveSketchObject)
-
-        self.AddNode(self.bezierNode, myGeom2d_BezierCurve, myAIS_Shape)
+        bezierObject = self.AddObject(myGeom2d_BezierCurve, myAIS_Shape, Sketch_GeometryType.CurveSketchObject)
+        self.bezierNode.setSketchObject(bezierObject)
 
         self.myContext.Display(myAIS_Shape, True)
         # create new object

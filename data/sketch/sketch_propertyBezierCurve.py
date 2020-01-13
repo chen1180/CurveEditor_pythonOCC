@@ -49,15 +49,20 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             if not new_pole2d.IsEqual(old_pole2d, 1.0e-6):
                 needUpdate = True
                 # update old poles interactive points
-                if self.mySObject.GetChildren():
-                    child = self.mySObject.GetChild(idx)
+                if self.myNode:
+                    child: Sketch_Object = self.myNode.child(idx).getSketchObject()
+
                     assert isinstance(child, Sketch_Object)
+
                     ais_point = child.GetAIS_Object()
                     self.myContext.Remove(ais_point, True)
-                    newGeom_Point = Geom_CartesianPoint(
-                        elclib.To3d(self.myCoordinateSystem.Ax2(), new_pole2d))
+                    newGeom2d_Point = Geom2d_CartesianPoint(new_pole2d)
+                    newGeom_Point = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), new_pole2d))
                     ais_point = AIS_Point(newGeom_Point)
                     self.myContext.Display(ais_point, True)
+
+                    child.SetAIS_Object(ais_point)
+                    child.SetGeometry(newGeom2d_Point)
 
         current_weights = []
         for idx in range(self.weights.childCount()):
