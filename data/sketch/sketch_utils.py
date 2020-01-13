@@ -1,5 +1,10 @@
 from OCC.Core.TColgp import TColgp_Array1OfPnt2d, TColgp_Array1OfPnt
 from OCC.Core.TColStd import TColStd_Array1OfReal, TColStd_Array1OfInteger
+from OCC.Core.ElCLib import elclib
+
+
+def Pnt2dToPnt(pnt2d, theAxis):
+    return elclib.To3d(theAxis.Ax2(), pnt2d)
 
 
 def TColgp_Array1OfPnt2d_to_point_list(li: TColgp_Array1OfPnt2d):

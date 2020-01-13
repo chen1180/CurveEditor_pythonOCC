@@ -14,7 +14,8 @@ class Sketch_CommandMoveObject(Sketch_Command):
     def __init__(self):
         super(Sketch_CommandMoveObject, self).__init__("Move Object")
         self.myMoveAction = MoveAction.Nothing
-        self.currentSObject: Sketch_Object = None
+        self.currentSObject: Sketch_Point = None
+        self.object = None
 
     def Action(self):
         self.myMoveAction = MoveAction.Input_SelectedObject
@@ -25,26 +26,29 @@ class Sketch_CommandMoveObject(Sketch_Command):
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
+
         if buttons == Qt.LeftButton:
             if self.myMoveAction == MoveAction.Nothing:
                 if self.rootNode:
                     for obj in self.rootNode.children():
                         if type(obj) == PointNode:
-                            myCurObject: Sketch_Object = obj.getSketchObject()
+                            myCurObject: Sketch_Point = obj.getSketchObject()
                             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
                                 self.currentSObject = myCurObject
                                 self.myMoveAction = MoveAction.Input_SelectedObject
                                 break
                         elif type(obj) == BezierNode:
-                            for subNodes in obj.children():
-                                myCurObject: Sketch_Object = subNodes.getSketchObject()
-                                if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                                    self.currentSObject = myCurObject
+                            myCurObject: Sketch_BezierCurve = obj.getSketchObject()
+                            for pole in myCurObject.GetPoles():
+                                if self.myContext.IsSelected(pole.GetAIS_Object()):
+                                    self.currentSObject = pole
                                     self.myMoveAction = MoveAction.Input_SelectedObject
+                                    self.object = myCurObject
                                     break
-
             elif self.myMoveAction == MoveAction.Input_SelectedObject:
-                self.UpdatePoint()
+                self.currentSObject.DragTo(self.curPnt2d)
+                if type(self.object) == Sketch_BezierCurve:
+                    self.object.Recompute()
 
     def MouseReleaseEvent(self, buttons, modifiers):
         self.currentSObject = None
@@ -56,14 +60,3 @@ class Sketch_CommandMoveObject(Sketch_Command):
 
     def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
         return Sketch_ObjectTypeOfMethod.Nothing_Method
-
-    def UpdatePoint(self):
-        if self.currentSObject:
-            geometry: Geom2d_CartesianPoint = self.currentSObject.GetGeometry()
-            geometry.SetPnt2d(self.curPnt2d)
-            # print(geometry.X(), geometry.Y())
-            curPoint = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
-            curGeom_Point = Geom_CartesianPoint(curPoint)
-            ais_point = self.currentSObject.GetAIS_Object()
-            ais_point.SetComponent(curGeom_Point)
-            ais_point.Redisplay(True)

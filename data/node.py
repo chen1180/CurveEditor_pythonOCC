@@ -267,12 +267,13 @@ from data.sketch.geometry import *
 from OCC.Core.AIS import *
 from OCC.Core.ElCLib import elclib
 from data.sketch.sketch_object import Sketch_Object
+from data.sketch.geometry import *
 
 
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
-        self._sketchObject: Sketch_Object = None
+        self._sketchObject: Sketch_Point = None
 
     def getAttribute(self, curSketchObject: Sketch_Object):
         self.myAIS_Object = curSketchObject.GetAIS_Object()
@@ -283,7 +284,6 @@ class SketchObjectNode(Node):
 
     def setSketchObject(self, theObject: Sketch_Object):
         self._sketchObject = theObject
-        self._sketchObject.SetParentNode(self)
 
     def getSketchObject(self):
         return self._sketchObject
@@ -298,8 +298,7 @@ class PointNode(SketchObjectNode):
 
     def data(self, column):
         r = super(PointNode, self).data(column)
-        if self._sketchObject:
-            self.getAttribute(self._sketchObject)
+        self.myGeometry = self._sketchObject.myGeometry.Pnt()
         if column == 2:
             pass
         elif column == 3:
@@ -352,8 +351,7 @@ class BezierNode(SketchObjectNode):
 
     def data(self, column):
         r = super(BezierNode, self).data(column)
-        if self._sketchObject:
-            self.getAttribute(self._sketchObject)
+        pass
 
         return r
 

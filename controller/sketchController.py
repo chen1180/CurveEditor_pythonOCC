@@ -28,7 +28,7 @@ class SketchController(QObject):
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
         node: SketchObjectNode = current.internalPointer()
         if isinstance(node, SketchObjectNode):
-            self._display.Context.SetSelected(node.myAIS_Object, True)
+            self._display.Context.SetSelected(node._sketchObject.myAIS_InteractiveObject, True)
 
     def createActions(self):
         self.action_createNewSketch = QAction(QIcon(""), "create a new sketch", self,
