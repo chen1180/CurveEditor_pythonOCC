@@ -89,7 +89,7 @@ class Sketch_CommandBSpline(Sketch_Command):
         self.myGeom_BSplineCurve = Geom_BSplineCurve(curgp_Array1CurvePoles, curgp_Array1CurveKnots,
                                                      curgp_Array1CurveMulti, self.myDegree)
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
 
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
@@ -161,7 +161,7 @@ class Sketch_CommandBSpline(Sketch_Command):
                     self.IndexCounter += 1
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
             pass

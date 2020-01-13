@@ -18,7 +18,7 @@ class Sketch_CommandPoint(Sketch_Command):
     def Action(self):
         self.myPointAction = PointAction.Input_Point
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
         if self.myPointAction == PointAction.Nothing:
             pass
@@ -33,7 +33,7 @@ class Sketch_CommandPoint(Sketch_Command):
             node.setSketchObject(sketchObject)
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
 
     def CancelEvent(self):

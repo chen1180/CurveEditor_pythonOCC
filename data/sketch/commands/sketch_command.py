@@ -12,6 +12,7 @@ from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
 from data.node import *
 from data.sketch.sketch_utils import *
+from PyQt5.QtCore import Qt
 
 SKETCH_RADIUS = 10.0
 
@@ -100,11 +101,14 @@ class Sketch_Command(object):
     def Action(self):
         raise NotImplementedError()
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         raise NotImplementedError()
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         raise NotImplementedError()
+
+    def MouseReleaseEvent(self, buttons, modifiers):
+        pass
 
     def CancelEvent(self):
         raise NotImplementedError()

@@ -27,7 +27,7 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
         self.myCircleAx2d.SetDirection(
             gp_Dir2d(self.curCoordinateSystem.XDirection().X(), self.curCoordinateSystem.XDirection().Y()))
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         if self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Nothing:
             pass
         elif self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Input_CenterPoint:
@@ -63,7 +63,7 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
 
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         if self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Nothing:
             pass
         elif self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Input_CenterPoint:

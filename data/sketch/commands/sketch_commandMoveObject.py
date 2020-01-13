@@ -19,37 +19,51 @@ class Sketch_CommandMoveObject(Sketch_Command):
     def Action(self):
         self.myMoveAction = MoveAction.Input_SelectedObject
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
-        if self.myMoveAction == MoveAction.Nothing:
-            if self.currentSObject is None:
-                for obj in self.currentSketchNode.children():
-                    myCurObject: Sketch_Object = obj.getSketchObject()
-                    if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                        self.currentSObject = myCurObject
-                        self.myMoveAction = MoveAction.Input_SelectedObject
-                        break
-        elif self.myMoveAction == MoveAction.Input_SelectedObject:
-            pass
+        return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
-        if self.myMoveAction == MoveAction.Nothing:
-            pass
-        elif self.myMoveAction == MoveAction.Input_SelectedObject:
-            if self.currentSObject:
-                curPoint2d = self.sketch.GetCurPoint2D()
-                geometry: Geom2d_CartesianPoint = self.currentSObject.GetGeometry()
-                geometry.SetPnt2d(curPoint2d)
-                print(geometry.X(), geometry.Y())
-                curPoint = self.sketch.GetCurPoint3D()
-                curGeom_Point = Geom_CartesianPoint(curPoint)
-                ais_point = self.currentSObject.GetAIS_Object()
-                ais_point.SetComponent(curGeom_Point)
-                ais_point.Redisplay(True)
+        if buttons == Qt.LeftButton:
+            if self.myMoveAction == MoveAction.Nothing:
+                if self.rootNode:
+                    for obj in self.rootNode.children():
+                        if type(obj) == PointNode:
+                            myCurObject: Sketch_Object = obj.getSketchObject()
+                            if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
+                                self.currentSObject = myCurObject
+                                self.myMoveAction = MoveAction.Input_SelectedObject
+                                break
+                        elif type(obj) == BezierNode:
+                            for subNodes in obj.children():
+                                myCurObject: Sketch_Object = subNodes.getSketchObject()
+                                if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
+                                    self.currentSObject = myCurObject
+                                    self.myMoveAction = MoveAction.Input_SelectedObject
+                                    break
+
+            elif self.myMoveAction == MoveAction.Input_SelectedObject:
+                self.UpdatePoint()
+
+    def MouseReleaseEvent(self, buttons, modifiers):
+        self.currentSObject = None
+        self.myContext.ClearSelected(True)
+        self.myMoveAction = MoveAction.Nothing
 
     def CancelEvent(self):
         self.myMoveAction = MoveAction.Nothing
 
     def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
         return Sketch_ObjectTypeOfMethod.Nothing_Method
+
+    def UpdatePoint(self):
+        if self.currentSObject:
+            geometry: Geom2d_CartesianPoint = self.currentSObject.GetGeometry()
+            geometry.SetPnt2d(self.curPnt2d)
+            # print(geometry.X(), geometry.Y())
+            curPoint = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
+            curGeom_Point = Geom_CartesianPoint(curPoint)
+            ais_point = self.currentSObject.GetAIS_Object()
+            ais_point.SetComponent(curGeom_Point)
+            ais_point.Redisplay(True)

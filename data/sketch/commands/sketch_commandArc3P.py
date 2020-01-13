@@ -61,7 +61,7 @@ class Sketch_CommandArc3P(Sketch_Command):
         self.myArc3PAction = Arc3PAction.Input_1ArcPoint
         self.temp_Circ.SetPosition(self.curCoordinateSystem.Ax2())
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
         if self.myArc3PAction == Arc3PAction.Nothing:
             pass
@@ -180,7 +180,7 @@ class Sketch_CommandArc3P(Sketch_Command):
                 self.myContext.Redisplay(self.myRubberCircle, True)
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
         if self.myArc3PAction == Arc3PAction.Nothing:
             pass

@@ -42,6 +42,7 @@ class Sketch(object):
         self.addCommand(Sketch_CommandCircleCenterRadius())
         self.addCommand(Sketch_CommandBSpline())
         self.addCommand(Sketch_CommandPointToBSpline())
+        self.addCommand(Sketch_CommandMoveObject())
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
@@ -134,22 +135,26 @@ class Sketch(object):
             return False
 
     def OnMouseInputEvent(self, *kargs):
-        theX, theY = kargs
+        theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
-            if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d):
+            if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d, buttons, modifier):
                 self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
 
     def OnMouseMoveEvent(self, *kargs):
-
-        theX, theY = kargs
+        theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
-            self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d)
+            self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d, buttons, modifier)
+
+    def OnMouseReleaseEvent(self, *kargs):
+        buttons, modifier = kargs
+        self.SelectCurCommand()
+        self.CurCommand.MouseReleaseEvent(buttons, modifier)
 
     def GetCurPoint2D(self):
         return self.myCurrentPnt2d

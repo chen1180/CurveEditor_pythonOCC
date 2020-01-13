@@ -6,3 +6,4 @@ from .sketch_commandArc3P import Sketch_CommandArc3P
 from .sketch_commandCircleCenterRadius import Sketch_CommandCircleCenterRadius
 from .sketch_commandBSpline import Sketch_CommandBSpline
 from .sketch_commandPointToBSpline import Sketch_CommandPointToBSpline
+from .sketch_commandMoveObject import Sketch_CommandMoveObject

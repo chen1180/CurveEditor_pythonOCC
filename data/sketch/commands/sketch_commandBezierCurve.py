@@ -45,7 +45,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
     def Action(self):
         self.myBezierCurveAction = BezierCurveAction.Input_1Point
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
 
         if self.myBezierCurveAction == BezierCurveAction.Nothing:
@@ -113,7 +113,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
                     self.IndexCounter += 1
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
         if self.myBezierCurveAction == BezierCurveAction.Nothing:
             pass

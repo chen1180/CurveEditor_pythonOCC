@@ -22,7 +22,7 @@ class Sketch_CommandLine2P(Sketch_Command):
     def Action(self):
         self.myLine2PAction = Line2PAction.Input_FirstPointLine
 
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
 
         if self.myLine2PAction == Line2PAction.Nothing:
             pass
@@ -60,7 +60,7 @@ class Sketch_CommandLine2P(Sketch_Command):
                     self.myLine2PAction = Line2PAction.Input_FirstPointLine
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         if self.myLine2PAction == Line2PAction.Nothing:
             pass
         elif self.myLine2PAction == Line2PAction.Input_FirstPointLine:

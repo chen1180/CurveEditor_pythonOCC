@@ -51,7 +51,7 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
                 print("3d",i.X(),i.Y(),i.Z())
             elif type(i)==gp_Pnt2d:
                 print("2d",i.X(), i.Y())
-    def MouseInputEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
 
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
@@ -124,7 +124,7 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
                     self.IndexCounter += 1
         return False
 
-    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d):
+    def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
             pass

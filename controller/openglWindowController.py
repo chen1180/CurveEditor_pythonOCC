@@ -183,13 +183,13 @@ class OpenGLEditor(GLWidget):
         for callback in self._mousePress_callback:
             callback(pt.x(), pt.y())
 
-        self.sketchController.OnMouseInputEvent(pt.x(), pt.y())
+        self.sketchController.OnMouseInputEvent(pt.x(), pt.y(), buttons, modifiers)
         self.part.OnMouseInputEvent(pt.x(), pt.y())
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()
+        buttons = int(event.buttons())
         modifiers = event.modifiers()
-
         if event.button() == QtCore.Qt.LeftButton:
             if self._select_area:
                 if type(self._drawbox) == list:
@@ -210,7 +210,8 @@ class OpenGLEditor(GLWidget):
                         self.sig_topods_selected.emit(self._display.selected_shapes)
             for callback in self._mouseRelease_callback:
                 callback(pt.x(), pt.y())
-            self.sketchController.OnReleaseSketchObject()
+
+        self.sketchController.OnMouseReleaseEvent(buttons, modifiers)
 
         # elif event.button() == QtCore.Qt.RightButton:
         #     if self._zoom_area:
@@ -233,12 +234,12 @@ class OpenGLEditor(GLWidget):
         pt = evt.pos()
         buttons = int(evt.buttons())
         modifiers = evt.modifiers()
-        self.sketchController.OnMouseMoveEvent(pt.x(), pt.y())
+        self.sketchController.OnMouseMoveEvent(pt.x(), pt.y(), buttons, modifiers)
         self.part.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
             callback(pt.x(), pt.y())
-        if buttons == QtCore.Qt.LeftButton:
-            self.sketchController.OnMoveSketchObject()
+        # if buttons == QtCore.Qt.LeftButton:
+        #     self.sketchController.OnMoveSketchObject()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 # ROTATE
