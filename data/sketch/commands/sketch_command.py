@@ -88,7 +88,6 @@ class Sketch_Command(object):
         so.SetStyle(self.myStyle)
         so.SetWidth(self.myWidth)
         self.data.append(so)
-        return so
 
     def AddNode(self, node: SketchObjectNode, theGeometry, theAIS_Object):
         node.setGeometry(theGeometry)

@@ -273,11 +273,11 @@ from data.sketch.geometry import *
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
-        self._sketchObject: Sketch_Point = None
+        self._sketchObject: Sketch_Geometry = None
 
     def getAttribute(self, curSketchObject: Sketch_Object):
         self.myAIS_Object = curSketchObject.GetAIS_Object()
-        self.myID = curSketchObject.GetObjectName()
+        self.myID = curSketchObject.GetName()
         self.myNameOfColor = curSketchObject.GetColor()
         self.myObjectType = curSketchObject.GetType()
         self.myGeometry = curSketchObject.GetGeometry()

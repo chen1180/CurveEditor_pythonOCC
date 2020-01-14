@@ -33,31 +33,30 @@ class Sketch_CommandLine2P(Sketch_Command):
             self.myFirstPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
             self.myContext.Display(self.myRubberLine, True)
+
+            self.line = Sketch_Line()
+            self.line.SetContext(self.myContext)
+            self.line.SetAxis(self.curCoordinateSystem)
+            self.line.AddPoints(self.curPnt2d)
+
             self.myLine2PAction = Line2PAction.Input_SecondPointLine
         elif self.myLine2PAction == Line2PAction.Input_SecondPointLine:
 
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                     TangentType.Line_SecondPnt, False)
             self.mySecondgp_Pn2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
-            newGeom2d_Edge = Geom2d_Edge()
-            if newGeom2d_Edge.SetPoints(self.myFirstgp_Pnt2d, self.mySecondgp_Pn2d):
-                Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))
-                Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.curCoordinateSystem.Ax2(), self.mySecondgp_Pn2d))
-                myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
-                # edge = BRepBuilderAPI_MakeEdge(Geom_Point1.Pnt(), Geom_Point2.Pnt())
-                # myAIS_Line=AIS_Shape(edge.Shape())
-                sketchObject = self.AddObject(newGeom2d_Edge, myAIS_Line, Sketch_GeometryType.LineSketchObject)
-                node = LineNode(self.objectName + str(self.objectCounter), self.rootNode)
-                node.setSketchObject(sketchObject)
-                self.myContext.Display(myAIS_Line, True)
-                if self.myPolylineMode:
-                    self.myFirstgp_Pnt2d = self.curPnt2d
-                    self.myFirstPoint.SetPnt(self.mySecondPoint.Pnt())
-                    self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
-                    self.myContext.Redisplay(self.myRubberLine, True)
-                else:
-                    self.myContext.Remove(self.myRubberLine, True)
-                    self.myLine2PAction = Line2PAction.Input_FirstPointLine
+            self.line.AddPoints(self.curPnt2d)
+            self.line.Compute()
+            node = LineNode(self.objectName + str(self.objectCounter), self.rootNode)
+            node.setSketchObject(self.line)
+            if self.myPolylineMode:
+                self.myFirstgp_Pnt2d = self.curPnt2d
+                self.myFirstPoint.SetPnt(self.mySecondPoint.Pnt())
+                self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
+                self.myContext.Redisplay(self.myRubberLine, True)
+            else:
+                self.myContext.Remove(self.myRubberLine, True)
+                self.myLine2PAction = Line2PAction.Input_FirstPointLine
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):

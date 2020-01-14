@@ -88,8 +88,8 @@ class Window(QtWidgets.QMainWindow):
         '''
         position = self._rootNode.childCount()
         self._model.insertNode(item, position, 1)
-        #select latest row
-        self._uiTreeView.setCurrentIndex(self._model.index(position,0,QtCore.QModelIndex()))
+        # select latest row
+        self._uiTreeView.setCurrentIndex(self._model.index(position, 0, QtCore.QModelIndex()))
         self._uiTreeView.updateEditorData()
         self._uiTreeView.expandAll()
 
@@ -149,6 +149,7 @@ class Window(QtWidgets.QMainWindow):
         self._snapModeButton.setMenu(self._snapModeMenu)
         self._snapModeButton.setDefaultAction(self._glWindow.sketchController.action_snapNothing)
         self._sketchToolBar.addWidget(self._snapModeButton)
+        self._sketchToolBar.addSeparator()
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 

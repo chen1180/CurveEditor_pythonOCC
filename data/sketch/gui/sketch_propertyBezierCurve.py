@@ -11,15 +11,16 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             self.setObjectName("Property bezier curve")
         self.geometry_dict = {}
         self.ui_initialized = False
+        self.mySObject: Sketch_BezierCurve = None
         # ui
         self.ui.TextLabelPoint1.close()
         self.ui.LineEditPoint1.close()
 
     def SetGeometry(self, *__args):
-        self.curGeom2d_BezierCurve: Geom2d_BezierCurve = self.mySObject.GetGeometry()
+        self.curGeom2d_BezierCurve: Geom2d_BezierCurve = self.mySObject.GetGeometry2d()
         # save data and create gui
-        poles = TColgp_Array1OfPnt2d_to_point_list(self.curGeom2d_BezierCurve.Poles())
-        weights = self.curGeom2d_BezierCurve.Weights()
+        poles = [pole.GetGeometry2d().Pnt2d() for pole in self.mySObject.GetPoles()]
+        weights = self.mySObject.myWeights
         nbPoles = self.curGeom2d_BezierCurve.NbPoles()
         degree = self.curGeom2d_BezierCurve.Degree()
         closed_flag = self.curGeom2d_BezierCurve.IsClosed()
@@ -35,7 +36,6 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
 
     def GetGeometry(self):
         needUpdate = False
-        current_poles2d = []
         for idx in range(self.poles.childCount()):
             pole = self.poles.child(idx)
             x = pole.child(0)
@@ -43,51 +43,22 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             coordinate_x: QDoubleSpinBox = self.tree.itemWidget(x, 1)
             coordinate_y: QDoubleSpinBox = self.tree.itemWidget(y, 1)
             new_pole2d = gp_Pnt2d(coordinate_x.value(), coordinate_y.value())
-            current_poles2d.append(new_pole2d)
             # original pole coordinate
             old_pole2d = self.geometry_dict["poles"][idx]
             if not new_pole2d.IsEqual(old_pole2d, 1.0e-6):
                 needUpdate = True
                 # update old poles interactive points
-                if self.myNode:
-                    child: Sketch_Object = self.myNode.child(idx).getSketchObject()
+                self.mySObject.GetPoles()[idx].DragTo(new_pole2d)
 
-                    assert isinstance(child, Sketch_Object)
-
-                    ais_point = child.GetAIS_Object()
-                    self.myContext.Remove(ais_point, True)
-                    newGeom2d_Point = Geom2d_CartesianPoint(new_pole2d)
-                    newGeom_Point = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), new_pole2d))
-                    ais_point = AIS_Point(newGeom_Point)
-                    self.myContext.Display(ais_point, True)
-
-                    child.SetAIS_Object(ais_point)
-                    child.SetGeometry(newGeom2d_Point)
-
-        current_weights = []
         for idx in range(self.weights.childCount()):
             weights = self.weights.child(idx)
             weight_spinbox: QDoubleSpinBox = self.tree.itemWidget(weights, 1)
             weight_value = weight_spinbox.value()
-            current_weights.append(weight_value)
+            self.mySObject.ChangeWeights(index=idx, weight=weight_value)
         # check if the geometry of curve (coordinate of poles) has changed.
         if needUpdate:
-            current_poles = [elclib.To3d(self.myCoordinateSystem.Ax2(), pole2d) for pole2d in current_poles2d]
-            current_poles = point_list_to_TColgp_Array1OfPnt(current_poles)
-            current_weights = float_list_to_TColStd_Array1OfReal(current_weights)
-            for i in range(len(current_poles2d)):
-                self.curGeom2d_BezierCurve.SetPole(i + 1, current_poles2d[i])
-                self.curGeom2d_BezierCurve.SetWeight(i + 1, current_weights[i])
-            # update geometry
-            myGeom_BezierCurve = Geom_BezierCurve(current_poles, current_weights)
-            ME = BRepBuilderAPI_MakeEdge(myGeom_BezierCurve)
-            if ME.IsDone():
-                edge = ME.Edge()
-                myAIS_shape = AIS_Shape(edge)
-                self.myContext.Remove(self.myAIS_Object, True)
-                self.myAIS_Object = myAIS_shape
-
-                self.updateUI()
+            self.mySObject.Recompute()
+            self.updateUI()
             return True
         return False
 

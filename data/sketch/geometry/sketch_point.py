@@ -25,3 +25,9 @@ class Sketch_Point(Sketch_Geometry):
         newPnt = Pnt2dToPnt(newPnt2d, self.curCoordinateSystem)
         self.myGeometry.SetPnt(newPnt)
         self.myAIS_InteractiveObject.Redisplay(True)
+
+    def GetGeometryType(self):
+        return Sketch_GeometryType.PointSketchObject
+
+    def GetTypeOfMethod(self):
+        return Sketch_ObjectTypeOfMethod.Point_Method

@@ -21,6 +21,7 @@ class Sketch_QTGUI(object):
         self.prop_bezierCurve.SetAx3(theAx3)
 
     def SetSketch_Object(self, CurObject):
+
         if not self.prop_point.isHidden():
             self.prop_point.close()
         if not self.prop_line.isHidden():

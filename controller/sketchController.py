@@ -81,6 +81,7 @@ class SketchController(QObject):
         self.action_snapNearest.setEnabled(a0)
         self.action_snapNothing.setEnabled(a0)
 
+
     def setModel(self, model):
         self.model = model
 

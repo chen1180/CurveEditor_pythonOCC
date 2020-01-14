@@ -26,7 +26,6 @@ class Sketch_CommandMoveObject(Sketch_Command):
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
         self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
-
         if buttons == Qt.LeftButton:
             if self.myMoveAction == MoveAction.Nothing:
                 if self.rootNode:
@@ -36,6 +35,7 @@ class Sketch_CommandMoveObject(Sketch_Command):
                             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
                                 self.currentSObject = myCurObject
                                 self.myMoveAction = MoveAction.Input_SelectedObject
+                                self.object=myCurObject
                                 break
                         elif type(obj) == BezierNode:
                             myCurObject: Sketch_BezierCurve = obj.getSketchObject()
@@ -45,9 +45,20 @@ class Sketch_CommandMoveObject(Sketch_Command):
                                     self.myMoveAction = MoveAction.Input_SelectedObject
                                     self.object = myCurObject
                                     break
+                        elif type(obj)==LineNode:
+                            myCurObject: Sketch_Line = obj.getSketchObject()
+                            for pole in myCurObject.GetPoints():
+                                if self.myContext.IsSelected(pole.GetAIS_Object()):
+                                    self.currentSObject = pole
+                                    self.myMoveAction = MoveAction.Input_SelectedObject
+                                    self.object = myCurObject
+                                    break
             elif self.myMoveAction == MoveAction.Input_SelectedObject:
-                self.currentSObject.DragTo(self.curPnt2d)
+                if self.currentSObject:
+                    self.currentSObject.DragTo(self.curPnt2d)
                 if type(self.object) == Sketch_BezierCurve:
+                    self.object.Recompute()
+                elif type(self.object)==Sketch_Line:
                     self.object.Recompute()
 
     def MouseReleaseEvent(self, buttons, modifiers):
@@ -59,4 +70,4 @@ class Sketch_CommandMoveObject(Sketch_Command):
         self.myMoveAction = MoveAction.Nothing
 
     def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
-        return Sketch_ObjectTypeOfMethod.Nothing_Method
+        return Sketch_ObjectTypeOfMethod.Move_Method

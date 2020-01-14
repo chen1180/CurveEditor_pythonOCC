@@ -5,6 +5,7 @@ from data.sketch.sketch_utils import *
 from OCC.Core.gp import *
 from OCC.Core.Aspect import *
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
+from data.sketch.sketch_object import *
 
 
 class Sketch_Geometry:
@@ -16,6 +17,13 @@ class Sketch_Geometry:
         self.curCoordinateSystem: gp_Ax3 = None
 
         self.myName = name
+        self.myGeometryType = None
+        self.myTypeOfMethod = None
+
+        self.myNameOfColor = None
+        self.myObjectType = AIS_SD_None
+        self.myLineStyle = Aspect_TOL_SOLID
+        self.myWidth = 1.0
 
     def SetAxis(self, theAxis):
         self.curCoordinateSystem = theAxis
@@ -37,6 +45,36 @@ class Sketch_Geometry:
 
     def GetName(self):
         return self.myName
+
+    def GetGeometryType(self):
+        pass
+
+    def GetTypeOfMethod(self):
+        pass
+
+    def SetColor(self, theColor):
+        self.myNameOfColor = theColor
+
+    def GetColor(self):
+        return self.myNameOfColor
+
+    def SetType(self, theType):
+        self.myObjectType = theType
+
+    def GetType(self):
+        return self.myObjectType
+
+    def SetStyle(self, theLineStyle):
+        self.myLineStyle = theLineStyle
+
+    def GetStyle(self):
+        return self.myLineStyle
+
+    def SetWidth(self, theWidth):
+        self.myWidth = theWidth
+
+    def GetWidth(self):
+        return self.myWidth
 
     def Display(self, theContext: AIS_InteractiveContext):
         pass

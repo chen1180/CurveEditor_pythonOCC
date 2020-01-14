@@ -28,8 +28,10 @@ class Sketch_ObjectTypeOfMethod:
     ArcCenter2P_Method = 9
     BezierCurve_Method = 10
     Trim_Method = 11
-    BSpline_Method=12
+    BSpline_Method = 12
     PointsToBSpline_Method = 13
+
+    Move_Method = 20
 
 
 class TangentType:

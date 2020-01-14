@@ -55,13 +55,12 @@ class Sketch_Property(QWidget):
     def SetAx3(self, theAx3):
         self.myCoordinateSystem = theAx3
 
-    def SetObject(self, CurObject: Sketch_Object):
-        self.mySObject: Sketch_Object = CurObject
+    def SetObject(self, CurObject: Sketch_Geometry):
+        self.mySObject: Sketch_Geometry = CurObject
         self.myAIS_Object = self.mySObject.GetAIS_Object()
-        self.myID = self.mySObject.GetObjectName()
+        self.myID = self.mySObject.GetName()
         self.myNameOfColor = self.mySObject.GetColor()
         self.myObjectType = self.mySObject.GetType()
-        self.myNode: SketchObjectNode = self.mySObject.GetParentNode()
 
         if not self.isPointWindow:
             self.myObjectStyle = self.mySObject.GetStyle()

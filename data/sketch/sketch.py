@@ -5,6 +5,7 @@ from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
 from OCC.Core.Geom import Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect
+from data.node import *
 
 
 class Sketch(object):
@@ -30,7 +31,7 @@ class Sketch(object):
         self.PolylineFirstPointExist = False
 
         self.myData = []
-        self.myNode = None
+        self.myNode: SketchObjectNode = None
         self.myCommands = []
 
         self.myAnalyserSnap = Sketch_AnalyserSnap(self.myContext, self.myData, self.myCoordinateSystem)
@@ -183,8 +184,15 @@ class Sketch(object):
                 break
 
     def ViewProperties(self):
-        for idx in range(len(self.myData)):
-            myCurObject: Sketch_Object = self.myData[idx]
+        # for idx in range(len(self.myData)):
+        #     myCurObject: Sketch_Object = self.myData[idx]
+        #     if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
+        #         self.myContext.ClearSelected(True)
+        #         self.myGUI.SetSketch_Object(myCurObject)
+        #         break
+        for child in self.myNode.children():
+            assert isinstance(child, SketchObjectNode)
+            myCurObject: Sketch_Geometry = child.getSketchObject()
             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
                 self.myContext.ClearSelected(True)
                 self.myGUI.SetSketch_Object(myCurObject)

@@ -36,6 +36,7 @@ def beziercurve():
     array.SetValue(4, gp_Pnt(4, 3,-2))
     array.SetValue(5, gp_Pnt(100, 5,-2))
     beziercurve = Geom_BezierCurve(array)
+    beziercurve.Increase(5)
     poles=beziercurve.Poles()
     for p in poles:
         print(p.X(),p.Y(),p.Z())

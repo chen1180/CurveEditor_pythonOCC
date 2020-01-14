@@ -80,7 +80,7 @@ class Sketch_Object(object):
     def SetObjectName(self, theName):
         self.myNameOfColor = theName
 
-    def GetObjectName(self):
+    def GetName(self):
         return self.myName
 
     def SetParentNode(self, theParent):
