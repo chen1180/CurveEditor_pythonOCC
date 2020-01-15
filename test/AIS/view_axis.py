@@ -19,6 +19,8 @@ plane=Geom_Plane(0,0,1,0)
 ais_plane=AIS_PlaneTrihedron(plane)
 
 point=Geom_CartesianPoint(2,2,2)
+position=str((point.X(),point.Y()))
+display.DisplayMessage(point.Pnt(),position)
 ais_point=AIS_Point(point)
 ais_point.SetMarker(Aspect_TOM_BALL)
 

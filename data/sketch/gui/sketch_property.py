@@ -29,7 +29,7 @@ class Sketch_Property(QWidget):
 
         if not name:
             self.setObjectName("Sketch_Property")
-        self.resize(400, 800)
+        self.resize(400, 400)
         self.setMaximumSize(QSize(400, 400))
         self.setWindowTitle("Property")
 

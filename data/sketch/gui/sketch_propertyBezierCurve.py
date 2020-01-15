@@ -64,10 +64,14 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
 
     def setupUI(self):
         self.tree = QTreeWidget()
-        self.tree.setColumnCount(2)
-        self.tree.setHeaderLabels(['Key', 'Value'])
+        self.tree.setColumnCount(3)
+        self.tree.setHeaderLabels(['Key', 'Value','Action'])
         self.ui.GroupBoxGPLayout.addWidget(self.tree, 1, 0, 1, 3)
         self.degree = QTreeWidgetItem(self.tree, ["degree", str(self.geometry_dict["degree"])])
+        self.button = QPushButton()
+        self.button.setText("Increase degree")
+        self.button.clicked.connect(self.degreeElevation)
+        self.tree.setItemWidget(self.degree, 2, self.button)
         self.closed = QTreeWidgetItem(self.tree, ["Is closed", str(self.geometry_dict["closed"])])
         self.rational = QTreeWidgetItem(self.tree, ["Is rational", str(self.geometry_dict["rational"])])
         self.continuity = QTreeWidgetItem(self.tree, ["Continuity", str(self.geometry_dict["continuity"])])
@@ -101,7 +105,13 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             widget.setSingleStep(0.1)
             widget.setValue(value)
             self.tree.setItemWidget(weights_children, 1, widget)
+
         self.tree.addTopLevelItem(self.poles)
+
+    def degreeElevation(self):
+        self.mySObject.IncreaseDegree(self.geometry_dict["degree"] + 1)
+        self.SetGeometry()
+        self.updateUI()
 
     def updateUI(self):
         degree = self.curGeom2d_BezierCurve.Degree()

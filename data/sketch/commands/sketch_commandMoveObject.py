@@ -22,6 +22,7 @@ class Sketch_CommandMoveObject(Sketch_Command):
 
     def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
+
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
@@ -35,7 +36,7 @@ class Sketch_CommandMoveObject(Sketch_Command):
                             if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
                                 self.currentSObject = myCurObject
                                 self.myMoveAction = MoveAction.Input_SelectedObject
-                                self.object=myCurObject
+                                self.object = myCurObject
                                 break
                         elif type(obj) == BezierNode:
                             myCurObject: Sketch_BezierCurve = obj.getSketchObject()
@@ -45,7 +46,7 @@ class Sketch_CommandMoveObject(Sketch_Command):
                                     self.myMoveAction = MoveAction.Input_SelectedObject
                                     self.object = myCurObject
                                     break
-                        elif type(obj)==LineNode:
+                        elif type(obj) == LineNode:
                             myCurObject: Sketch_Line = obj.getSketchObject()
                             for pole in myCurObject.GetPoints():
                                 if self.myContext.IsSelected(pole.GetAIS_Object()):
@@ -58,12 +59,12 @@ class Sketch_CommandMoveObject(Sketch_Command):
                     self.currentSObject.DragTo(self.curPnt2d)
                 if type(self.object) == Sketch_BezierCurve:
                     self.object.Recompute()
-                elif type(self.object)==Sketch_Line:
+                elif type(self.object) == Sketch_Line:
                     self.object.Recompute()
 
     def MouseReleaseEvent(self, buttons, modifiers):
         self.currentSObject = None
-        self.myContext.ClearSelected(True)
+        self.object = None
         self.myMoveAction = MoveAction.Nothing
 
     def CancelEvent(self):

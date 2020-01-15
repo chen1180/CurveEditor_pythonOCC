@@ -11,6 +11,7 @@ class Sketch_BezierCurve(Sketch_Geometry):
         self.myGeometry: Geom_BezierCurve = None
         self.myGeometry2d: Geom2d_BezierCurve = None
         self.myAIS_InteractiveObject: AIS_Shape = None
+        self.myAIS_Line = []
         self.myPoles = []
         self.myWeights = []
         self.myName = "Bezier curve" + str(self.IndexCounter)
@@ -21,11 +22,20 @@ class Sketch_BezierCurve(Sketch_Geometry):
     def SetWeights(self, weights):
         self.myWeights = weights
 
+    def GetWeights(self):
+        return self.myWeights
+
     def AddPoles(self, thePnt2d):
         sketch_point = Sketch_Point()
         sketch_point.SetAxis(self.curCoordinateSystem)
         sketch_point.SetContext(self.myContext)
         sketch_point.Init(thePnt2d)
+        # auxiliry lines
+        if len(self.myPoles) >= 1:
+            ais_line: AIS_Line = AIS_Line(self.myPoles[-1].GetGeometry(), sketch_point.GetGeometry())
+            ais_line.SetAttributes(self.myDrawer)
+            self.myAIS_Line.append(ais_line)
+            self.myContext.Display(ais_line, True)
         self.myPoles.append(sketch_point)
         self.myWeights.append(1.0)
 
@@ -48,6 +58,9 @@ class Sketch_BezierCurve(Sketch_Geometry):
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def Recompute(self):
+        # remove auxiliry line
+        for line in self.myAIS_Line:
+            self.myContext.Remove(line, True)
         poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
         for index, pole2d in enumerate(poles2d_list):
             self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
@@ -58,6 +71,25 @@ class Sketch_BezierCurve(Sketch_Geometry):
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
         self.myAIS_InteractiveObject.SetShape(edge.Edge())
         self.myAIS_InteractiveObject.Redisplay(True)
+        # # auxiliry line update
+        # for line in self.myAIS_Line:
+        #     line.Redisplay(True)
+
+    def IncreaseDegree(self, theDegree):
+        if theDegree <= 2 or theDegree < self.myGeometry2d.Degree():
+            print("Degree elevation: degree can't be lower than 2 or lower than current degree")
+        else:
+            self.myGeometry2d.Increase(theDegree)
+            self.myGeometry.Increase(theDegree)
+            poles2d_array = self.myGeometry2d.Poles()
+            poles2d_list = TColgp_Array1OfPnt2d_to_point_list(poles2d_array)
+            for p in self.myPoles:
+                p.RemoveDisplay()
+            self.myPoles.clear()
+            self.myWeights.clear()
+            for new_point in poles2d_list:
+                self.AddPoles(new_point)
+            self.myAIS_InteractiveObject.Redisplay(True)
 
     def GetGeometryType(self):
         return Sketch_GeometryType.CurveSketchObject

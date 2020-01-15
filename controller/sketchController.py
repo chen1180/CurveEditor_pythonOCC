@@ -28,7 +28,7 @@ class SketchController(QObject):
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
         node: SketchObjectNode = current.internalPointer()
         if isinstance(node, SketchObjectNode):
-            self._display.Context.SetSelected(node._sketchObject.myAIS_InteractiveObject, True)
+            self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
 
     def createActions(self):
         self.action_createNewSketch = QAction(QIcon(""), "create a new sketch", self,
@@ -118,12 +118,7 @@ class SketchController(QObject):
         self.modelUpdated.emit(self.currentSketchNode)
         assert isinstance(self._display.Viewer, V3d_Viewer)
         coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
-        # direction = coordinate_system.Direction()
-        # print(direction.X(), direction.Y(), direction.Z())
         self.sketch.SetCoordinateSystem(coordinate_system)
-        # coordinate_system: gp_Ax3 = self.sketch.GetCoordinateSystem()
-        # direction = coordinate_system.Direction()
-        # print(direction.X(), direction.Y(), direction.Z())
 
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)

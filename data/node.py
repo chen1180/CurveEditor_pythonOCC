@@ -268,25 +268,19 @@ from OCC.Core.AIS import *
 from OCC.Core.ElCLib import elclib
 from data.sketch.sketch_object import Sketch_Object
 from data.sketch.geometry import *
+from OCC.Core.gp import *
 
 
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
-        self._sketchObject: Sketch_Geometry = None
-
-    def getAttribute(self, curSketchObject: Sketch_Object):
-        self.myAIS_Object = curSketchObject.GetAIS_Object()
-        self.myID = curSketchObject.GetName()
-        self.myNameOfColor = curSketchObject.GetColor()
-        self.myObjectType = curSketchObject.GetType()
-        self.myGeometry = curSketchObject.GetGeometry()
+        self.sketchObject: Sketch_Geometry = None
 
     def setSketchObject(self, theObject: Sketch_Object):
-        self._sketchObject = theObject
+        self.sketchObject = theObject
 
     def getSketchObject(self):
-        return self._sketchObject
+        return self.sketchObject
 
     def typeInfo(self):
         return "SketchObject"
@@ -295,23 +289,24 @@ class SketchObjectNode(Node):
 class PointNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(PointNode, self).__init__(name, parent)
+        self.sketchObject: Sketch_Point = None
 
     def data(self, column):
         r = super(PointNode, self).data(column)
-        self.myGeometry = self._sketchObject.myGeometry.Pnt()
+        self.myGeometry = self.sketchObject.GetGeometry2d()
         if column == 2:
-            pass
+            r = self.myGeometry.Pnt2d().X()
         elif column == 3:
-            r = str(round(self.myGeometry.X(), 1)) + "," + str(round(self.myGeometry.Y(), 1))
+            r = self.myGeometry.Pnt2d().Y()
         return r
 
     def setData(self, column, value):
         super(PointNode, self).setData(column, value)
         if column == 2:
-            self._color = value
+            self.myGeometry.SetX(value)
         elif column == 3:
-            x, y = value.split(",")
-            self.myGeometry.SetCoord(float(x), float(y))
+            self.myGeometry.SetY(value)
+        self.sketchObject.DragTo(self.myGeometry.Pnt2d())
 
     def typeInfo(self):
         return "Point"
@@ -320,44 +315,116 @@ class PointNode(SketchObjectNode):
 class LineNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(LineNode, self).__init__(name, parent)
-        self.geometry: Geom2d_Edge = None
-        self.ais_geometry: AIS_Line = None
+        self.sketchObject: Sketch_Line = None
 
     def data(self, column):
         r = super(LineNode, self).data(column)
-        if self._sketchObject:
-            self.getAttribute(self._sketchObject)
-
+        self.myGeometry: list = self.sketchObject.GetPoints()
+        self.startPnt2d: gp_Pnt2d = self.myGeometry[0].GetGeometry2d().Pnt2d()
+        self.endPnt2d: gp_Pnt2d = self.myGeometry[1].GetGeometry2d().Pnt2d()
+        if column == 2:
+            r = str((round(self.startPnt2d.X(), 1), round(self.startPnt2d.Y(), 1)))
+        elif column == 3:
+            r = self.startPnt2d.X()
+        elif column == 4:
+            r = self.startPnt2d.Y()
+        elif column == 5:
+            r = str((round(self.endPnt2d.X(), 1), round(self.endPnt2d.Y(), 1)))
+        elif column == 6:
+            r = self.endPnt2d.X()
+        elif column == 7:
+            r = self.endPnt2d.Y()
+        elif column == 8:
+            r = self.startPnt2d.Distance(self.endPnt2d)
         return r
 
     def setData(self, column, value):
         super(LineNode, self).setData(column, value)
-        pass
+        if column == 3:
+            self.startPnt2d.SetX(value)
+        elif column == 4:
+            self.startPnt2d.SetY(value)
+        elif column == 6:
+            self.endPnt2d.SetX(value)
+        elif column == 7:
+            self.endPnt2d.SetY(value)
+        elif column == 8:
+            pass
+        self.myGeometry[0].DragTo(self.startPnt2d)
+        self.myGeometry[1].DragTo(self.endPnt2d)
+        self.sketchObject.Recompute()
 
     def typeInfo(self):
         return "Line"
 
 
+from OCC.Core.Geom2d import Geom2d_BezierCurve
+
+
 class BezierNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(BezierNode, self).__init__(name, parent)
-        self._points = None
-
-    def setPoints(self, points):
-        self._points = points
-
-    def setColor(self, colors):
-        self._color = colors
+        self.sketchObject: Sketch_BezierCurve = None
 
     def data(self, column):
         r = super(BezierNode, self).data(column)
-        pass
+        if self.sketchObject:
+            self.myGeometry2d: Geom2d_BezierCurve = self.sketchObject.GetGeometry2d()
+            self.degree = self.myGeometry2d.Degree()
+            self.continuity = self.myGeometry2d.Continuity()
+            self.closed_flag = self.myGeometry2d.IsClosed()
+            self.rational_flag = self.myGeometry2d.IsRational()
+            self.weights = self.sketchObject.GetWeights()
+            self.poles = self.sketchObject.GetPoles()
+            if column == 2:
+                r = self.degree
+            elif column == 3:
+                r =  self.rational_flag
+            elif column == 4:
+                r =  self.closed_flag
+            elif column == 5:
+                r =  self.continuity
+            for i in range(1, len(self.weights) + 1):
+                if column == 5 + i:
+                    r = self.weights[i - 1]
+            # count = 5 + len(self.weights)
+            # for i in range(1, len(self.poles) + 1, 2):
+            #     pole = self.poles[i - 1].GetGeometry2d().Pnt2d()
+            #     x = pole.X()
+            #     y = pole.Y()
+            #     if column == i + count:
+            #         r = str((x, y))
+            #         print(r)
+            #     elif column == i + count + 1:
+            #         r = x
+            #         print(r)
+            #     elif column == i + count + 2:
+            #         r = y
+            #         print(r)
 
         return r
 
     def setData(self, column, value):
+        if column == 2:
+            self.degree=value
+        elif column == 3:
+            self.rational_flag=value
+        elif column == 4:
+            self.closed_flag=value
+        elif column == 5:
+            self.continuity=value
         super(BezierNode, self).setData(column, value)
-        pass
+        for i in range(1, len(self.weights) + 1):
+            if column == 5 + i:
+                self.weights[i - 1] = value
+        self.sketchObject.Recompute()
+        # for i in range(1, len(self.poles) + 1, 2):
+        #     if column == i + count:
+        #         x = value
+        #     elif column == i + count + 1:
+        #         y = value
+        #     self.poles[i - 1].DragTo(gp_Pnt2d(x, y))
+        # self.sketchObject.Recompute()
 
     def typeInfo(self):
         return "Bezier curve"

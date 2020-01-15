@@ -88,6 +88,7 @@ class Window(QtWidgets.QMainWindow):
         '''
         position = self._rootNode.childCount()
         self._model.insertNode(item, position, 1)
+        self._propEditor.setModel(self._model)
         # select latest row
         self._uiTreeView.setCurrentIndex(self._model.index(position, 0, QtCore.QModelIndex()))
         self._uiTreeView.updateEditorData()

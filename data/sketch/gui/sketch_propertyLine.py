@@ -28,7 +28,7 @@ class Sketch_PropertyLine(Sketch_Property):
         self.ui.GroupBoxAttributesLayout.addWidget(self.LineEditLength, 4, 1)
 
     def SetGeometry(self, *__args):
-        self.curGeom2d_Edge: Geom2d_Edge = self.mySObject.GetGeometry()
+        self.curGeom2d_Edge: Geom2d_Edge = self.mySObject.GetGeometry2d()
         # must use constructor otherwise the vairable will be the pointer to the edge point
         self.firstPnt2d.SetX(self.curGeom2d_Edge.GetStart_Pnt().X())
         self.firstPnt2d.SetY(self.curGeom2d_Edge.GetStart_Pnt().Y())

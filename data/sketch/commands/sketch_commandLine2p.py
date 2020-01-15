@@ -49,6 +49,7 @@ class Sketch_CommandLine2P(Sketch_Command):
             self.line.Compute()
             node = LineNode(self.objectName + str(self.objectCounter), self.rootNode)
             node.setSketchObject(self.line)
+            self.AddObject(self.line.GetGeometry2d(),self.line.GetAIS_Object(), Sketch_GeometryType.LineSketchObject)
             if self.myPolylineMode:
                 self.myFirstgp_Pnt2d = self.curPnt2d
                 self.myFirstPoint.SetPnt(self.mySecondPoint.Pnt())

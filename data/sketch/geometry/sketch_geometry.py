@@ -5,6 +5,7 @@ from data.sketch.sketch_utils import *
 from OCC.Core.gp import *
 from OCC.Core.Aspect import *
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
+from OCC.Core.Prs3d import *
 from data.sketch.sketch_object import *
 
 
@@ -20,10 +21,21 @@ class Sketch_Geometry:
         self.myGeometryType = None
         self.myTypeOfMethod = None
 
-        self.myNameOfColor = None
+        self.myNameOfColor = Quantity_NOC_GREEN
         self.myObjectType = AIS_SD_None
-        self.myLineStyle = Aspect_TOL_SOLID
+        '''
+        Line style:
+                    Aspect_TOL_SOLID 	
+                    Aspect_TOL_DASH 	
+                    Aspect_TOL_DOT 	
+                    Aspect_TOL_DOTDASH 	
+                    Aspect_TOL_USERDEFINED 
+        '''
+        self.myLineStyle = Aspect_TOL_DOT
         self.myWidth = 1.0
+        self.myLineAspect = Prs3d_LineAspect(Quantity_Color(self.myNameOfColor), self.myLineStyle, self.myWidth)
+        self.myDrawer = Prs3d_Drawer()
+        self.myDrawer.SetLineAspect(self.myLineAspect)
 
     def SetAxis(self, theAxis):
         self.curCoordinateSystem = theAxis
