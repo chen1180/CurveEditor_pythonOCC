@@ -379,52 +379,31 @@ class BezierNode(SketchObjectNode):
             if column == 2:
                 r = self.degree
             elif column == 3:
-                r =  self.rational_flag
+                r = self.rational_flag
             elif column == 4:
-                r =  self.closed_flag
+                r = self.closed_flag
             elif column == 5:
-                r =  self.continuity
+                r = self.continuity
             for i in range(1, len(self.weights) + 1):
                 if column == 5 + i:
                     r = self.weights[i - 1]
-            # count = 5 + len(self.weights)
-            # for i in range(1, len(self.poles) + 1, 2):
-            #     pole = self.poles[i - 1].GetGeometry2d().Pnt2d()
-            #     x = pole.X()
-            #     y = pole.Y()
-            #     if column == i + count:
-            #         r = str((x, y))
-            #         print(r)
-            #     elif column == i + count + 1:
-            #         r = x
-            #         print(r)
-            #     elif column == i + count + 2:
-            #         r = y
-            #         print(r)
 
         return r
 
     def setData(self, column, value):
         if column == 2:
-            self.degree=value
+            self.degree = value
         elif column == 3:
-            self.rational_flag=value
+            self.rational_flag = value
         elif column == 4:
-            self.closed_flag=value
+            self.closed_flag = value
         elif column == 5:
-            self.continuity=value
+            self.continuity = value
         super(BezierNode, self).setData(column, value)
         for i in range(1, len(self.weights) + 1):
             if column == 5 + i:
                 self.weights[i - 1] = value
         self.sketchObject.Recompute()
-        # for i in range(1, len(self.poles) + 1, 2):
-        #     if column == i + count:
-        #         x = value
-        #     elif column == i + count + 1:
-        #         y = value
-        #     self.poles[i - 1].DragTo(gp_Pnt2d(x, y))
-        # self.sketchObject.Recompute()
 
     def typeInfo(self):
         return "Bezier curve"
@@ -433,37 +412,14 @@ class BezierNode(SketchObjectNode):
 class BsplineNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(BsplineNode, self).__init__(name, parent)
-        self._points = None
-
-    def setPoints(self, points):
-        self._points = points
-
-    def setColor(self, colors):
-        self._color = colors
 
     def data(self, column):
         r = super(BsplineNode, self).data(column)
 
-        if column == 2:
-            r = self._color
-        elif column == 3:
-            r = self._style
-        elif column == 4:
-            r = self._width
-        elif column == 5:
-            r = self._type
         return r
 
     def setData(self, column, value):
         super(BsplineNode, self).setData(column, value)
-        if column == 2:
-            self._color = value
-        elif column == 3:
-            self._style = value
-        elif column == 4:
-            self._width = value
-        elif column == 5:
-            self._type = value
 
     def typeInfo(self):
         return "BSpline"

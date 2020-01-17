@@ -11,11 +11,12 @@ from data.sketch.sketch_object import *
 
 class Sketch_Geometry:
 
-    def __init__(self, name):
+    def __init__(self, name, theContext, theAxis):
         self.myGeometry = None
         self.myGeometry2d = None
         self.myAIS_InteractiveObject = None
-        self.curCoordinateSystem: gp_Ax3 = None
+        self.curCoordinateSystem: gp_Ax3 = theAxis
+        self.myContext = theContext
 
         self.myName = name
         self.myGeometryType = None

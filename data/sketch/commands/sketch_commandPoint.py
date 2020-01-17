@@ -31,10 +31,8 @@ class Sketch_CommandPoint(Sketch_Command):
             # node = PointNode(self.objectName + str(self.objectCounter+1), self.rootNode)
 
             # node.setSketchObject(sketchObject)
-            sketch_point = Sketch_Point()
-            sketch_point.SetAxis(self.curCoordinateSystem)
-            sketch_point.SetContext(self.myContext)
-            sketch_point.Init(self.curPnt2d)
+            sketch_point = Sketch_Point(self.myContext,self.curCoordinateSystem)
+            sketch_point.Compute(self.curPnt2d)
             node = PointNode(sketch_point.GetName(), self.rootNode)
             node.setSketchObject(sketch_point)
             self.AddObject(sketch_point.GetGeometry2d(), sketch_point.GetAIS_Object(), Sketch_GeometryType.PointSketchObject)

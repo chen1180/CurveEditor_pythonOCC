@@ -4,8 +4,8 @@ from .sketch_geometry import *
 class Sketch_Point(Sketch_Geometry):
     IndexCounter = 0
 
-    def __init__(self):
-        super(Sketch_Point, self).__init__("Point")
+    def __init__(self,theContext,theAxis):
+        super(Sketch_Point, self).__init__("Point",theContext,theAxis)
         self.myGeometry: Geom_CartesianPoint = None
         self.myGeometry2d: Geom2d_CartesianPoint = None
         self.myAIS_InteractiveObject: AIS_Point = None
@@ -13,7 +13,7 @@ class Sketch_Point(Sketch_Geometry):
         Sketch_Point.IndexCounter += 1
         self.myName = "Point" + str(self.IndexCounter)
 
-    def Init(self, thePnt2d):
+    def Compute(self, thePnt2d):
         self.myGeometry2d = Geom2d_CartesianPoint(thePnt2d)
         self.myGeometry = Geom_CartesianPoint(Pnt2dToPnt(thePnt2d, self.curCoordinateSystem))
         self.myAIS_InteractiveObject = AIS_Point(self.myGeometry)

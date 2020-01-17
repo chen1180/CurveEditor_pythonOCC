@@ -34,9 +34,7 @@ class Sketch_CommandLine2P(Sketch_Command):
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
             self.myContext.Display(self.myRubberLine, True)
 
-            self.line = Sketch_Line()
-            self.line.SetContext(self.myContext)
-            self.line.SetAxis(self.curCoordinateSystem)
+            self.line = Sketch_Line(self.myContext,self.curCoordinateSystem)
             self.line.AddPoints(self.curPnt2d)
 
             self.myLine2PAction = Line2PAction.Input_SecondPointLine

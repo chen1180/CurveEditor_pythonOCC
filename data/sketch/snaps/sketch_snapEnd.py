@@ -32,6 +32,7 @@ class Sketch_SnapEnd(Sketch_Snap):
             elif myGeometryType == Sketch_GeometryType.CurveSketchObject:
                 self.curGeom2d_Curve: Geom2d_Curve = mySObject.GetGeometry()
                 self.objectPnt2d = self.curGeom2d_Curve.Value(0.0)
+                print(self.objectPnt2d)
                 if self.count():
                     self.bestPnt2d = self.objectPnt2d
                     self.curHilightedObj = mySObject.GetAIS_Object()
