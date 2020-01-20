@@ -44,6 +44,7 @@ class Sketch(object):
         self.addCommand(Sketch_CommandBSpline())
         self.addCommand(Sketch_CommandPointToBSpline())
         self.addCommand(Sketch_CommandMoveObject())
+        self.addCommand(Sketch_CommandNurbCircle())
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext

@@ -40,9 +40,10 @@ class Sketch_CommandMoveObject(Sketch_Command):
                                 break
                         elif type(obj) == BezierNode or type(obj)==BsplineNode:
                             myCurObject: Sketch_BezierCurve = obj.getSketchObject()
-                            for pole in myCurObject.GetPoles():
+                            for index,pole in enumerate(myCurObject.GetPoles()):
                                 if self.myContext.IsSelected(pole.GetAIS_Object()):
                                     self.currentSObject = pole
+                                    self.myIndex=index
                                     self.myMoveAction = MoveAction.Input_SelectedObject
                                     self.object = myCurObject
                                     break
@@ -50,7 +51,7 @@ class Sketch_CommandMoveObject(Sketch_Command):
                 if self.currentSObject:
                     self.currentSObject.DragTo(self.curPnt2d)
                 if type(self.object) == Sketch_BezierCurve or type(self.object)==Sketch_Bspline:
-                    self.object.Recompute()
+                    self.object.DragTo(self.myIndex,self.curPnt2d)
                 elif type(self.object) == Sketch_Line:
                     self.object.Recompute()
 
@@ -63,4 +64,4 @@ class Sketch_CommandMoveObject(Sketch_Command):
         self.myMoveAction = MoveAction.Nothing
 
     def GetTypeOfMethod(self) -> Sketch_ObjectTypeOfMethod:
-        return Sketch_ObjectTypeOfMethod.Move_Method
+        return Sketch_ObjectTypeOfMethod.Nothing_Method

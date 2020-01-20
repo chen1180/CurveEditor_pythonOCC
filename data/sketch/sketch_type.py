@@ -30,6 +30,7 @@ class Sketch_ObjectTypeOfMethod:
     Trim_Method = 11
     BSpline_Method = 12
     PointsToBSpline_Method = 13
+    NurbsCircle_Method=14
 
     Move_Method = 20
 

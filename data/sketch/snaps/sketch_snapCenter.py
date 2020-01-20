@@ -20,7 +20,7 @@ class Sketch_SnapCenter(Sketch_Snap):
                 pass
             elif myGeometryType == Sketch_GeometryType.CircleSketchObject or myGeometryType == Sketch_GeometryType.ArcSketchObject:
                 self.curGeom2d_Circle: Geom2d_Circle = mySObject.GetGeometry()
-                self.ProjectOnCurve.Compute(self.curPnt2d, self.curGeom2d_Circle)
+                self.ProjectOnCurve.Init(self.curPnt2d, self.curGeom2d_Circle)
                 if self.countProject():
                     self.bestPnt2d = self.curGeom2d_Circle.Location()
                     self.curHilightedObj = mySObject.GetAIS_Object()

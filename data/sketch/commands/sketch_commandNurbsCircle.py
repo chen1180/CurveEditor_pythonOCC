@@ -11,9 +11,9 @@ class CircleCenterRadiusAction(Enum):
     Input_RadiusPoint = 2
 
 
-class Sketch_CommandCircleCenterRadius(Sketch_Command):
+class Sketch_CommandNurbCircle(Sketch_Command):
     def __init__(self):
-        super(Sketch_CommandCircleCenterRadius, self).__init__("CircleCR.")
+        super(Sketch_CommandNurbCircle, self).__init__("NURBS Circle.")
         self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
         self.radius = 0.0
         self.tempGeom_Circle = Geom_Circle(self.curCoordinateSystem.Ax2(), SKETCH_RADIUS)
@@ -49,15 +49,13 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                     TangentType.Circle_CenterPnt, True)
             self.radius = self.myFirstgp_Pnt2d.Distance(self.curPnt2d)
-            myGeom2d_Circle = Geom2d_Circle(self.myCircleAx2d, self.radius)
-
-            Geom_Circle1 = Geom_Circle(elclib.To3d(self.curCoordinateSystem.Ax2(), myGeom2d_Circle.Circ2d()))
-            myAIS_Circle = AIS_Circle(Geom_Circle1)
-            self.AddObject(myGeom2d_Circle, myAIS_Circle, Sketch_GeometryType.CircleSketchObject)
-
             self.myContext.Remove(self.myRubberCircle, True)
             self.myContext.Remove(self.myRubberLine, True)
-            self.myContext.Display(myAIS_Circle, True)
+            nurbs = self.CircleToNurbsCircle(self.myFirstgp_Pnt2d, self.radius)
+            nurbs.Compute()
+            self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
+            self.bspline_node.setSketchObject(nurbs)
+
             self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_CenterPoint
 
         return False
@@ -89,4 +87,34 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
         self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
 
     def GetTypeOfMethod(self):
-        return Sketch_ObjectTypeOfMethod.CircleCenterRadius_Method
+        return Sketch_ObjectTypeOfMethod.NurbsCircle_Method
+
+    def CircleToNurbsCircle(self, center: gp_Pnt2d, radius: float):
+        nurbsCircle = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
+        # calculate the 9 vertices of square that can enclose circle
+        # top
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X(), center.Y() + radius))
+        # right top
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X() + radius, center.Y() + radius))
+        # right
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X() + radius, center.Y()))
+        # right bottom
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X() + radius, center.Y() - radius))
+        # bottom
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X(), center.Y() - radius))
+        # left bottom
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X() - radius, center.Y() - radius))
+        # left
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X() - radius, center.Y()))
+        # left top
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X() - radius, center.Y() + radius))
+        # top
+        nurbsCircle.AddPoles(gp_Pnt2d(center.X(), center.Y() + radius))
+        weights = [1, 2 ** 0.5 / 2, 1, 2 ** 0.5 / 2, 1, 2 ** 0.5 / 2, 1, 2 ** 0.5 / 2, 1]
+        knots = [0, 1, 2, 3, 4]
+        multiplicity = [3, 2, 2, 2, 3]
+        nurbsCircle.SetWeights(weights)
+        nurbsCircle.SetKnots(knots)
+        nurbsCircle.SetMultiplicities(multiplicity)
+        nurbsCircle.SetDegree(2)
+        return nurbsCircle

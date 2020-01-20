@@ -46,6 +46,9 @@ class SketchController(QObject):
         self.action_addBSpline = QAction(QIcon(""), "Add BSpline Curve", self,
                                          statusTip="Add a B Spline curve",
                                          triggered=self.sketchBSpline)
+        self.action_addNurbsCircle = QAction(QIcon(""), "Add a Nurbs Circle", self,
+                                             statusTip="Add a 9 control points nurbs circle",
+                                             triggered=self.sketchNurbCircle)
         self.action_pointsToBSpline = QAction(QIcon(""), "Interpolate BSpline", self,
                                               statusTip="Interpolate points with BSpline",
                                               triggered=self.sketchPointsToBSpline)
@@ -73,6 +76,7 @@ class SketchController(QObject):
         self.action_addLine.setEnabled(a0)
         self.action_addBezierCurve.setEnabled(a0)
         self.action_addBSpline.setEnabled(a0)
+        self.action_addNurbsCircle.setEnabled(a0)
         self.action_pointsToBSpline.setEnabled(a0)
         self.action_addArc.setEnabled(a0)
         self.action_addCircle.setEnabled(a0)
@@ -80,7 +84,6 @@ class SketchController(QObject):
         self.action_snapCenter.setEnabled(a0)
         self.action_snapNearest.setEnabled(a0)
         self.action_snapNothing.setEnabled(a0)
-
 
     def setModel(self, model):
         self.model = model
@@ -137,6 +140,9 @@ class SketchController(QObject):
 
     def sketchBSpline(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BSpline_Method)
+
+    def sketchNurbCircle(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.NurbsCircle_Method)
 
     def sketchPointsToBSpline(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.PointsToBSpline_Method)

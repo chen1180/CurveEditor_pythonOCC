@@ -20,7 +20,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myDegree = 3
         self.myPeriodicFlag = True
 
-    def AddPoles(self, thePnt2d):
+    def AddPoles(self, thePnt2d, weight=1.0):
         # set poles
         sketch_point = Sketch_Point(self.myContext, self.curCoordinateSystem)
         sketch_point.Compute(thePnt2d)
@@ -32,7 +32,7 @@ class Sketch_Bspline(Sketch_Geometry):
             self.myContext.Display(ais_line, True)
         # set weight
         self.myPoles.append(sketch_point)
-        self.myWeights.append(1.0)
+        self.myWeights.append(weight)
 
     def Compute(self):
         arrayOfWeights = float_list_to_TColStd_Array1OfReal(self.myWeights)
@@ -51,6 +51,16 @@ class Sketch_Bspline(Sketch_Geometry):
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
         self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
         self.myContext.Display(self.myAIS_InteractiveObject, True)
+
+    def DragTo(self, index, newPnt2d):
+        self.myPoles[index].DragTo(newPnt2d)
+        pole2d = self.myPoles[index].GetGeometry2d().Pnt2d()
+        pole = self.myPoles[index].GetGeometry().Pnt()
+        self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
+        self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
+        self.myAIS_InteractiveObject.Redisplay(True)
+        for line in self.myAIS_Line:
+            line.Redisplay(True)
 
     def Recompute(self):
         self.RemoveAIS_Lines()

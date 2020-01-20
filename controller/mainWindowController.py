@@ -138,6 +138,7 @@ class Window(QtWidgets.QMainWindow):
         self._sketchToolBar.addAction(self._glWindow.sketchController.action_addLine)
         self._sketchToolBar.addAction(self._glWindow.sketchController.action_addBezierCurve)
         self._sketchToolBar.addAction(self._glWindow.sketchController.action_addBSpline)
+        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addNurbsCircle)
         self._sketchToolBar.addAction(self._glWindow.sketchController.action_pointsToBSpline)
         self._sketchToolBar.addAction(self._glWindow.sketchController.action_addArc)
         self._sketchToolBar.addAction(self._glWindow.sketchController.action_addCircle)
@@ -212,7 +213,7 @@ class Window(QtWidgets.QMainWindow):
         self._action_partMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
                                                                    self,
                                                                    statusTip="Create from two Bezier curve",
-                                                                   triggered=self._glWindow.sketchController.sketchCircleCenterRadius)
+                                                                   triggered=self._glWindow.partRevolveSurface)
         self._action_partMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
                                                                    statusTip="Create surface of revolution based on a selected shape",
                                                                    triggered=self._glWindow.partRevolveSurface)

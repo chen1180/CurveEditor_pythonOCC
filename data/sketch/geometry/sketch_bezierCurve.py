@@ -5,8 +5,8 @@ from .sketch_point import Sketch_Point
 class Sketch_BezierCurve(Sketch_Geometry):
     IndexCounter = 0
 
-    def __init__(self,theContext,theAxis):
-        super(Sketch_BezierCurve, self).__init__("Bezier curve",theContext,theAxis)
+    def __init__(self, theContext, theAxis):
+        super(Sketch_BezierCurve, self).__init__("Bezier curve", theContext, theAxis)
         Sketch_BezierCurve.IndexCounter += 1
         self.myGeometry: Geom_BezierCurve = None
         self.myGeometry2d: Geom2d_BezierCurve = None
@@ -26,7 +26,7 @@ class Sketch_BezierCurve(Sketch_Geometry):
         return self.myWeights
 
     def AddPoles(self, thePnt2d):
-        sketch_point = Sketch_Point(self.myContext,self.curCoordinateSystem)
+        sketch_point = Sketch_Point(self.myContext, self.curCoordinateSystem)
         sketch_point.Compute(thePnt2d)
         # auxiliry lines
         if len(self.myPoles) >= 1:
@@ -39,6 +39,16 @@ class Sketch_BezierCurve(Sketch_Geometry):
 
     def GetPoles(self):
         return self.myPoles
+
+    def DragTo(self, index, newPnt2d):
+        self.myPoles[index].DragTo(newPnt2d)
+        pole2d = self.myPoles[index].GetGeometry2d().Pnt2d()
+        pole = self.myPoles[index].GetGeometry().Pnt()
+        self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
+        self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
+        self.myAIS_InteractiveObject.Redisplay(True)
+        for line in self.myAIS_Line:
+            line.Redisplay(True)
 
     def Compute(self):
         arrayOfWeights = float_list_to_TColStd_Array1OfReal(self.myWeights)
@@ -69,7 +79,6 @@ class Sketch_BezierCurve(Sketch_Geometry):
         # edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
         # self.myAIS_InteractiveObject.SetShape(edge.Edge())
         self.myAIS_InteractiveObject.Redisplay(True)
-
 
     def IncreaseDegree(self, theDegree):
         if theDegree <= 2 or theDegree < self.myGeometry2d.Degree():

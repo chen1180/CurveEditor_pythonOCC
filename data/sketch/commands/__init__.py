@@ -7,3 +7,4 @@ from .sketch_commandCircleCenterRadius import Sketch_CommandCircleCenterRadius
 from .sketch_commandBSpline import Sketch_CommandBSpline
 from .sketch_commandPointToBSpline import Sketch_CommandPointToBSpline
 from .sketch_commandMoveObject import Sketch_CommandMoveObject
+from .sketch_commandNurbsCircle import Sketch_CommandNurbCircle
