@@ -7,7 +7,7 @@ from data.sketch.sketch_type import *
 from controller.editorController import Sketch_NewSketchEditor
 from data.node import *
 from data.model import SceneGraphModel
-from OCC.Core.V3d import V3d_Viewer
+from OCC.Core.V3d import *
 from OCC.Core.gp import gp_Ax3
 
 
@@ -20,14 +20,15 @@ class SketchController(QObject):
         self.sketchUI = Sketch_QTGUI()
         self.sketch = Sketch(self._display, self.sketchUI)
         self.model: SceneGraphModel = None
-        self.currentSketchNode = None
-        self.sketch_list = []
+        self.currentSketchNode:SketchObjectNode = None
         self.createActions()
         self.setActionEnabled(False)
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
         node: SketchObjectNode = current.internalPointer()
-        if isinstance(node, SketchObjectNode):
+        if isinstance(node, SketchNode):
+            self.selectSketchNode(node)
+        elif isinstance(node, SketchObjectNode):
             self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
 
     def createActions(self):
@@ -109,19 +110,23 @@ class SketchController(QObject):
 
     def createSketchNode(self):
         name = "Sketch "
-        count = str(len(self.sketch_list))
+        count = str(self.rootNode.childCount())
         name += count
         if self.currentSketchNode is None:
             self.setActionEnabled(True)
-
         self.currentSketchNode = SketchNode(name)
-        self.sketch_list.append(self.currentSketchNode)
-        self.new_sketch.constructGrid()
-        self.sketch.SetRootNode(self.currentSketchNode)
-        self.modelUpdated.emit(self.currentSketchNode)
-        assert isinstance(self._display.Viewer, V3d_Viewer)
         coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
-        self.sketch.SetCoordinateSystem(coordinate_system)
+        self.currentSketchNode.setSketchPlane(coordinate_system)
+        self.modelUpdated.emit(self.currentSketchNode)
+        self.selectSketchNode(self.currentSketchNode)
+
+    def selectSketchNode(self, node: SketchNode):
+        assert isinstance(self._display.Viewer, V3d_Viewer)
+        assert isinstance(self._display.View, V3d_View)
+        self._display.Viewer.SetPrivilegedPlane(node.sketch_plane)
+        self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
+        self.sketch.SetRootNode(node)
+        self.sketch.SetCoordinateSystem(node.sketch_plane)
 
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)

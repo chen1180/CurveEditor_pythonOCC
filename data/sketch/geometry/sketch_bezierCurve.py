@@ -101,3 +101,10 @@ class Sketch_BezierCurve(Sketch_Geometry):
 
     def GetTypeOfMethod(self):
         return Sketch_ObjectTypeOfMethod.BezierCurve_Method
+
+    def RemoveDisplay(self):
+        super(Sketch_BezierCurve, self).RemoveDisplay()
+        for point in self.myPoles:
+            point.RemoveDisplay()
+        for line in self.myAIS_Lines:
+            self.myContext.Remove(line,True)

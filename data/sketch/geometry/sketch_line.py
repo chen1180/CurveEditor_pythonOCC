@@ -6,8 +6,8 @@ from .geom2d_edge import Geom2d_Edge
 class Sketch_Line(Sketch_Geometry):
     IndexCounter = 0
 
-    def __init__(self,theContext,theAxis):
-        super(Sketch_Line, self).__init__("Line",theContext,theAxis)
+    def __init__(self, theContext, theAxis):
+        super(Sketch_Line, self).__init__("Line", theContext, theAxis)
         self.myGeometry: Geom_Line = None
         self.myGeometry2d: Geom2d_Edge = None
         self.myAIS_InteractiveObject: AIS_Shape = None
@@ -16,7 +16,7 @@ class Sketch_Line(Sketch_Geometry):
         self.myPoints = []
 
     def AddPoints(self, thePnt2d):
-        sketch_point = Sketch_Point(self.myContext,self.curCoordinateSystem)
+        sketch_point = Sketch_Point(self.myContext, self.curCoordinateSystem)
         sketch_point.Compute(thePnt2d)
         self.myPoints.append(sketch_point)
 
@@ -49,6 +49,11 @@ class Sketch_Line(Sketch_Geometry):
         self.myGeometry.SetDirection(dir)
         self.myAIS_InteractiveObject.SetPoints(self.myPoints[0].GetGeometry(), self.myPoints[1].GetGeometry())
         self.myAIS_InteractiveObject.Redisplay(True)
+
+    def RemoveDisplay(self):
+        super(Sketch_Line, self).RemoveDisplay()
+        for point in self.myPoints:
+            point.RemoveDisplay()
 
     def GetGeometryType(self):
         return Sketch_GeometryType.LineSketchObject

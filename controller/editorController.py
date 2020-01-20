@@ -344,5 +344,3 @@ class Sketch_NewSketchEditor(QWidget):
         self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
         self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
-        self._display.FitAll()
-        self._display.Repaint()

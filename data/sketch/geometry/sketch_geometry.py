@@ -95,5 +95,5 @@ class Sketch_Geometry:
     def Redisplay(self, theContext: AIS_InteractiveContext):
         pass
 
-    def RemoveDisplay(self, theContext: AIS_InteractiveContext):
-        pass
+    def RemoveDisplay(self):
+        self.myContext.Remove(self.myAIS_InteractiveObject,True)

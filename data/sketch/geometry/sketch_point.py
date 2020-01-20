@@ -26,8 +26,6 @@ class Sketch_Point(Sketch_Geometry):
         self.myGeometry.SetPnt(newPnt)
         self.myAIS_InteractiveObject.Redisplay(True)
 
-    def RemoveDisplay(self):
-        self.myContext.Remove(self.myAIS_InteractiveObject, True)
 
     def GetGeometryType(self):
         return Sketch_GeometryType.PointSketchObject

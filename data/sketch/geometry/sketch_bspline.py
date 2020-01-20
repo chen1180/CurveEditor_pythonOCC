@@ -12,7 +12,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myGeometry: Geom_BSplineCurve = None
         self.myGeometry2d: Geom2d_BSplineCurve = None
         self.myAIS_InteractiveObject: AIS_Shape = None
-        self.myAIS_Line = []
+        self.myAIS_Lines = []
         self.myPoles = []
         self.myWeights = []
         self.myKnots = []
@@ -28,11 +28,18 @@ class Sketch_Bspline(Sketch_Geometry):
         if len(self.myPoles) >= 1:
             ais_line: AIS_Line = AIS_Line(self.myPoles[-1].GetGeometry(), sketch_point.GetGeometry())
             ais_line.SetAttributes(self.myDrawer)
-            self.myAIS_Line.append(ais_line)
+            self.myAIS_Lines.append(ais_line)
             self.myContext.Display(ais_line, True)
         # set weight
         self.myPoles.append(sketch_point)
         self.myWeights.append(weight)
+
+    def RemoveDisplay(self):
+        super(Sketch_Bspline, self).RemoveDisplay()
+        for point in self.myPoles:
+            point.RemoveDisplay()
+        for line in self.myAIS_Lines:
+            self.myContext.Remove(line, True)
 
     def Compute(self):
         arrayOfWeights = float_list_to_TColStd_Array1OfReal(self.myWeights)
@@ -59,7 +66,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
         self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
         self.myAIS_InteractiveObject.Redisplay(True)
-        for line in self.myAIS_Line:
+        for line in self.myAIS_Lines:
             line.Redisplay(True)
 
     def Recompute(self):
@@ -112,18 +119,18 @@ class Sketch_Bspline(Sketch_Geometry):
         else:
             self.myGeometry2d.SetNotPeriodic()
             self.myGeometry.SetNotPeriodic()
-        self.myContext.Remove(self.myAIS_Line[-1], True)
+        self.myContext.Remove(self.myAIS_Lines[-1], True)
         self.updateGeomAttributes()
         # display the last lines
         ais_line: AIS_Line = AIS_Line(self.myPoles[-1].GetGeometry(), self.myPoles[0].GetGeometry())
         ais_line.SetAttributes(self.myDrawer)
-        self.myAIS_Line.append(ais_line)
+        self.myAIS_Lines.append(ais_line)
         self.myContext.Display(ais_line, True)
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def RemoveAIS_Lines(self):
         # remove auxiliry line
-        for line in self.myAIS_Line:
+        for line in self.myAIS_Lines:
             self.myContext.Remove(line, True)
 
     def GetGeometryType(self):

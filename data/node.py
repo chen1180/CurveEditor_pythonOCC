@@ -253,9 +253,10 @@ class LightNode(Node):
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
-        self._sketch_plane = None
-        self._vertices = None
-        self._edges = None
+        self.sketch_plane:gp_Ax3 = None
+
+    def setSketchPlane(self, thePlane):
+        self.sketch_plane = thePlane
 
     def typeInfo(self):
         return "Sketch"
