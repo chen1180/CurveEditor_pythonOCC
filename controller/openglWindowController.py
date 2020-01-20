@@ -96,6 +96,8 @@ class OpenGLEditor(GLWidget):
         # self._display.Context.Display(ais_x, True)
         # self._display.Context.Display(ais_y, True)
         # self._display.Context.Display(ais_z, True)
+    def partBezierSurface(self):
+        self.part.ObjectAction(Part_ObjectTypeOfMethod.BezierSurface_Method)
 
     def partRevolveSurface(self):
         self.part.ObjectAction(Part_ObjectTypeOfMethod.RevolvedSurface_Method)

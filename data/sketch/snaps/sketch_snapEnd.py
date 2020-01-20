@@ -6,7 +6,6 @@ from data.sketch.geometry.geom2d_edge import Geom2d_Edge
 class Sketch_SnapEnd(Sketch_Snap):
     def __init__(self):
         super(Sketch_SnapEnd, self).__init__()
-
     def SelectEvent(self):
         self.findbestPnt2d = False
         self.minDistance = self.minimumSnapDistance
@@ -32,7 +31,6 @@ class Sketch_SnapEnd(Sketch_Snap):
             elif myGeometryType == Sketch_GeometryType.CurveSketchObject:
                 self.curGeom2d_Curve: Geom2d_Curve = mySObject.GetGeometry()
                 self.objectPnt2d = self.curGeom2d_Curve.Value(0.0)
-                print(self.objectPnt2d)
                 if self.count():
                     self.bestPnt2d = self.objectPnt2d
                     self.curHilightedObj = mySObject.GetAIS_Object()

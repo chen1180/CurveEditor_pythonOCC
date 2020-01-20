@@ -213,7 +213,7 @@ class Window(QtWidgets.QMainWindow):
         self._action_partMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
                                                                    self,
                                                                    statusTip="Create from two Bezier curve",
-                                                                   triggered=self._glWindow.partRevolveSurface)
+                                                                   triggered=self._glWindow.partBezierSurface)
         self._action_partMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
                                                                    statusTip="Create surface of revolution based on a selected shape",
                                                                    triggered=self._glWindow.partRevolveSurface)

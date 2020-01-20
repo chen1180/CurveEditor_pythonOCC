@@ -47,7 +47,7 @@ class Sketch_BezierCurve(Sketch_Geometry):
         self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
         self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
         self.myAIS_InteractiveObject.Redisplay(True)
-        for line in self.myAIS_Line:
+        for line in self.myAIS_Lines:
             line.Redisplay(True)
 
     def Compute(self):

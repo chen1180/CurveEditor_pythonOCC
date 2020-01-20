@@ -48,9 +48,6 @@ class Sketch_Snap(object):
 
     def SetAx3(self, theAx3: gp_Ax3):
         self.curCoordinateSystem = theAx3
-        coordinate_system: gp_Ax3 = self.curCoordinateSystem
-        # direction = coordinate_system.Direction()
-        # print(direction.X(), direction.Y(), direction.Z())
 
     def SetMinDistance(self, aPrecise):
         self.minDistance = aPrecise

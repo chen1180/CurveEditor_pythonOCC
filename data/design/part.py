@@ -1,5 +1,6 @@
 from data.design.part_commandRevolvedSurface import Part_CommandRevolvedSurface
 from data.design.part_commandLinearExtrusion import Part_CommandExtrudedSurface
+from data.design.part_commandBezierSurface import Part_CommandBezierSurface
 from data.design.part_command import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
@@ -24,7 +25,7 @@ class Part(object):
 
         self.myData = []
         self.myCommands = []
-
+        self.addCommand(Part_CommandBezierSurface())
         self.addCommand(Part_CommandRevolvedSurface())
         self.addCommand(Part_CommandExtrudedSurface())
     def SetContext(self, theContext: AIS_InteractiveContext):
