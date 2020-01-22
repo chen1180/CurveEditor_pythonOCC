@@ -75,9 +75,6 @@ class Sketch_BezierCurve(Sketch_Geometry):
         poles_list = [pole.GetGeometry().Pnt() for pole in self.myPoles]
         for index, pole in enumerate(poles_list):
             self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
-
-        # edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
-        # self.myAIS_InteractiveObject.SetShape(edge.Edge())
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def IncreaseDegree(self, theDegree):
@@ -107,4 +104,4 @@ class Sketch_BezierCurve(Sketch_Geometry):
         for point in self.myPoles:
             point.RemoveDisplay()
         for line in self.myAIS_Lines:
-            self.myContext.Remove(line,True)
+            self.myContext.Remove(line, True)

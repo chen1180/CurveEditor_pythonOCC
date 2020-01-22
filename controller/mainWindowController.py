@@ -1,5 +1,5 @@
 from view import mainWindow, customToolButton
-from controller import editorController, openglWindowController, toolController, sketchController
+from controller import editorController, openglWindowController, toolController, sketchController, partController
 import resources.icon.icon
 from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
@@ -26,11 +26,11 @@ class Window(QtWidgets.QMainWindow):
         # self._proxyModel.setFilterRole(SceneGraphModel.filterRole)
 
         # opengl window
-        self._glWindow = openglWindowController.OpenGLEditor( self)
+        self._glWindow = openglWindowController.OpenGLEditor(self)
         self.setCentralWidget(self._glWindow)
 
         # sketch manager
-        self.sketchController = sketchController.SketchController(self._glWindow._display)
+        self.sketchController = sketchController.SketchController(self._glWindow._display,self)
         self.sketchController.setModel(self._model)
         self.sketchController.setRootNode(self._rootNode)
         self._glWindow.register_mousePress_callback(self.sketchController.OnMouseInputEvent)
@@ -39,11 +39,17 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_mouseDoubleClick_callback(self.sketchController.editGeometry)
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.sketchController.OnCancel)
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.sketchController.DeleteSelectedObject)
+        # part manager
+        self.partController = partController.PartController(self._glWindow._display,self)
+        self.partController.setModel(self._model)
+        self.partController.setRootNode(self._rootNode)
+        self._glWindow.register_mousePress_callback(self.partController.OnMouseInputEvent)
+        self._glWindow.register_mouseMove_callback(self.partController.OnMouseMoveEvent)
+        self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.partController.OnCancel)
 
         # setup tool bar
         self.createViewActions()
         self.createModeActions()
-        self.createPartActions()
         self.createToolBars()
 
         # setup sceneGraph editor
@@ -99,7 +105,6 @@ class Window(QtWidgets.QMainWindow):
         '''
         position = self._rootNode.childCount()
         self._model.insertNode(item, position, 1)
-        print(self._model.children())
         self._propEditor.setModel(self._model)
         # select latest row
         self._uiTreeView.setCurrentIndex(self._model.index(position, 0, QtCore.QModelIndex()))
@@ -172,9 +177,9 @@ class Window(QtWidgets.QMainWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         self._designToolBar = QtWidgets.QToolBar("Design")
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
-        self._designToolBar.addAction(self._action_partMode_addBezierSurface)
-        self._designToolBar.addAction(self._action_partMode_revolutedSurface)
-        self._designToolBar.addAction(self._action_partMode_extrudedSurface)
+        self._designToolBar.addAction(self.partController.action_addBezierSurface)
+        self._designToolBar.addAction(self.partController.action_revolutedSurface)
+        self._designToolBar.addAction(self.partController.action_extrudedSurface)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
         self._sketchToolBar.setVisible(False)
         self._designToolBar.setVisible(False)
@@ -219,18 +224,6 @@ class Window(QtWidgets.QMainWindow):
         self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
                                                  statusTip="Change view point",
                                                  triggered=self._glWindow._display.View_Iso)
-
-    def createPartActions(self):
-        self._action_partMode_addBezierSurface = QtWidgets.QAction(QtGui.QIcon(""), "Construct a Bezier Surface",
-                                                                   self,
-                                                                   statusTip="Create from two Bezier curve",
-                                                                   triggered=self._glWindow.partBezierSurface)
-        self._action_partMode_revolutedSurface = QtWidgets.QAction(QtGui.QIcon(""), "revolve a shape", self,
-                                                                   statusTip="Create surface of revolution based on a selected shape",
-                                                                   triggered=self._glWindow.partRevolveSurface)
-        self._action_partMode_extrudedSurface = QtWidgets.QAction(QtGui.QIcon(""), "extrude a shape", self,
-                                                                  statusTip="Create extruded surface based on a selected shape",
-                                                                  triggered=self._glWindow.partExtrudedSurface)
 
     def createModeActions(self):
         self._action_switchViewMode = QtWidgets.QAction(QtGui.QIcon(""), "View", self,

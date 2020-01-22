@@ -1,7 +1,7 @@
 from data.design.part_command import *
 from enum import Enum
 
-from OCC.Core.Geom import  Geom_SurfaceOfRevolution, Geom_Line
+from OCC.Core.Geom import Geom_SurfaceOfRevolution, Geom_Line
 
 
 class RevolvedSurfaceAction(Enum):
@@ -24,7 +24,7 @@ class Part_CommandRevolvedSurface(Part_Command):
     def Action(self):
         self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Curve
 
-    def MouseInputEvent(self, xPix, yPix):
+    def MouseInputEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.SelectObject(xPix, yPix)
         if myObjects is None:
             return False
@@ -59,7 +59,7 @@ class Part_CommandRevolvedSurface(Part_Command):
                         self.myDisplay.DisplayShape(surface)
                         self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Curve
 
-    def MouseMoveEvent(self, xPix, yPix):
+    def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)
 
         if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
@@ -94,5 +94,3 @@ class Part_CommandRevolvedSurface(Part_Command):
 
     def GetTypeOfMethod(self):
         return Part_ObjectTypeOfMethod.RevolvedSurface_Method
-
-

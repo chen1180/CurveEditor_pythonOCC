@@ -1,42 +1,58 @@
 from controller import mainWindowController
-import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+import traceback
+import logging
+import sys
 
-# Qt error message traceback
-sys._excepthook = sys.excepthook
-
-
-def my_exception_hook(exctype, value, traceback):
-    # Print the error and traceback
-    print(exctype, value, traceback)
-    # Call the normal Exception hook after
-    sys._excepthook(exctype, value, traceback)
-    sys.exit(1)
+log = logging.getLogger(__name__)
+handler = logging.StreamHandler(stream=sys.stdout)
+log.addHandler(handler)
 
 
-sys.excepthook = my_exception_hook
-
-
-# Install qt debug message handler
-def qt_message_handler(mode, context, message):
-    if mode == QtInfoMsg:
-        mode = 'INFO'
-    elif mode == QtWarningMsg:
-        mode = 'WARNING'
-    elif mode == QtCriticalMsg:
-        mode = 'CRITICAL'
-    elif mode == QtFatalMsg:
-        mode = 'FATAL'
+def show_exception_box(log_msg):
+    """Checks if a QApplication instance is available and shows a messagebox with the exception message.
+    If unavailable (non-console application), log an additional notice.
+    """
+    if QApplication.instance() is not None:
+        errorbox = QMessageBox()
+        errorbox.setText("Oops. An unexpected error occured:\n{0}".format(log_msg))
+        errorbox.exec_()
     else:
-        mode = 'DEBUG'
-    print('qt_message_handler: line: %d, func: %s(), file: %s' % (
-        context.line, context.function, context.file))
-    print('  %s: %s\n' % (mode, message))
+        log.debug("No QApplication instance available.")
+
+
+class UncaughtHook(QObject):
+    _exception_caught = pyqtSignal(object)
+
+    def __init__(self, *args, **kwargs):
+        super(UncaughtHook, self).__init__(*args, **kwargs)
+
+        # this registers the exception_hook() function as hook with the Python interpreter
+        sys.excepthook = self.exception_hook
+
+        # connect signal to execute the message box function always on main thread
+        self._exception_caught.connect(show_exception_box)
+
+    def exception_hook(self, exc_type, exc_value, exc_traceback):
+        """Function handling uncaught exceptions.
+        It is triggered each time an uncaught exception occurs.
+        """
+        if issubclass(exc_type, KeyboardInterrupt):
+            # ignore keyboard interrupt to support console applications
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        else:
+            exc_info = (exc_type, exc_value, exc_traceback)
+            log_msg = '\n'.join([''.join(traceback.format_tb(exc_traceback)),
+                                 '{0}: {1}'.format(exc_type.__name__, exc_value)])
+            log.critical("Uncaught exception:\n {0}".format(log_msg), exc_info=exc_info)
+
+            # trigger message box show
+            self._exception_caught.emit(log_msg)
 
 
 if __name__ == '__main__':
-    qInstallMessageHandler(qt_message_handler)
+    qt_exception_hook = UncaughtHook()
     # following couple of lines is a tweak to enable ipython --gui='qt'
     app = QApplication.instance()  # checks if QApplication already exists
     if not app:  # create QApplication if it doesnt exist
@@ -46,5 +62,4 @@ if __name__ == '__main__':
     try:
         app.exec_()
     except Exception as e:
-        print(e)
         sys.exit(0)

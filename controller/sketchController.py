@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QModelIndex,QObject,pyqtSignal
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtCore import QModelIndex, QObject, pyqtSignal
+from PyQt5.QtWidgets import QAction, QStatusBar
 from PyQt5.QtGui import QIcon
 from data.sketch.sketch import Sketch
 from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
@@ -17,10 +17,12 @@ class SketchController(QObject):
     def __init__(self, display, parent=None):
         super(SketchController, self).__init__(parent)
         self._display = display
+        self.statusBar: QStatusBar = parent.statusBar()
+
         self.sketchUI = Sketch_QTGUI()
         self.sketch = Sketch(self._display, self.sketchUI)
         self.model: SceneGraphModel = None
-        self.currentSketchNode:SketchObjectNode = None
+        self.currentSketchNode: SketchObjectNode = None
         self.createActions()
         self.setActionEnabled(False)
 
@@ -30,6 +32,10 @@ class SketchController(QObject):
             self.selectSketchNode(node)
         elif isinstance(node, SketchObjectNode):
             self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
+
+    def setStatusBar(self, theStatusBar):
+        self.statusBar: QStatusBar = theStatusBar
+        self.statusBar.showMessage("status bar setted")
 
     def createActions(self):
         self.action_createNewSketch = QAction(QIcon(""), "create a new sketch", self,
@@ -163,7 +169,8 @@ class SketchController(QObject):
         self.sketch.OnMouseReleaseEvent(*kargs)
 
     def editGeometry(self):
-        self.sketch.ViewProperties()
+        if self.currentSketchNode:
+            self.sketch.ViewProperties()
 
     def OnCancel(self):
         self.sketch.OnCancel()

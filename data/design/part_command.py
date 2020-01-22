@@ -13,7 +13,8 @@ from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import *
 from OCC.Core.TopoDS import TopoDS_Shape
 from OCC.Core.TopAbs import *
-from OCC.Core.Geom import Geom_Circle,Geom_Line
+from OCC.Core.Geom import Geom_Circle, Geom_Line
+from PyQt5.QtWidgets import QStatusBar
 
 
 class Part_Command(object):
@@ -48,6 +49,9 @@ class Part_Command(object):
     def SetData(self, theData: list):
         self.data = theData
 
+    def SetStatusBar(self, theStatusBar):
+        self.myStatusBar: QStatusBar = theStatusBar
+
     def SetAx3(self, theAx3: gp_Ax3):
         dir = theAx3.Direction()
         location = theAx3.Location()
@@ -66,36 +70,16 @@ class Part_Command(object):
     def SetStyle(self, theLineStyle):
         self.myStyle = theLineStyle
 
-    # def AddObject(self, theGeom2d_Geometry: Geom2d_Geometry, theAIS_InteractiveObject: AIS_InteractiveObject,
-    #               theGeometryType: Sketch_GeometryType):
-    #     self.objectCounter += 1
-    #     numString = TCollection_ExtendedString(self.objectCounter)
-    #     currentName = TCollection_ExtendedString(self.objectName)
-    #     currentName += numString
-    #     if self.GetTypeOfMethod() == Sketch_ObjectTypeOfMethod.Point_Method:
-    #         theAIS_InteractiveObject.SetColor(self.myColor)
-    #     else:
-    #         self.myPrs3dAspect.SetColor(self.myColor)
-    #         self.myPrs3dAspect.SetTypeOfLine(self.myStyle)
-    #         self.myPrs3dAspect.SetWidth(self.myWidth)
-    #     so = Sketch_Object(theGeom2d_Geometry, theAIS_InteractiveObject, currentName, theGeometryType,
-    #                        self.GetTypeOfMethod())
-    #     so.SetColor(self.myColor)
-    #     so.SetType(self.myType)
-    #     so.SetStyle(self.myStyle)
-    #     so.SetWidth(self.myWidth)
-    #     self.data.append(so)
-
     def GetTypeOfMethod(self):
         raise NotImplementedError()
 
     def Action(self):
         raise NotImplementedError()
 
-    def MouseInputEvent(self, xPix, yPix):
+    def MouseInputEvent(self, xPix, yPix, buttons, modifier):
         raise NotImplementedError()
 
-    def MouseMoveEvent(self, xPix, yPix):
+    def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         raise NotImplementedError()
 
     def CancelEvent(self):
@@ -139,7 +123,7 @@ class Part_Command(object):
                     return curve.BSpline()
                 elif curve_type == GeomAbs_Circle:
                     return Geom_Circle(curve.Circle())
-                elif curve_type==GeomAbs_Line:
+                elif curve_type == GeomAbs_Line:
                     return Geom_Line(curve.Line())
             elif shape.ShapeType() == TopAbs_FACE:
                 pass

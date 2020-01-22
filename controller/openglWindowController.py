@@ -38,8 +38,6 @@ class OpenGLEditor(GLWidget):
         # self.sketchManager = toolController.SketchController(self._display)
         # self.viewManager = toolController.ViewController(self._display)
 
-        self.part = Part(self._display)
-
         self._state = self.MODE_VIEW
 
         self._mousePress_callback = []
@@ -60,15 +58,6 @@ class OpenGLEditor(GLWidget):
         self._refrenceAxies = AIS_Trihedron(geom_axe)
         self._refrenceAxies.SetSelectionPriority(Prs3d_DP_XOYAxis, 3)
         self._display.Context.Display(self._refrenceAxies, True)
-
-    def partBezierSurface(self):
-        self.part.ObjectAction(Part_ObjectTypeOfMethod.BezierSurface_Method)
-
-    def partRevolveSurface(self):
-        self.part.ObjectAction(Part_ObjectTypeOfMethod.RevolvedSurface_Method)
-
-    def partExtrudedSurface(self):
-        self.part.ObjectAction(Part_ObjectTypeOfMethod.ExtrudedSurface_Method)
 
     def fitSelection(self):
         self._display.Context.FitSelected(self._display.View, 0.0, True)
@@ -149,8 +138,6 @@ class OpenGLEditor(GLWidget):
         for callback in self._mousePress_callback:
             callback(pt.x(), pt.y(), buttons, modifiers)
 
-        self.part.OnMouseInputEvent(pt.x(), pt.y())
-
     def mouseReleaseEvent(self, event):
         pt = event.pos()
         buttons = int(event.buttons())
@@ -197,7 +184,6 @@ class OpenGLEditor(GLWidget):
         pt = evt.pos()
         buttons = int(evt.buttons())
         modifiers = evt.modifiers()
-        self.part.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
             callback(pt.x(), pt.y(), buttons, modifiers)
 
@@ -213,7 +199,6 @@ class OpenGLEditor(GLWidget):
                     pass
                 elif self._state == self.MODE_SKETCH:
                     pass
-                self.viewManager.transform(pt.x(), pt.y())
             # PAN
             elif modifiers == QtCore.Qt.ShiftModifier:
                 dx = pt.x() - self.dragStartPosX

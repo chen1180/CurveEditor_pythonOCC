@@ -18,7 +18,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myKnots = []
         self.myMultiplicities = []
         self.myDegree = 3
-        self.myPeriodicFlag = True
+        self.myPeriodicFlag = False
 
     def AddPoles(self, thePnt2d, weight=1.0):
         # set poles
@@ -80,11 +80,6 @@ class Sketch_Bspline(Sketch_Geometry):
         for index, knots in enumerate(self.myKnots):
             self.myGeometry2d.SetKnot(index + 1, knots)
             self.myGeometry.SetKnot(index + 1, knots)
-        # for index,multiplicity in enumerate(self.myMultiplicities):
-        #     self.myGeometry2d.IncreaseMultiplicity(index+1,multiplicity)
-        #     self.myGeometry.IncreaseMultiplicity(index + 1, multiplicity)
-        # edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
-        # self.myAIS_InteractiveObject.SetShape(edge.Edge())
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def IncreaseDegree(self, theDegree):

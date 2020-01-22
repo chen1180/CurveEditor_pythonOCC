@@ -21,12 +21,10 @@ class Sketch_CommandMoveObject(Sketch_Command):
         self.myMoveAction = MoveAction.Input_SelectedObject
 
     def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
-        self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
-
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
-        self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
+        self.curPnt2d = thePnt2d
         if buttons == Qt.LeftButton:
             if self.myMoveAction == MoveAction.Nothing:
                 if self.rootNode:
@@ -38,20 +36,20 @@ class Sketch_CommandMoveObject(Sketch_Command):
                                 self.myMoveAction = MoveAction.Input_SelectedObject
                                 self.object = myCurObject
                                 break
-                        elif type(obj) == BezierNode or type(obj)==BsplineNode:
+                        elif type(obj) == BezierNode or type(obj) == BsplineNode:
                             myCurObject: Sketch_BezierCurve = obj.getSketchObject()
-                            for index,pole in enumerate(myCurObject.GetPoles()):
+                            for index, pole in enumerate(myCurObject.GetPoles()):
                                 if self.myContext.IsSelected(pole.GetAIS_Object()):
                                     self.currentSObject = pole
-                                    self.myIndex=index
+                                    self.myIndex = index
                                     self.myMoveAction = MoveAction.Input_SelectedObject
                                     self.object = myCurObject
                                     break
             elif self.myMoveAction == MoveAction.Input_SelectedObject:
                 if self.currentSObject:
                     self.currentSObject.DragTo(self.curPnt2d)
-                if type(self.object) == Sketch_BezierCurve or type(self.object)==Sketch_Bspline:
-                    self.object.DragTo(self.myIndex,self.curPnt2d)
+                if type(self.object) == Sketch_BezierCurve or type(self.object) == Sketch_Bspline:
+                    self.object.DragTo(self.myIndex, self.curPnt2d)
                 elif type(self.object) == Sketch_Line:
                     self.object.Recompute()
 

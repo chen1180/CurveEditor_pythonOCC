@@ -11,10 +11,11 @@ from OCC.Display.OCCViewer import Viewer3d
 
 
 class Part(object):
-    def __init__(self, theDisplay: Viewer3d, sg=None):
+    def __init__(self, theDisplay: Viewer3d, statusBar, sg=None):
         self.myDisplay = theDisplay
         self.myContext: AIS_InteractiveContext = theDisplay.Context
         self.myView: V3d_View = theDisplay.View
+        self.myStatusBar = statusBar
         # self.myGUI = sg
         # self.myGUI.SetAx3(self.myCoordinateSystem)
         # self.myGUI.SetContext(self.myContext)
@@ -28,6 +29,7 @@ class Part(object):
         self.addCommand(Part_CommandBezierSurface())
         self.addCommand(Part_CommandRevolvedSurface())
         self.addCommand(Part_CommandExtrudedSurface())
+
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
         self.myGUI.SetContext(theContext)
@@ -35,7 +37,7 @@ class Part(object):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetContext(self.myContext)
 
-    def SetDisplay(self, theDisplay:Viewer3d):
+    def SetDisplay(self, theDisplay: Viewer3d):
         self.myDisplay = theDisplay
         for idx in range(1, len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
@@ -70,23 +72,21 @@ class Part(object):
     def GetStatus(self):
         return self.myCurrentMethod
 
-
     def OnMouseInputEvent(self, *kargs):
-        theX, theY = kargs
+        theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         self.SelectCurCommand()
-        if self.CurCommand.MouseInputEvent(theX, theY):
-            self.myCurrentMethod=Part_ObjectTypeOfMethod.Nothing_Method
+        if self.CurCommand.MouseInputEvent(theX, theY, buttons, modifier):
+            self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
     def OnMouseMoveEvent(self, *kargs):
-        theX, theY = kargs
+        theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         self.SelectCurCommand()
-        self.CurCommand.MouseMoveEvent(theX, theY)
+        self.CurCommand.MouseMoveEvent(theX, theY, buttons, modifier)
 
     def OnCancel(self):
         self.SelectCurCommand()
-        self.myAnalyserSnap.Cancel()
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
@@ -114,6 +114,7 @@ class Part(object):
     def addCommand(self, theCommand: Part_Command):
         theCommand.SetData(self.myData)
         theCommand.SetDisplay(self.myDisplay)
+        theCommand.SetStatusBar(self.myStatusBar)
         self.myCommands.append(theCommand)
 
     def SelectCurCommand(self):

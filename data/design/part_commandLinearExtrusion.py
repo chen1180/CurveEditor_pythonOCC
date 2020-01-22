@@ -24,7 +24,7 @@ class Part_CommandExtrudedSurface(Part_Command):
     def Action(self):
         self.myRevolvedSurfaceAction = ExtrudedSurfaceAction.Input_Curve
 
-    def MouseInputEvent(self, xPix, yPix):
+    def MouseInputEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.SelectObject(xPix, yPix)
         if myObjects is None:
             return False
@@ -59,7 +59,7 @@ class Part_CommandExtrudedSurface(Part_Command):
                         self.myDisplay.DisplayShape(surface)
                         self.myRevolvedSurfaceAction = ExtrudedSurfaceAction.Input_Curve
 
-    def MouseMoveEvent(self, xPix, yPix):
+    def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)
 
         if self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Nothing:
