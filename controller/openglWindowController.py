@@ -24,7 +24,7 @@ class OpenGLEditor(GLWidget):
     MODE_DESIGN = 1
     MODE_VIEW = 2
 
-    def __init__(self, model, parent=None):
+    def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
         try:
             self.InitDriver()
@@ -32,49 +32,24 @@ class OpenGLEditor(GLWidget):
             print(e)
 
         self.parent = parent
-        self.model = model
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
         # Acitivate selection automaticlly
         self._display.Context.SetAutoActivateSelection(False)
-        self.sketchManager = toolController.SketchController(self._display)
-        self.viewManager = toolController.ViewController(self._display)
-        self.sketchController = SketchController(self._display)
-        self.sketchController.setModel(self.model)
+        # self.sketchManager = toolController.SketchController(self._display)
+        # self.viewManager = toolController.ViewController(self._display)
 
         self.part = Part(self._display)
 
-        # self.sketchManager.interactive.prepareContext_find_edge()
-        # self._display.Context.RemoveFilters()
-        # self._display.Context.Deactivate()
-        # self._display.Context.Activate(0)
         self._state = self.MODE_VIEW
 
         self._mousePress_callback = []
         self._mouseMove_callback = []
         self._mouseRelease_callback = []
+        self._mouseDoubleClick_callback = []
 
-        # callback functions
-        # self._display.register_select_callback(self.sketchManager.recognize_clicked)
+        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketchManager.ExitDrawingMode)
+        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
 
-        # self.register_mousePress_callback(self.sketchManager.mousePress)
-        # self.register_mouseMove_callback(self.sketchManager.mouseMove)
-        # self.register_mouseRelease_callback(self.sketchManager.mouseRelease)
-
-        # self.register_mousePress_callback(self.viewManager.selectAIS_Shape)
-        # self.register_mousePress_callback(self.viewManager.startTransform)
-
-        # signals and slots
-        # self.sketchManager.modelUpdate.connect(self.addNewItem)
-
-        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketchManager.ExitDrawingMode)
-        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
-        self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketchController.OnCancel)
-        self._key_map.setdefault(QtCore.Qt.Key_Delete, []).append(self.sketchController.DeleteSelectedObject)
-        # self._display.Test()
-        # self._cubeManip = AIS_ViewCube()
-        # self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
-        # self._cubeManip.SetInfiniteState(True)
-        # self._display.Context.Display(self._cubeManip, True)
         self._display.display_triedron()
         # self.setReferenceAxe()
         assert isinstance(self._display.Context, AIS_InteractiveContext)
@@ -85,18 +60,7 @@ class OpenGLEditor(GLWidget):
         self._refrenceAxies = AIS_Trihedron(geom_axe)
         self._refrenceAxies.SetSelectionPriority(Prs3d_DP_XOYAxis, 3)
         self._display.Context.Display(self._refrenceAxies, True)
-        origin = Geom_CartesianPoint(gp_Pnt(0, 0, 0))
-        # ais_origin=AIS_Point(origin)
-        # ais_x=AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(50,0,0)))
-        # ais_x.SetColor(Quantity_Color(1.0,0,0,Quantity_TOC_RGB))
-        # ais_y = AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(0,50,0)))
-        # ais_y.SetColor(Quantity_Color(0, 1, 0, Quantity_TOC_RGB))
-        # ais_z = AIS_Line(origin,Geom_CartesianPoint(gp_Pnt(0,0,50)))
-        # ais_z.SetColor(Quantity_Color(0, 0, 1.0, Quantity_TOC_RGB))
-        # self._display.Context.Display(ais_origin, True)
-        # self._display.Context.Display(ais_x, True)
-        # self._display.Context.Display(ais_y, True)
-        # self._display.Context.Display(ais_z, True)
+
     def partBezierSurface(self):
         self.part.ObjectAction(Part_ObjectTypeOfMethod.BezierSurface_Method)
 
@@ -123,7 +87,6 @@ class OpenGLEditor(GLWidget):
         elif self._state == self.MODE_DESIGN:
             pass
         elif self._state == self.MODE_SKETCH:
-            # self.sketchManager.EnterDrawingMode()
             pass
         self._display.Repaint()
 
@@ -131,7 +94,6 @@ class OpenGLEditor(GLWidget):
         super(OpenGLEditor, self).paintEvent(event)
         if self._inited:
             self._display.Context.UpdateCurrentViewer()
-            self.sketchController.sketch.RedrawAll()
             self.processActions()
             self.update()
 
@@ -139,7 +101,6 @@ class OpenGLEditor(GLWidget):
         code = event.key()
         if code in self._key_map:
             functions = self._key_map[code]
-            # print(functions)
             if type(functions) == list:
                 for func in functions:
                     func()
@@ -160,9 +121,11 @@ class OpenGLEditor(GLWidget):
         self._display.ZoomFactor(zoom_factor)
 
     def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
+        pt = event.pos()
         buttons = int(event.buttons())
-        if buttons == QtCore.Qt.LeftButton:
-            self.sketchController.editGeometry()
+        modifiers = event.modifiers()
+        for callback in self._mouseDoubleClick_callback:
+            callback()
 
     def mousePressEvent(self, event):
         self.setFocus()
@@ -184,15 +147,16 @@ class OpenGLEditor(GLWidget):
         elif self._state == self.MODE_SKETCH:
             pass
         for callback in self._mousePress_callback:
-            callback(pt.x(), pt.y())
+            callback(pt.x(), pt.y(), buttons, modifiers)
 
-        self.sketchController.OnMouseInputEvent(pt.x(), pt.y(), buttons, modifiers)
         self.part.OnMouseInputEvent(pt.x(), pt.y())
 
     def mouseReleaseEvent(self, event):
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
+        for callback in self._mouseRelease_callback:
+            callback(buttons, modifiers)
         if event.button() == QtCore.Qt.LeftButton:
             if self._select_area:
                 if type(self._drawbox) == list:
@@ -211,10 +175,6 @@ class OpenGLEditor(GLWidget):
 
                     if (self._display.selected_shapes is not None) and HAVE_PYQT_SIGNAL:
                         self.sig_topods_selected.emit(self._display.selected_shapes)
-            for callback in self._mouseRelease_callback:
-                callback(pt.x(), pt.y())
-
-        self.sketchController.OnMouseReleaseEvent(buttons, modifiers)
 
         # elif event.button() == QtCore.Qt.RightButton:
         #     if self._zoom_area:
@@ -237,12 +197,10 @@ class OpenGLEditor(GLWidget):
         pt = evt.pos()
         buttons = int(evt.buttons())
         modifiers = evt.modifiers()
-        self.sketchController.OnMouseMoveEvent(pt.x(), pt.y(), buttons, modifiers)
         self.part.OnMouseMoveEvent(pt.x(), pt.y())
         for callback in self._mouseMove_callback:
-            callback(pt.x(), pt.y())
-        # if buttons == QtCore.Qt.LeftButton:
-        #     self.sketchController.OnMoveSketchObject()
+            callback(pt.x(), pt.y(), buttons, modifiers)
+
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 # ROTATE
@@ -313,6 +271,18 @@ class OpenGLEditor(GLWidget):
             raise AssertionError("You must provide a callable to register the callback")
         else:
             self._mouseRelease_callback.append(callback)
+
+    def register_mouseDoubleClick_callback(self, callback):
+        if not callable(callback):
+            raise AssertionError("You must provide a callable to register the callback")
+        else:
+            self._mouseDoubleClick_callback.append(callback)
+
+    def register_keymap(self, key, callback):
+        if not callable(callback):
+            raise AssertionError("You must provide a callable to register the callback")
+        else:
+            self._key_map.setdefault(key, []).append(callback)
 
 
 # -----------------------------Debugging-----------------------------------#

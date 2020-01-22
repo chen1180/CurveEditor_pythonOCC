@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QModelIndex
+from PyQt5.QtCore import QModelIndex,QObject,pyqtSignal
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 from data.sketch.sketch import Sketch

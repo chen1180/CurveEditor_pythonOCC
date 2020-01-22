@@ -16,8 +16,6 @@ class BezierSurfaceAction(Enum):
 class Part_CommandBezierSurface(Part_Command):
     def __init__(self):
         super(Part_CommandBezierSurface, self).__init__("BezierSurface.")
-        # self.myRubberAxis = AIS_Line()
-        # self.myRubberAxis.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
         self.myCurves = []
         self.myAxis = gp_Ax1()
         self.myGeomSurface = []

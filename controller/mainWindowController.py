@@ -1,5 +1,5 @@
 from view import mainWindow, customToolButton
-from controller import editorController, openglWindowController, toolController
+from controller import editorController, openglWindowController, toolController, sketchController
 import resources.icon.icon
 from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
@@ -26,9 +26,20 @@ class Window(QtWidgets.QMainWindow):
         # self._proxyModel.setFilterRole(SceneGraphModel.filterRole)
 
         # opengl window
-        self._glWindow = openglWindowController.OpenGLEditor(self._model, self)
-        self._glWindow.sketchController.setRootNode(self._rootNode)
+        self._glWindow = openglWindowController.OpenGLEditor( self)
         self.setCentralWidget(self._glWindow)
+
+        # sketch manager
+        self.sketchController = sketchController.SketchController(self._glWindow._display)
+        self.sketchController.setModel(self._model)
+        self.sketchController.setRootNode(self._rootNode)
+        self._glWindow.register_mousePress_callback(self.sketchController.OnMouseInputEvent)
+        self._glWindow.register_mouseMove_callback(self.sketchController.OnMouseMoveEvent)
+        self._glWindow.register_mouseRelease_callback(self.sketchController.OnMouseReleaseEvent)
+        self._glWindow.register_mouseDoubleClick_callback(self.sketchController.editGeometry)
+        self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.sketchController.OnCancel)
+        self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.sketchController.DeleteSelectedObject)
+
         # setup tool bar
         self.createViewActions()
         self.createModeActions()
@@ -74,8 +85,8 @@ class Window(QtWidgets.QMainWindow):
 
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
-        self._uiTreeView.selectionModel().currentChanged.connect(self._glWindow.sketchController.highlightCurrentNode)
-        self._glWindow.sketchController.modelUpdated.connect(self.updateModel)
+        self._uiTreeView.selectionModel().currentChanged.connect(self.sketchController.highlightCurrentNode)
+        self.sketchController.modelUpdated.connect(self.updateModel)
 
     def updateModel(self, item):
         '''
@@ -133,24 +144,24 @@ class Window(QtWidgets.QMainWindow):
 
     def createSketchToolBar(self):
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_createNewSketch)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addPoint)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addLine)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addBezierCurve)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addBSpline)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addNurbsCircle)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_pointsToBSpline)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addArc)
-        self._sketchToolBar.addAction(self._glWindow.sketchController.action_addCircle)
+        self._sketchToolBar.addAction(self.sketchController.action_createNewSketch)
+        self._sketchToolBar.addAction(self.sketchController.action_addPoint)
+        self._sketchToolBar.addAction(self.sketchController.action_addLine)
+        self._sketchToolBar.addAction(self.sketchController.action_addBezierCurve)
+        self._sketchToolBar.addAction(self.sketchController.action_addBSpline)
+        self._sketchToolBar.addAction(self.sketchController.action_addNurbsCircle)
+        self._sketchToolBar.addAction(self.sketchController.action_pointsToBSpline)
+        self._sketchToolBar.addAction(self.sketchController.action_addArc)
+        self._sketchToolBar.addAction(self.sketchController.action_addCircle)
         self._sketchToolBar.addSeparator()
         self._snapModeButton = customToolButton.CustomToolButton()
         self._snapModeMenu = QtWidgets.QMenu()
-        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapNothing)
-        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapCenter)
-        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapEnd)
-        self._snapModeMenu.addAction(self._glWindow.sketchController.action_snapNearest)
+        self._snapModeMenu.addAction(self.sketchController.action_snapNothing)
+        self._snapModeMenu.addAction(self.sketchController.action_snapCenter)
+        self._snapModeMenu.addAction(self.sketchController.action_snapEnd)
+        self._snapModeMenu.addAction(self.sketchController.action_snapNearest)
         self._snapModeButton.setMenu(self._snapModeMenu)
-        self._snapModeButton.setDefaultAction(self._glWindow.sketchController.action_snapNothing)
+        self._snapModeButton.setDefaultAction(self.sketchController.action_snapNothing)
         self._sketchToolBar.addWidget(self._snapModeButton)
         self._sketchToolBar.addSeparator()
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
@@ -178,7 +189,7 @@ class Window(QtWidgets.QMainWindow):
 
         self._action_transform = QtWidgets.QAction(QtGui.QIcon(""), "Transform", self,
                                                    statusTip="Transform a object",
-                                                   triggered=self._glWindow.viewManager.setActive)
+                                                   triggered=self.sketchController.sketchLine)
         self._action_fitAll = QtWidgets.QAction(QtGui.QIcon(""), "Fit all shape on screen", self,
                                                 statusTip="Fit all shapes on screen",
                                                 triggered=self._glWindow._display.FitAll)

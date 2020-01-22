@@ -1,12 +1,6 @@
-import resources.icon.icon
-from PyQt5.QtCore import QObject, pyqtSignal
-
-
-class Node(QObject):
-    nodeModified = pyqtSignal()
+class Node(object):
 
     def __init__(self, name, parent=None):
-        super(Node, self).__init__(parent)
         '''
         Args:
             name: name of the node
@@ -35,6 +29,9 @@ class Node(QObject):
         if self._children:
             return self._children[row]
         return None
+
+    def children(self):
+        return self._children
 
     def insertChild(self, position, child):
         if position < 0 or position > len(self._children):
@@ -253,7 +250,7 @@ class LightNode(Node):
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
-        self.sketch_plane:gp_Ax3 = None
+        self.sketch_plane: gp_Ax3 = None
 
     def setSketchPlane(self, thePlane):
         self.sketch_plane = thePlane
@@ -262,14 +259,10 @@ class SketchNode(Node):
         return "Sketch"
 
 
-from OCC.Core.Geom2d import Geom2d_CartesianPoint
-from OCC.Core.Geom import Geom_CartesianPoint
-from data.sketch.geometry import *
-from OCC.Core.AIS import *
-from OCC.Core.ElCLib import elclib
-from data.sketch.sketch_object import Sketch_Object
-from data.sketch.geometry import *
 from OCC.Core.gp import *
+
+from data.sketch.geometry import *
+from data.sketch.sketch_object import Sketch_Object
 
 
 class SketchObjectNode(Node):
@@ -424,3 +417,19 @@ class BsplineNode(SketchObjectNode):
 
     def typeInfo(self):
         return "BSpline"
+
+
+class BezierSurfaceNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(BezierSurfaceNode, self).__init__(name, parent)
+
+    def data(self, column):
+        r = super(BezierSurfaceNode, self).data(column)
+
+        return r
+
+    def setData(self, column, value):
+        super(BezierSurfaceNode, self).setData(column, value)
+
+    def typeInfo(self):
+        return "Bezier Surface"
