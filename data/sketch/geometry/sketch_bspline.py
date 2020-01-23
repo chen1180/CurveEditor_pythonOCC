@@ -17,7 +17,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myWeights = []
         self.myKnots = []
         self.myMultiplicities = []
-        self.myDegree = 3
+        self.myDegree = 2
         self.myPeriodicFlag = False
 
     def AddPoles(self, thePnt2d, weight=1.0):
@@ -56,8 +56,12 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myGeometry = Geom_BSplineCurve(arrayOfPoles, arrayOfWeights, arrayOfKnots, arrayOfMulties, self.myDegree)
 
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
-        self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
-        self.myContext.Display(self.myAIS_InteractiveObject, True)
+        if self.myAIS_InteractiveObject:
+            self.myAIS_InteractiveObject.SetShape(edge.Edge())
+            self.myAIS_InteractiveObject.Redisplay(True)
+        else:
+            self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
+            self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def DragTo(self, index, newPnt2d):
         self.myPoles[index].DragTo(newPnt2d)
@@ -71,25 +75,30 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def Recompute(self):
         self.RemoveAIS_Lines()
-
         poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
         poles_list = [pole.GetGeometry().Pnt() for pole in self.myPoles]
         for index, pole2d in enumerate(poles2d_list):
             self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
             self.myGeometry.SetPole(index + 1, poles_list[index], self.myWeights[index])
         for index, knots in enumerate(self.myKnots):
-            self.myGeometry2d.SetKnot(index + 1, knots)
-            self.myGeometry.SetKnot(index + 1, knots)
+            self.myGeometry2d.SetKnot(index + 1, knots, self.myMultiplicities[index])
+            self.myGeometry.SetKnot(index + 1, knots, self.myMultiplicities[index])
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def IncreaseDegree(self, theDegree):
-        if theDegree <= 2 or theDegree < self.myGeometry2d.Degree():
+        if theDegree < self.myGeometry2d.Degree():
             print("Degree elevation: degree can't be lower than 2 or lower than current degree")
         else:
             self.myGeometry2d.IncreaseDegree(theDegree)
             self.myGeometry.IncreaseDegree(theDegree)
+            self.myDegree = theDegree
             self.updateGeomAttributes()
             self.myAIS_InteractiveObject.Redisplay(True)
+
+    def IncreaseMultiplicity(self, theIndex, theMulti):
+        self.myGeometry2d.IncreaseMultiplicity(theIndex, theMulti)
+        self.myGeometry.IncreaseMultiplicity(theIndex, theMulti)
+        self.myAIS_InteractiveObject.Redisplay(True)
 
     def updateGeomAttributes(self):
         poles2d_array = self.myGeometry2d.Poles()
@@ -99,7 +108,6 @@ class Sketch_Bspline(Sketch_Geometry):
         multiplicity = self.myGeometry2d.Multiplicities()
         self.myKnots = TColStd_Array1OfNumber_to_list(knots_array)
         self.myMultiplicities = TColStd_Array1OfNumber_to_list(multiplicity)
-
         for p in self.myPoles:
             p.RemoveDisplay()
         self.myPoles.clear()
@@ -166,3 +174,21 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def SetDegree(self, theDegree):
         self.myDegree = theDegree
+
+    def SetKnotsType(self, theType: int):
+        # Non uniform type
+        if theType == 0:
+            pass
+        # Uniform: if all the knots are of multiplicity 1,
+        elif theType == 1:
+            self.myMultiplicities, self.myKnots = setUniformKnots(len(self.myPoles), self.myDegree)
+        # QuasiUniform: if all the knots are of multiplicity 1 except for the first and last knot which are of multiplicity Degree + 1,
+        elif theType == 2:
+            self.myMultiplicities, self.myKnots = setQuasiUniformKnots(len(self.myPoles), self.myDegree)
+        # PiecewiseBezier: if the first and last knots have multiplicity Degree + 1 and if interior knots have multiplicity Degree A piecewise Bezier with only two knots is a BezierCurve. else the curve is non uniform.
+        elif theType == 3:
+            if len(self.myPoles) < 5:
+                raise ValueError
+            else:
+                self.myMultiplicities, self.myKnots = setPiecewiseBezierKnots(len(self.myPoles), self.myDegree)
+        self.Compute()

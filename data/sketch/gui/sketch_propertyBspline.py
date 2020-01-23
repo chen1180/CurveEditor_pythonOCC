@@ -80,6 +80,7 @@ class Sketch_PropertyBspline(Sketch_Property):
             if multi_value != self.geometry_dict["multiplicity"][idx]:
                 needUpdate = True
                 self.mySObject.ChangeMulties(idx, multi_value)
+                self.mySObject.IncreaseMultiplicity(idx, multi_value)
         # check if the geometry of curve (coordinate of poles) has changed.
         if needUpdate:
             self.mySObject.Recompute()
@@ -110,10 +111,16 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.continuity = QTreeWidgetItem(self.tree, ["Continuity", str(self.geometry_dict["continuity"])])
         self.knots_distribution = QTreeWidgetItem(self.tree,
                                                   ["Knots distribution", str(self.geometry_dict["knots_distribution"])])
+        self.comboBox_knots_distribution = QComboBox()
+        self.comboBox_knots_distribution.addItems(["NonUniform", "Uniform", "QuasiUniform ", "PiecewiseBezier"])
+        self.comboBox_knots_distribution.setCurrentText(self.geometry_dict["knots_distribution"])
+        self.comboBox_knots_distribution.currentIndexChanged.connect(self.changeKnotsType)
+        self.tree.setItemWidget(self.knots_distribution, 2, self.comboBox_knots_distribution)
+
         self.knots_sequence = QTreeWidgetItem(self.tree, ["Knots sequence", str(self.geometry_dict["knots_sequence"])])
 
         self.poles = QTreeWidgetItem(self.tree, ["poles", str(self.geometry_dict["nbPoles"])])
-        self.poles.setData(0, Qt.UserRole, self.geometry_dict["poles"])
+        # self.poles.setData(0, Qt.UserRole, self.geometry_dict["poles"])
         for k, v in enumerate(self.geometry_dict["poles"]):
             poles_children = QTreeWidgetItem(self.poles, [str(k), str((round(v.X(), 2), round(v.Y(), 2)))])
             coordinate_x = QTreeWidgetItem()
@@ -158,8 +165,8 @@ class Sketch_PropertyBspline(Sketch_Property):
             multiplicity_children = QTreeWidgetItem(self.multiplicity)
             multiplicity_children.setText(0, str(idx))
             widget = QSpinBox()
+            widget.setRange(1, self.geometry_dict["degree"] + 1)
             widget.setValue(value)
-            widget.setMinimum(0)
             self.tree.setItemWidget(multiplicity_children, 1, widget)
         # for i in range(3):
         #     self.tree.resizeColumnToContents(i)
@@ -168,10 +175,18 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.mySObject.IncreaseDegree(self.geometry_dict["degree"] + 1)
         self.SetGeometry()
         self.updateUI()
+
+    def changeKnotsType(self, currentIndex):
+        self.knots_distribution.setText(1, self.knots_distribution_dict[currentIndex])
+        self.mySObject.SetKnotsType(currentIndex)
+        self.SetGeometry()
+        self.updateUI()
+
     def setPeriodic(self):
         self.mySObject.SetPeriodic()
         self.SetGeometry()
         self.updateUI()
+
     def updateUI(self):
         degree = self.curGeom2d_Bspline.Degree()
         closed_flag = self.curGeom2d_Bspline.IsClosed()

@@ -49,3 +49,55 @@ def float_list_to_TColStd_Array1OfReal(li):
     for n, i in enumerate(li):
         pts.SetValue(n + 1, i)
     return pts
+
+
+def setQuasiUniformKnots(poles_size: int, degree: int):
+    # total knots vector size
+    knots_size = poles_size + degree + 1
+    # calculate number of vectors in the middle of knots vector
+    middle_size = knots_size - 2 * (degree + 1)
+    multipicities = []
+    if middle_size > 0:
+        multipicities = [degree + 1]
+        for i in range(middle_size):
+            multipicities.append(1)
+        multipicities += [degree + 1]
+    else:
+        first_point_multiplicities = knots_size - (degree + 1)
+        if first_point_multiplicities > 0:
+            multipicities = [degree + 1]
+            for i in range(first_point_multiplicities):
+                multipicities.append(1)
+        else:
+            for i in range(knots_size):
+                multipicities.append(1)
+    knots = []
+    for i in range(len(multipicities)):
+        knots.append(float(i))
+    return (multipicities, knots)
+
+
+def setUniformKnots(poles_size: int, degree: int):
+    # total knots vector size
+    knots_size = poles_size + degree + 1
+    # calculate number of vectors in the middle of knots vector
+    middle_size = knots_size - 2 * (degree + 1)
+    multipicities = []
+    knots = [float(i) for i in range(knots_size)]
+    multipicities = [1] * knots_size
+    return (multipicities, knots)
+
+
+def setPiecewiseBezierKnots(poles_size: int, degree: int):
+    # total knots vector size
+    knots_size = poles_size + degree + 1
+    # calculate number of vectors in the middle of knots vector
+    middle_size = knots_size - 2 * (degree + 1)
+    multipicities = [degree + 1]
+    for i in range(middle_size // degree):
+        multipicities.append(degree)
+    multipicities += [degree + 1]
+    knots = []
+    for i in range(len(multipicities)):
+        knots.append(float(i))
+    return (multipicities, knots)

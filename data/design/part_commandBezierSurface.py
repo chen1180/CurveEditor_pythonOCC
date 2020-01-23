@@ -102,6 +102,7 @@ class Part_CommandBezierSurface(Part_Command):
             face.Build()
             self.myGeomSurface = AIS_Shape(face.Shape())
             self.myContext.Display(self.myGeomSurface, True)
+        self.myCurves.clear()
         self.myBezierSurfaceAction = BezierSurfaceAction.Nothing
 
     def GetTypeOfMethod(self):
