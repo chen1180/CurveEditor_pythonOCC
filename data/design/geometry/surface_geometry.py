@@ -53,3 +53,6 @@ class Surface_Geometry:
 
     def RemoveDisplay(self, theContext: AIS_InteractiveContext):
         pass
+
+    def Compute(self):
+        pass

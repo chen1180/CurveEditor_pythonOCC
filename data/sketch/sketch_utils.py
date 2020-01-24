@@ -96,6 +96,9 @@ def setPiecewiseBezierKnots(poles_size: int, degree: int):
     multipicities = [degree + 1]
     for i in range(middle_size // degree):
         multipicities.append(degree)
+    remainder=middle_size%degree
+    if remainder!=0:
+        multipicities.append(remainder)
     multipicities += [degree + 1]
     knots = []
     for i in range(len(multipicities)):

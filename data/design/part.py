@@ -8,6 +8,7 @@ from OCC.Core.Geom import Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect
 from OCC.Core.AIS import AIS_InteractiveContext
 from OCC.Display.OCCViewer import Viewer3d
+from data.node import *
 
 
 class Part(object):
@@ -16,13 +17,12 @@ class Part(object):
         self.myContext: AIS_InteractiveContext = theDisplay.Context
         self.myView: V3d_View = theDisplay.View
         self.myStatusBar = statusBar
-        # self.myGUI = sg
-        # self.myGUI.SetAx3(self.myCoordinateSystem)
-        # self.myGUI.SetContext(self.myContext)
 
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
         self.myIntCS = GeomAPI_IntCS()
+
+        self.myNode: SketchNode = None
 
         self.myData = []
         self.myCommands = []
@@ -48,6 +48,12 @@ class Part(object):
         for idx in range(1, len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetData(self.myData)
+
+    def SetRootNode(self, theNode):
+        self.myNode = theNode
+        for idx in range(len(self.myCommands)):
+            self.CurCommand: Part_Command = self.myCommands[idx]
+            self.CurCommand.SetRootNode(self.myNode)
 
     def GetData(self):
         return self.myData

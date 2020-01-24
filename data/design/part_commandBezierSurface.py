@@ -43,6 +43,7 @@ class Part_CommandBezierSurface(Part_Command):
                     face = BRepBuilderAPI_MakeFace()
                     face.Init(surface1.Surface(), True, 1.0e-6)
                     face.Build()
+
                     self.myRubberSurface = AIS_Shape(face.Shape())
                     self.myContext.Display(self.myRubberSurface, True)
                     self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve3
@@ -87,23 +88,20 @@ class Part_CommandBezierSurface(Part_Command):
         elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve2:
             pass
         elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve3:
-            self.myContext.Remove(self.myRubberSurface, True)
-            surface1 = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], GeomFill_CurvedStyle)
-            face = BRepBuilderAPI_MakeFace()
-            face.Init(surface1.Surface(), True, 1.0e-6)
-            face.Build()
-            self.myGeomSurface = AIS_Shape(face.Shape())
-            self.myContext.Display(self.myGeomSurface, True)
+            self.CloseSurface()
         elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve4:
-            self.myContext.Remove(self.myRubberSurface, True)
-            surface1 = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2], GeomFill_CurvedStyle)
-            face = BRepBuilderAPI_MakeFace()
-            face.Init(surface1.Surface(), True, 1.0e-6)
-            face.Build()
-            self.myGeomSurface = AIS_Shape(face.Shape())
-            self.myContext.Display(self.myGeomSurface, True)
+            self.CloseSurface()
+
         self.myCurves.clear()
         self.myBezierSurfaceAction = BezierSurfaceAction.Nothing
+
+    def CloseSurface(self):
+        self.myContext.Remove(self.myRubberSurface, True)
+        self.myGeomSurface = Surface_Bezier(self.myContext, self.curCoordinateSystem)
+        self.myGeomSurface.SetCurves(self.myCurves)
+        self.myGeomSurface.Compute()
+        self.bezierSurfaceNode = BezierSurfaceNode("surface", self.myNode)
+        self.bezierSurfaceNode.setSketchObject(self.myGeomSurface)
 
     def GetTypeOfMethod(self):
         return Part_ObjectTypeOfMethod.BezierSurface_Method

@@ -36,7 +36,7 @@ class Sketch_CommandMoveObject(Sketch_Command):
                                 self.myMoveAction = MoveAction.Input_SelectedObject
                                 self.object = myCurObject
                                 break
-                        elif type(obj) == BezierNode or type(obj) == BsplineNode:
+                        elif type(obj) == BezierNode or type(obj) == BsplineNode or type(obj)==LineNode:
                             myCurObject: Sketch_BezierCurve = obj.getSketchObject()
                             for index, pole in enumerate(myCurObject.GetPoles()):
                                 if self.myContext.IsSelected(pole.GetAIS_Object()):
@@ -48,10 +48,8 @@ class Sketch_CommandMoveObject(Sketch_Command):
             elif self.myMoveAction == MoveAction.Input_SelectedObject:
                 if self.currentSObject:
                     self.currentSObject.DragTo(self.curPnt2d)
-                if type(self.object) == Sketch_BezierCurve or type(self.object) == Sketch_Bspline:
+                if type(self.object) == Sketch_BezierCurve or type(self.object) == Sketch_Bspline or type(self.object)==Sketch_Line:
                     self.object.DragTo(self.myIndex, self.curPnt2d)
-                elif type(self.object) == Sketch_Line:
-                    self.object.Recompute()
 
     def MouseReleaseEvent(self, buttons, modifiers):
         self.currentSObject = None

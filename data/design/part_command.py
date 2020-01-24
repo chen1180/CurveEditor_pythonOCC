@@ -15,7 +15,8 @@ from OCC.Core.TopoDS import TopoDS_Shape
 from OCC.Core.TopAbs import *
 from OCC.Core.Geom import Geom_Circle, Geom_Line
 from PyQt5.QtWidgets import QStatusBar
-
+from data.node import *
+from data.design.geometry import *
 
 class Part_Command(object):
     def __init__(self, name):
@@ -24,11 +25,6 @@ class Part_Command(object):
         self.objectName = name
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
-
-        self.myColor = Quantity_Color(Quantity_NOC_SKYBLUE)
-        self.myStyle = Aspect_TOL_SOLID
-        self.myWidth = 1.0
-        self.myPrs3dAspect = Prs3d_LineAspect(self.myColor, self.myStyle, self.myWidth)
 
         self.myPolylineMode = False
         self.curPnt2d = gp.Origin2d()
@@ -58,17 +54,8 @@ class Part_Command(object):
         self.curCoordinateSystem.SetDirection(dir)
         self.curCoordinateSystem.SetLocation(location)
 
-    def SetColor(self, theColor):
-        self.myColor = theColor
-
-    def SetType(self, theType):
-        self.objectType = theType
-
-    def SetWidth(self, theWidth):
-        self.myWidth = theWidth
-
-    def SetStyle(self, theLineStyle):
-        self.myStyle = theLineStyle
+    def SetRootNode(self, theNode):
+        self.myNode: SketchNode = theNode
 
     def GetTypeOfMethod(self):
         raise NotImplementedError()
@@ -84,15 +71,6 @@ class Part_Command(object):
 
     def CancelEvent(self):
         raise NotImplementedError()
-
-    def SetPolylineFirstPnt(self, p1):
-        pass
-
-    def GetPolylineFirstPnt(self, p1):
-        pass
-
-    def SetPolylineMode(self, mode):
-        pass
 
     def SelectObject(self, xPix, yPix) -> AIS_InteractiveObject:
         self.myDisplay.MoveTo(xPix, yPix)

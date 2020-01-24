@@ -15,7 +15,7 @@ class PartController(QObject):
         self._display = display
         self._statusBar: QStatusBar = parent.statusBar()
 
-        self.part = Part(self._display,self._statusBar)
+        self.part = Part(self._display, self._statusBar)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
         self.createActions()
@@ -44,6 +44,7 @@ class PartController(QObject):
 
     def setRootNode(self, root):
         self.rootNode: Node = root
+        self.part.SetRootNode(self.rootNode)
 
     def partBezierSurface(self):
         self.part.ObjectAction(Part_ObjectTypeOfMethod.BezierSurface_Method)

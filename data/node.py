@@ -313,7 +313,7 @@ class LineNode(SketchObjectNode):
 
     def data(self, column):
         r = super(LineNode, self).data(column)
-        self.myGeometry: list = self.sketchObject.GetPoints()
+        self.myGeometry: list = self.sketchObject.GetPoles()
         self.startPnt2d: gp_Pnt2d = self.myGeometry[0].GetGeometry2d().Pnt2d()
         self.endPnt2d: gp_Pnt2d = self.myGeometry[1].GetGeometry2d().Pnt2d()
         if column == 2:

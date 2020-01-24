@@ -13,46 +13,60 @@ class Sketch_Line(Sketch_Geometry):
         self.myAIS_InteractiveObject: AIS_Shape = None
         Sketch_Line.IndexCounter += 1
         self.myName = "Line" + str(self.IndexCounter)
-        self.myPoints = []
+        self.myPoles = []
 
     def AddPoints(self, thePnt2d):
         sketch_point = Sketch_Point(self.myContext, self.curCoordinateSystem)
         sketch_point.Compute(thePnt2d)
-        self.myPoints.append(sketch_point)
+        self.myPoles.append(sketch_point)
 
-    def GetPoints(self):
-        return self.myPoints
+    def GetPoles(self):
+        return self.myPoles
 
     def Compute(self):
-        startPnt2d = self.myPoints[0].GetGeometry2d().Pnt2d()
-        endPnt2d = self.myPoints[1].GetGeometry2d().Pnt2d()
+        startPnt2d = self.myPoles[0].GetGeometry2d().Pnt2d()
+        endPnt2d = self.myPoles[1].GetGeometry2d().Pnt2d()
         self.myGeometry2d = Geom2d_Edge()
         self.myGeometry2d.SetPoints(startPnt2d, endPnt2d)
 
-        startPnt = self.myPoints[0].GetGeometry().Pnt()
-        endPnt = self.myPoints[1].GetGeometry().Pnt()
+        startPnt = self.myPoles[0].GetGeometry().Pnt()
+        endPnt = self.myPoles[1].GetGeometry().Pnt()
         dir = gp_Dir(gp_Vec(startPnt, endPnt))
         self.myGeometry = Geom_Line(startPnt, dir)
 
-        self.myAIS_InteractiveObject = AIS_Line(self.myPoints[0].GetGeometry(), self.myPoints[1].GetGeometry())
+        self.myAIS_InteractiveObject = AIS_Line(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def Recompute(self):
-        startPnt2d = self.myPoints[0].GetGeometry2d().Pnt2d()
-        endPnt2d = self.myPoints[1].GetGeometry2d().Pnt2d()
+        startPnt2d = self.myPoles[0].GetGeometry2d().Pnt2d()
+        endPnt2d = self.myPoles[1].GetGeometry2d().Pnt2d()
         self.myGeometry2d.SetPoints(startPnt2d, endPnt2d)
 
-        startPnt = self.myPoints[0].GetGeometry().Pnt()
-        endPnt = self.myPoints[1].GetGeometry().Pnt()
+        startPnt = self.myPoles[0].GetGeometry().Pnt()
+        endPnt = self.myPoles[1].GetGeometry().Pnt()
         dir = gp_Dir(gp_Vec(startPnt, endPnt))
         self.myGeometry.SetLocation(startPnt)
         self.myGeometry.SetDirection(dir)
-        self.myAIS_InteractiveObject.SetPoints(self.myPoints[0].GetGeometry(), self.myPoints[1].GetGeometry())
+        self.myAIS_InteractiveObject.SetPoints(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
+        self.myAIS_InteractiveObject.Redisplay(True)
+
+    def DragTo(self, index, newPnt2d):
+        self.myPoles[index].DragTo(newPnt2d)
+        startPnt2d = self.myPoles[0].GetGeometry2d().Pnt2d()
+        endPnt2d = self.myPoles[1].GetGeometry2d().Pnt2d()
+        self.myGeometry2d.SetPoints(startPnt2d, endPnt2d)
+
+        startPnt = self.myPoles[0].GetGeometry().Pnt()
+        endPnt = self.myPoles[1].GetGeometry().Pnt()
+        dir = gp_Dir(gp_Vec(startPnt, endPnt))
+        self.myGeometry.SetLocation(startPnt)
+        self.myGeometry.SetDirection(dir)
+        self.myAIS_InteractiveObject.SetPoints(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def RemoveDisplay(self):
         super(Sketch_Line, self).RemoveDisplay()
-        for point in self.myPoints:
+        for point in self.myPoles:
             point.RemoveDisplay()
 
     def GetGeometryType(self):
