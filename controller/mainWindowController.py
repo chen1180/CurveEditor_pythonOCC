@@ -46,7 +46,7 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_mousePress_callback(self.partController.OnMouseInputEvent)
         self._glWindow.register_mouseMove_callback(self.partController.OnMouseMoveEvent)
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.partController.OnCancel)
-
+        self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.partController.DeleteSelectedObject)
         # setup tool bar
         self.createViewActions()
         self.createModeActions()

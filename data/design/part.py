@@ -2,6 +2,7 @@ from data.design.part_commandRevolvedSurface import Part_CommandRevolvedSurface
 from data.design.part_commandLinearExtrusion import Part_CommandExtrudedSurface
 from data.design.part_commandBezierSurface import Part_CommandBezierSurface
 from data.design.part_command import *
+from .geometry import *
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
 from OCC.Core.Geom import Geom_Line
@@ -97,11 +98,14 @@ class Part(object):
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
     def DeleteSelectedObject(self):
-        for idx in range(len(self.myData)):
-            myCurObject: Part_Object = self.myData[idx]
-            if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                self.myContext.Erase(myCurObject.GetAIS_Object(), True)
-                self.myData.remove(idx)
+        for index in range(self.myNode.childCount()):
+            child = self.myNode.child(index)
+            if type(child) == BezierSurfaceNode or type(child) == RevolvedSurfaceNode:
+                myObject = child.getSketchObject()
+                if self.myContext.IsSelected(myObject.GetAIS_Object()):
+                    myObject.RemoveDisplay()
+                    self.myNode.removeChild(index)
+                    break
 
     def ViewProperties(self):
         for idx in range(len(self.myData)):

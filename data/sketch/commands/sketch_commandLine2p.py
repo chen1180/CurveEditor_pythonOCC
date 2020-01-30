@@ -16,7 +16,7 @@ class Line2PAction(Enum):
 
 class Sketch_CommandLine2P(Sketch_Command):
     def __init__(self):
-        super(Sketch_CommandLine2P, self).__init__("Line2p.")
+        super(Sketch_CommandLine2P, self).__init__("Line ")
         self.myLine2PAction = Line2PAction.Nothing
 
     def Action(self):

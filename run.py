@@ -59,7 +59,5 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
     mainWin = mainWindowController.Window()
     mainWin.showMaximized()
-    try:
-        app.exec_()
-    except Exception as e:
-        sys.exit(0)
+    app.exec_()
+

@@ -433,3 +433,19 @@ class BezierSurfaceNode(SketchObjectNode):
 
     def typeInfo(self):
         return "Bezier Surface"
+
+
+class RevolvedSurfaceNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(RevolvedSurfaceNode, self).__init__(name, parent)
+
+    def data(self, column):
+        r = super(RevolvedSurfaceNode, self).data(column)
+
+        return r
+
+    def setData(self, column, value):
+        super(RevolvedSurfaceNode, self).setData(column, value)
+
+    def typeInfo(self):
+        return "Surface of Revolution"

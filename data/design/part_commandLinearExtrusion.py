@@ -13,8 +13,6 @@ class ExtrudedSurfaceAction(Enum):
 class Part_CommandExtrudedSurface(Part_Command):
     def __init__(self):
         super(Part_CommandExtrudedSurface, self).__init__("ExtrudedSurface.")
-        # self.myRubberAxis = AIS_Line()
-        # self.myRubberAxis.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
         self.myCurve = Geom_Line(gp.OX())
         self.myDir = gp_Dir()
         self.myGeomSurface = Geom_SurfaceOfLinearExtrusion(self.myCurve, self.myDir)

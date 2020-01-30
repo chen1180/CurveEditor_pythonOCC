@@ -32,6 +32,8 @@ class Part_CommandBezierSurface(Part_Command):
         if myObjects.Type() == AIS_KOI_Shape:
             curve = self.FindGeometry(myObjects)
             if curve:
+                if type(curve) == Geom_BSplineCurve:
+                    raise Exception("Curve must be bezier type")
                 if self.myBezierSurfaceAction == BezierSurfaceAction.Nothing:
                     pass
                 elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve1:
@@ -100,7 +102,7 @@ class Part_CommandBezierSurface(Part_Command):
         self.myGeomSurface = Surface_Bezier(self.myContext, self.curCoordinateSystem)
         self.myGeomSurface.SetCurves(self.myCurves)
         self.myGeomSurface.Compute()
-        self.bezierSurfaceNode = BezierSurfaceNode("surface", self.myNode)
+        self.bezierSurfaceNode = BezierSurfaceNode(self.myGeomSurface.GetName(), self.myNode)
         self.bezierSurfaceNode.setSketchObject(self.myGeomSurface)
 
     def GetTypeOfMethod(self):

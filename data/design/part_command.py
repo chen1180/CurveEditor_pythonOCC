@@ -11,6 +11,7 @@ from OCC.Display.OCCViewer import Viewer3d
 from data.design.part_type import *
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import *
+from OCC.Core.Geom import *
 from OCC.Core.TopoDS import TopoDS_Shape
 from OCC.Core.TopAbs import *
 from OCC.Core.Geom import Geom_Circle, Geom_Line

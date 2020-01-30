@@ -11,6 +11,7 @@ HAVE_PYQT_SIGNAL = hasattr(QtCore, 'pyqtSignal')
 from OCC.Core.Geom import Geom_Axis2Placement, Geom_Plane, Geom_Line, Geom_CartesianPoint
 from OCC.Core.Prs3d import *
 from OCC.Core.Graphic3d import *
+from OCC.Core.Quantity import *
 from controller.editorController import Sketch_NewSketchEditor
 from data.node import *
 from OCC.Core.V3d import V3d_Viewer
@@ -37,6 +38,17 @@ class OpenGLEditor(GLWidget):
         self._display.Context.SetAutoActivateSelection(False)
         # self.sketchManager = toolController.SketchController(self._display)
         # self.viewManager = toolController.ViewController(self._display)
+
+        # view_controller for view manipulation
+        self._cubeManip = AIS_ViewCube()
+        self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
+        self._cubeManip.SetInfiniteState(True)
+        self._display.Context.Display(self._cubeManip, True)
+        #rubberband for selection
+        self.myRubberBand = AIS_RubberBand()
+        self.myRubberBand.SetFilling(Quantity_Color(Quantity_NOC_GRAY), 0.8)
+        self.myRubberBand.SetRectangle(0, 0, 0, 0)
+        self._display.Context.Display(self.myRubberBand, True)
 
         self._state = self.MODE_VIEW
 
@@ -129,6 +141,9 @@ class OpenGLEditor(GLWidget):
             else:
                 self.dragStartPosX = pt.x()
                 self.dragStartPosY = pt.y()
+        if buttons == QtCore.Qt.LeftButton and modifiers == QtCore.Qt.ShiftModifier:
+            self.dragStartPosX = pt.x()
+            self.dragStartPosY = pt.y()
         if self._state == self.MODE_VIEW:
             pass
         elif self._state == self.MODE_DESIGN:
@@ -146,12 +161,10 @@ class OpenGLEditor(GLWidget):
             callback(buttons, modifiers)
         if event.button() == QtCore.Qt.LeftButton:
             if self._select_area:
-                if type(self._drawbox) == list:
-                    [Xmin, Ymin, dx, dy] = self._drawbox
-                    self._display.SelectArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
-                    self._select_area = False
-                else:
-                    self._display.Select(pt.x(), pt.y())
+                self._display.SelectArea(self.dragStartPosX, self.dragStartPosY, pt.x(), pt.y())
+                self._select_area = False
+                self.myRubberBand.SetRectangle(0, 0, 0, 0)
+                self.myRubberBand.Redisplay(True)
             else:
                 # multiple select if shift is pressed
                 if modifiers == QtCore.Qt.ShiftModifier:
@@ -178,7 +191,9 @@ class OpenGLEditor(GLWidget):
         dy = pt.y() - self.dragStartPosY
         if abs(dx) <= tolerance and abs(dy) <= tolerance:
             return
-        self._drawbox = [self.dragStartPosX, self.dragStartPosY, dx, dy]
+        self.myRubberBand.SetRectangle(self.dragStartPosX, self.height() - self.dragStartPosY, pt.x(),
+                                       self.height() - pt.y())
+        self.myRubberBand.Redisplay(True)
 
     def mouseMoveEvent(self, evt):
         pt = evt.pos()

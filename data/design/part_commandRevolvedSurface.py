@@ -13,8 +13,6 @@ class RevolvedSurfaceAction(Enum):
 class Part_CommandRevolvedSurface(Part_Command):
     def __init__(self):
         super(Part_CommandRevolvedSurface, self).__init__("RevolvedSurface.")
-        # self.myRubberAxis = AIS_Line()
-        # self.myRubberAxis.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
         self.myCurve = Geom_Line(gp.OX())
         self.myAxis = gp_Ax1()
         self.myGeomSurface = Geom_SurfaceOfRevolution(self.myCurve, self.myAxis)
@@ -33,19 +31,8 @@ class Part_CommandRevolvedSurface(Part_Command):
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
             if myObjects.Type() == AIS_KOI_Shape:
                 curve = self.FindGeometry(myObjects)
-                print(curve)
                 if curve:
                     self.myCurve = curve
-                    self.myGeomSurface.SetBasisCurve(self.myCurve)
-                    self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Axis
-            elif myObjects.Type() == AIS_KOI_Datum:
-                datum = self.FindDatum(myObjects)
-                if type(datum) == AIS_Circle:
-                    self.myCurve = datum.Circle()
-                    self.myGeomSurface.SetBasisCurve(self.myCurve)
-                    self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Axis
-                elif type(datum) == AIS_Line:
-                    self.myCurve = datum.Line()
                     self.myGeomSurface.SetBasisCurve(self.myCurve)
                     self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Axis
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
@@ -55,30 +42,22 @@ class Part_CommandRevolvedSurface(Part_Command):
                     if type(datum) == AIS_Line:
                         self.myContext.Remove(self.myRubberSurface, True)
                         self.myAxis = datum.Line().Position()
-                        surface = Geom_SurfaceOfRevolution(self.myCurve, self.myAxis)
-                        self.myDisplay.DisplayShape(surface)
-                        self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Curve
+                        self.mySurface = Surface_Revolved(self.myContext, self.curCoordinateSystem)
+                        self.mySurface.SetCurves(self.myCurve)
+                        self.mySurface.SetRevolveAxis(self.myAxis)
+                        self.mySurface.Compute()
+                        self.surfaceNode = RevolvedSurfaceNode(self.mySurface.GetName(), self.myNode)
+                        self.surfaceNode.setSketchObject(self.mySurface)
+                        self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Nothing
 
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)
-
         if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
             pass
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
-            pass
+            self.myStatusBar.showMessage("Select a shape for revolve operation! (Bezier curve or Bspline)", 1000)
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
-            if myObjects is None:
-                self.myContext.Remove(self.myRubberSurface, True)
-            else:
-                if myObjects.Type() == AIS_KOI_Datum:
-                    datum = self.FindDatum(myObjects)
-                    if datum:
-                        if type(datum) == AIS_Line:
-                            myAxis = datum.Line().Position()
-                            surface = Geom_SurfaceOfRevolution(self.myCurve, myAxis)
-                            self.myRubberSurface = self.myDisplay.DisplayShape(surface)
-                else:
-                    self.myContext.Remove(self.myRubberSurface, True)
+            self.myStatusBar.showMessage("Select an axis!", 1000)
 
     def CancelEvent(self):
         if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
@@ -86,10 +65,7 @@ class Part_CommandRevolvedSurface(Part_Command):
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
             pass
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
-            geomSurface = Geom_SurfaceOfRevolution(self.myCurve, self.myAxis)
-            self.myContext.Remove(self.myRubberSurface, True)
-            # self.AddObject() not impletemented yet
-            self.myContext.Display(geomSurface, True)
+            pass
         self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Nothing
 
     def GetTypeOfMethod(self):
