@@ -256,7 +256,7 @@ class SketchNode(Node):
         self.sketch_plane = thePlane
 
     def typeInfo(self):
-        return "Sketch"
+        return "Plane"
 
 
 from OCC.Core.gp import *

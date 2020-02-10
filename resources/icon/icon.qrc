@@ -6,5 +6,8 @@
         <file>bezier.png</file>
         <file>spline.png</file>
         <file>nurbs.png</file>
+        <file>inputLine.png</file>
+        <file>point.png</file>
+        <file>newPlane.png</file>
     </qresource>
 </RCC>

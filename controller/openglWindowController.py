@@ -36,6 +36,7 @@ class OpenGLEditor(GLWidget):
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
         # Acitivate selection automaticlly
         self._display.Context.SetAutoActivateSelection(False)
+
         # self.sketchManager = toolController.SketchController(self._display)
         # self.viewManager = toolController.ViewController(self._display)
 

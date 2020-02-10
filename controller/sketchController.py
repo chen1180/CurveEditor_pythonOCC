@@ -9,7 +9,7 @@ from data.node import *
 from data.model import SceneGraphModel
 from OCC.Core.V3d import *
 from OCC.Core.gp import gp_Ax3
-
+from resources.icon import icon
 
 class SketchController(QObject):
     modelUpdated = pyqtSignal(object)
@@ -38,22 +38,22 @@ class SketchController(QObject):
         self.statusBar.showMessage("status bar setted")
 
     def createActions(self):
-        self.action_createNewSketch = QAction(QIcon(""), "create a new sketch", self,
+        self.action_createNewSketch = QAction(QIcon(":/newPlane.png"), "create a new sketch", self,
                                               statusTip="create a new sketch",
                                               triggered=self.createNewSketch)
-        self.action_addPoint = QAction(QIcon(""), "add points", self,
+        self.action_addPoint = QAction(QIcon(":/point.png"), "add points", self,
                                        statusTip="add points on sketch",
                                        triggered=self.sketchPoint)
-        self.action_addLine = QAction(QIcon(""), "add lines", self,
+        self.action_addLine = QAction(QIcon(":/inputLine.png"), "add lines", self,
                                       statusTip="add a line",
                                       triggered=self.sketchLine)
-        self.action_addBezierCurve = QAction(QIcon(""), "Add Bezier Curve", self,
+        self.action_addBezierCurve = QAction(QIcon(":/bezier.png"), "Add Bezier Curve", self,
                                              statusTip="Add a cubic Bezier curve",
                                              triggered=self.sketchBezier)
-        self.action_addBSpline = QAction(QIcon(""), "Add BSpline Curve", self,
+        self.action_addBSpline = QAction(QIcon(":/spline.png"), "Add BSpline Curve", self,
                                          statusTip="Add a B Spline curve",
                                          triggered=self.sketchBSpline)
-        self.action_addNurbsCircle = QAction(QIcon(""), "Add a Nurbs Circle", self,
+        self.action_addNurbsCircle = QAction(QIcon(":/nurbs.png"), "Add a Nurbs Circle", self,
                                              statusTip="Add a 9 control points nurbs circle",
                                              triggered=self.sketchNurbCircle)
         self.action_pointsToBSpline = QAction(QIcon(""), "Interpolate BSpline", self,

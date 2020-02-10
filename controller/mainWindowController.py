@@ -194,7 +194,7 @@ class Window(QtWidgets.QMainWindow):
 
         self._action_transform = QtWidgets.QAction(QtGui.QIcon(""), "Transform", self,
                                                    statusTip="Transform a object",
-                                                   triggered=self.sketchController.sketchLine)
+                                                   triggered=self._glWindow._display.View.SetFront)
         self._action_fitAll = QtWidgets.QAction(QtGui.QIcon(""), "Fit all shape on screen", self,
                                                 statusTip="Fit all shapes on screen",
                                                 triggered=self._glWindow._display.FitAll)
