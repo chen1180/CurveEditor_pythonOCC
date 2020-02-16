@@ -1,22 +1,17 @@
-from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp, gp_Pnt, gp_Circ, gp_Circ2d, gp_Lin2d, gp_Ax2d, gp_Dir2d, \
-    gp_Dir, gp_Ax1
 from OCC.Core.AIS import *
-from OCC.Core.Aspect import Aspect_TOL_SOLID
-from OCC.Core.Prs3d import Prs3d_LineAspect
-from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1, Quantity_Color, Quantity_NOC_SKYBLUE
-from OCC.Core.Geom2d import Geom2d_Geometry
-from OCC.Core.TCollection import TCollection_ExtendedString
+from OCC.Core.Quantity import *
 from OCC.Display.OCCViewer import Viewer3d
-from data.design.part_type import *
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import *
 from OCC.Core.Geom import *
-from OCC.Core.TopoDS import TopoDS_Shape
 from OCC.Core.TopAbs import *
 from OCC.Core.Geom import Geom_Circle, Geom_Line
 from PyQt5.QtWidgets import QStatusBar
 from data.node import *
+from data.design.part_type import *
+from OCC.Core.GeomFill import *
+from OCC.Core.BRepBuilderAPI import *
+from enum import Enum
 from data.design.geometry import *
 
 class Part_Command(object):

@@ -1,7 +1,4 @@
-from data.design.part_command import *
-from enum import Enum
-
-from OCC.Core.Geom import Geom_SurfaceOfRevolution, Geom_Line
+from data.design.commands.part_command import *
 
 
 class RevolvedSurfaceAction(Enum):

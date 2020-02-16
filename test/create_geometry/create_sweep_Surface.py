@@ -38,7 +38,6 @@ def beziercurve():
     beziercurve = Geom_BezierCurve(array)
     surface=Geom_SurfaceOfRevolution(beziercurve,gp_Ax1(gp_Pnt(0.0,0.0,0.0),gp_Dir(1.0,1.0,0.0)))
     print(surface.Bounds())
-
     poles=beziercurve.Poles()
 
     for j in range(array.Lower(), array.Upper()+1):

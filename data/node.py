@@ -449,3 +449,35 @@ class RevolvedSurfaceNode(SketchObjectNode):
 
     def typeInfo(self):
         return "Surface of Revolution"
+
+
+class ExtrudedSurfaceNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(ExtrudedSurfaceNode, self).__init__(name, parent)
+
+    def data(self, column):
+        r = super(ExtrudedSurfaceNode, self).data(column)
+
+        return r
+
+    def setData(self, column, value):
+        super(ExtrudedSurfaceNode, self).setData(column, value)
+
+    def typeInfo(self):
+        return "Surface of Linear Extrusion"
+
+
+class SweepSurfaceNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(SweepSurfaceNode, self).__init__(name, parent)
+
+    def data(self, column):
+        r = super(SweepSurfaceNode, self).data(column)
+
+        return r
+
+    def setData(self, column, value):
+        super(SweepSurfaceNode, self).setData(column, value)
+
+    def typeInfo(self):
+        return "Sweep Surface"

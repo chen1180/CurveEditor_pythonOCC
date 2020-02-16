@@ -10,6 +10,8 @@ from data.model import SceneGraphModel
 from OCC.Core.V3d import *
 from OCC.Core.gp import gp_Ax3
 from resources.icon import icon
+from OCC.Core.AIS import *
+from OCC.Core.Geom import *
 
 class SketchController(QObject):
     modelUpdated = pyqtSignal(object)
@@ -122,6 +124,12 @@ class SketchController(QObject):
             self.setActionEnabled(True)
         self.currentSketchNode = SketchNode(name)
         coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
+        #Display normal axis of the plane
+        # print(coordinate_system.Axis())
+        # normal_axis=coordinate_system.Axis()
+        # normal_geom_axis=Geom_Line(normal_axis)
+        # ais_axis=AIS_Line(normal_geom_axis)
+        # self._display.Context.Display(ais_axis,True)
         self.currentSketchNode.setSketchPlane(coordinate_system)
         self.modelUpdated.emit(self.currentSketchNode)
         self.selectSketchNode(self.currentSketchNode)

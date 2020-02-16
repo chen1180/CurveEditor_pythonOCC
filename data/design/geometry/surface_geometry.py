@@ -6,7 +6,7 @@ from OCC.Core.gp import *
 from OCC.Core.Aspect import *
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from OCC.Core.Prs3d import *
-from data.sketch.sketch_object import *
+
 
 
 class Surface_Geometry:

@@ -180,6 +180,7 @@ class Window(QtWidgets.QMainWindow):
         self._designToolBar.addAction(self.partController.action_addBezierSurface)
         self._designToolBar.addAction(self.partController.action_revolutedSurface)
         self._designToolBar.addAction(self.partController.action_extrudedSurface)
+        self._designToolBar.addAction(self.partController.action_sweptSurface)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
         self._sketchToolBar.setVisible(False)
         self._designToolBar.setVisible(False)

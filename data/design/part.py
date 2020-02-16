@@ -1,11 +1,8 @@
-from data.design.part_commandRevolvedSurface import Part_CommandRevolvedSurface
-from data.design.part_commandLinearExtrusion import Part_CommandExtrudedSurface
-from data.design.part_commandBezierSurface import Part_CommandBezierSurface
-from data.design.part_command import *
-from .geometry import *
+from data.design.commands import *
+from data.design.part_type import *
+from data.design.part_object import Part_Object
 from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
-from OCC.Core.Geom import Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect
 from OCC.Core.AIS import AIS_InteractiveContext
 from OCC.Display.OCCViewer import Viewer3d
@@ -30,7 +27,7 @@ class Part(object):
         self.addCommand(Part_CommandBezierSurface())
         self.addCommand(Part_CommandRevolvedSurface())
         self.addCommand(Part_CommandExtrudedSurface())
-
+        self.addCommand(Part_CommandSweepSurface())
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
         self.myGUI.SetContext(theContext)

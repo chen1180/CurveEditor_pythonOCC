@@ -4,3 +4,4 @@ class Part_ObjectTypeOfMethod:
     BSplineSurface_Method = 2
     RevolvedSurface_Method = 3
     ExtrudedSurface_Method = 4
+    SweptSurface_Method = 5

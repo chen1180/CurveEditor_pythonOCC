@@ -1,8 +1,6 @@
-from data.design.part_command import *
-from enum import Enum
-from OCC.Core.BRepBuilderAPI import *
-from OCC.Core.Geom import Geom_Line
-from OCC.Core.GeomFill import *
+from data.design.commands.part_command import *
+
+
 
 
 class BezierSurfaceAction(Enum):

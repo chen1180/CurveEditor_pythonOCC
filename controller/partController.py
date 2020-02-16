@@ -35,9 +35,12 @@ class PartController(QObject):
         self.action_revolutedSurface = QAction(QIcon(""), "revolve a shape", self,
                                                statusTip="Create surface of revolution based on a selected shape",
                                                triggered=self.partRevolveSurface)
-        self.action_extrudedSurface = QAction(QIcon(""), "extrude a shape", self,
+        self.action_extrudedSurface = QAction(QIcon(""), "Extrude a curve", self,
                                               statusTip="Create extruded surface based on a selected shape",
                                               triggered=self.partExtrudedSurface)
+        self.action_sweptSurface = QAction(QIcon(""), "Sweep a curve", self,
+                                           statusTip="Select a profile and a path to create sweep surface",
+                                           triggered=self.partSweptSurface)
 
     def setModel(self, model):
         self.model = model
@@ -54,6 +57,9 @@ class PartController(QObject):
 
     def partExtrudedSurface(self):
         self.part.ObjectAction(Part_ObjectTypeOfMethod.ExtrudedSurface_Method)
+
+    def partSweptSurface(self):
+        self.part.ObjectAction(Part_ObjectTypeOfMethod.SweptSurface_Method)
 
     def OnMouseInputEvent(self, *kargs):
         self.part.OnMouseInputEvent(*kargs)
