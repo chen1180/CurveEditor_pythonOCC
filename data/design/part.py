@@ -97,7 +97,7 @@ class Part(object):
     def DeleteSelectedObject(self):
         for index in range(self.myNode.childCount()):
             child = self.myNode.child(index)
-            if type(child) == BezierSurfaceNode or type(child) == RevolvedSurfaceNode:
+            if isinstance(child,SketchObjectNode):
                 myObject = child.getSketchObject()
                 if self.myContext.IsSelected(myObject.GetAIS_Object()):
                     myObject.RemoveDisplay()

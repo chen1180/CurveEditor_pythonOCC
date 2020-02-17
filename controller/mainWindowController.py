@@ -172,9 +172,9 @@ class Window(QtWidgets.QMainWindow):
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
-        # self._viewToolBar = QtWidgets.QToolBar("View")
-        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
-        # self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
+        self._viewToolBar = QtWidgets.QToolBar("View")
+        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         self._designToolBar = QtWidgets.QToolBar("Design")
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self._designToolBar.addAction(self.partController.action_addBezierSurface)
@@ -182,8 +182,8 @@ class Window(QtWidgets.QMainWindow):
         self._designToolBar.addAction(self.partController.action_extrudedSurface)
         self._designToolBar.addAction(self.partController.action_sweptSurface)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
-        # self._sketchToolBar.setVisible(False)
-        # self._designToolBar.setVisible(False)
+        self._sketchToolBar.setVisible(False)
+        self._designToolBar.setVisible(False)
 
     def createViewActions(self):
         def setView(a0):
