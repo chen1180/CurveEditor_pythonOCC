@@ -9,9 +9,13 @@ from data.node import *
 from data.model import SceneGraphModel
 from OCC.Core.V3d import *
 from OCC.Core.gp import gp_Ax3
+from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
+from OCC.Core.V3d import V3d_Viewer
+from OCC.Core.Graphic3d import *
 from resources.icon import icon
 from OCC.Core.AIS import *
 from OCC.Core.Geom import *
+
 
 class SketchController(QObject):
     modelUpdated = pyqtSignal(object)
@@ -124,15 +128,34 @@ class SketchController(QObject):
             self.setActionEnabled(True)
         self.currentSketchNode = SketchNode(name)
         coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
-        #Display normal axis of the plane
+        # Display normal axis of the plane
         # print(coordinate_system.Axis())
         # normal_axis=coordinate_system.Axis()
         # normal_geom_axis=Geom_Line(normal_axis)
         # ais_axis=AIS_Line(normal_geom_axis)
         # self._display.Context.Display(ais_axis,True)
+        self.createDynamicGrid()
         self.currentSketchNode.setSketchPlane(coordinate_system)
         self.modelUpdated.emit(self.currentSketchNode)
         self.selectSketchNode(self.currentSketchNode)
+
+    def createDynamicGrid(self):
+        # camera attribute
+        self.view: V3d_View = self._display.View
+        # scale factor by mosue scroller
+        self.camera: Graphic3d_Camera = self.view.Camera()
+        grid_interval = self.camera.Distance() // self.view.Scale() / 5
+        self.displayGrid(self.new_sketch.plane(), 0.0, 0.0, grid_interval, grid_interval, 0.0, self.view.Size()[0],
+                         self.view.Size()[1], self.new_sketch.ui.uiOffset.value())
+
+    def displayGrid(self, aPlane, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
+
+        assert isinstance(self._display.Viewer, V3d_Viewer)
+        theAx3 = self._display.Viewer.PrivilegedPlane()
+        dir = theAx3.Direction()
+        self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
+        self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
+        self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
 
     def selectSketchNode(self, node: SketchNode):
         assert isinstance(self._display.Viewer, V3d_Viewer)
@@ -168,10 +191,10 @@ class SketchController(QObject):
 
     def OnMouseInputEvent(self, *kargs):
         self.sketch.OnMouseInputEvent(*kargs)
+        self.model.layoutChanged.emit()
 
     def OnMouseMoveEvent(self, *kargs):
         self.sketch.OnMouseMoveEvent(*kargs)
-        self.model.layoutChanged.emit()
 
     def OnMouseReleaseEvent(self, *kargs):
         self.sketch.OnMouseReleaseEvent(*kargs)

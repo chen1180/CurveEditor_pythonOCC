@@ -15,6 +15,8 @@ from OCC.Core.Quantity import *
 from controller.editorController import Sketch_NewSketchEditor
 from data.node import *
 from OCC.Core.V3d import V3d_Viewer
+from OCC.Core.StdSelect import *
+from OCC.Core.Graphic3d import *
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -35,17 +37,16 @@ class OpenGLEditor(GLWidget):
         self.parent = parent
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
         # Acitivate selection automaticlly
-        self._display.Context.SetAutoActivateSelection(False)
-
-        # self.sketchManager = toolController.SketchController(self._display)
-        # self.viewManager = toolController.ViewController(self._display)
+        # self._display.Context.SetAutoActivateSelection(False)
 
         # view_controller for view manipulation
         self._cubeManip = AIS_ViewCube()
         self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
         self._cubeManip.SetInfiniteState(True)
+        self._cubeManip.UnsetAttributes()
+        self._cubeManip.UnsetColor()
         self._display.Context.Display(self._cubeManip, True)
-        #rubberband for selection
+        # rubberband for selection
         self.myRubberBand = AIS_RubberBand()
         self.myRubberBand.SetFilling(Quantity_Color(Quantity_NOC_GRAY), 0.8)
         self.myRubberBand.SetRectangle(0, 0, 0, 0)
@@ -57,6 +58,7 @@ class OpenGLEditor(GLWidget):
         self._mouseMove_callback = []
         self._mouseRelease_callback = []
         self._mouseDoubleClick_callback = []
+        self._mouseScroll_callback = []
 
         # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketchManager.ExitDrawingMode)
         # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
@@ -65,6 +67,15 @@ class OpenGLEditor(GLWidget):
         # self.setReferenceAxe()
         assert isinstance(self._display.Context, AIS_InteractiveContext)
         # self._display.View.SetBgGradientColors(Quantity_Color(Quantity_NOC_SKYBLUE), Quantity_Color(Quantity_NOC_GRAY), 2, True)
+        # selector
+        selector_manager: StdSelect_ViewerSelector3d = self._display.Context.MainSelector()
+        # self._display.Context.SetPixelTolerance(5)
+        selector_manager.SetPixelTolerance(20)
+        print(selector_manager.PixelTolerance())
+        # camera attribute
+        self.view: V3d_View = self._display.View
+        # scale factor by mosue scroller
+        self.camera: Graphic3d_Camera = self.view.Camera()
 
     def setReferenceAxe(self):
         geom_axe = Geom_Axis2Placement(gp_XOY())
@@ -90,6 +101,9 @@ class OpenGLEditor(GLWidget):
             pass
         elif self._state == self.MODE_SKETCH:
             pass
+        print(self.camera.Distance())
+        print(self.view.Scale())
+        print(self.camera.Eye().X(), self.camera.Eye().Y())
         self._display.Repaint()
 
     def paintEvent(self, event):
@@ -121,6 +135,8 @@ class OpenGLEditor(GLWidget):
         else:
             zoom_factor = 0.5
         self._display.ZoomFactor(zoom_factor)
+        for callback in self._mouseScroll_callback:
+            callback()
 
     def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
         pt = event.pos()
@@ -134,6 +150,8 @@ class OpenGLEditor(GLWidget):
         pt = event.pos()
         buttons = int(event.buttons())
         modifiers = event.modifiers()
+        self.dragStartPosX = pt.x()
+        self.dragStartPosY = pt.y()
         if buttons == QtCore.Qt.MiddleButton:
             if modifiers != QtCore.Qt.ShiftModifier:
                 self.dragStartPosX = pt.x()
@@ -142,9 +160,6 @@ class OpenGLEditor(GLWidget):
             else:
                 self.dragStartPosX = pt.x()
                 self.dragStartPosY = pt.y()
-        if buttons == QtCore.Qt.LeftButton and modifiers == QtCore.Qt.ShiftModifier:
-            self.dragStartPosX = pt.x()
-            self.dragStartPosY = pt.y()
         if self._state == self.MODE_VIEW:
             pass
         elif self._state == self.MODE_DESIGN:
@@ -177,11 +192,11 @@ class OpenGLEditor(GLWidget):
                     if (self._display.selected_shapes is not None) and HAVE_PYQT_SIGNAL:
                         self.sig_topods_selected.emit(self._display.selected_shapes)
 
-        # elif event.button() == QtCore.Qt.RightButton:
-        #     if self._zoom_area:
-        #         [Xmin, Ymin, dx, dy] = self._drawbox
-        #         self._display.ZoomArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
-        #         self._zoom_area = False
+        elif event.button() == QtCore.Qt.RightButton:
+            if self._zoom_area:
+                [Xmin, Ymin, dx, dy] = self._drawbox
+                self._display.ZoomArea(Xmin, Ymin, Xmin + dx, Ymin + dy)
+                self._zoom_area = False
 
         self.cursor = "arrow"
 
@@ -224,17 +239,17 @@ class OpenGLEditor(GLWidget):
                 self.cursor = "pan"
                 self._display.Pan(dx, -dy)
                 self._drawbox = False
-        # # DYNAMIC ZOOM
-        # elif (buttons == QtCore.Qt.RightButton and
-        #       not modifiers == QtCore.Qt.ShiftModifier):
-        #     self.cursor = "zoom"
-        #     self._display.Repaint()
-        #     self._display.DynamicZoom(abs(self.dragStartPosX),
-        #                               abs(self.dragStartPosY), abs(pt.x()),
-        #                               abs(pt.y()))
-        #     self.dragStartPosX = pt.x()
-        #     self.dragStartPosY = pt.y()
-        #     self._drawbox = False
+        # DYNAMIC ZOOM
+        elif (buttons == QtCore.Qt.RightButton and
+              not modifiers == QtCore.Qt.ShiftModifier):
+            self.cursor = "zoom"
+            self._display.Repaint()
+            self._display.DynamicZoom(abs(self.dragStartPosX),
+                                      abs(self.dragStartPosY), abs(pt.x()),
+                                      abs(pt.y()))
+            self.dragStartPosX = pt.x()
+            self.dragStartPosY = pt.y()
+            self._drawbox = False
 
         # DRAW BOX
         # ZOOM WINDOW
@@ -284,6 +299,12 @@ class OpenGLEditor(GLWidget):
             raise AssertionError("You must provide a callable to register the callback")
         else:
             self._key_map.setdefault(key, []).append(callback)
+
+    def register_mouseScroll_callback(self,callback):
+        if not callable(callback):
+            raise AssertionError("You must provide a callable to register the callback")
+        else:
+            self._mouseScroll_callback.append(callback)
 
 
 # -----------------------------Debugging-----------------------------------#

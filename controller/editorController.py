@@ -304,8 +304,6 @@ class BezierCurveEditor(QWidget):
 
 
 from OCC.Core.gp import gp_Pnt, gp_Pln, gp_Dir, gp_Ax3, gp
-from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
-from OCC.Core.V3d import V3d_Viewer
 
 
 class Sketch_NewSketchEditor(QWidget):
@@ -313,10 +311,12 @@ class Sketch_NewSketchEditor(QWidget):
         super(Sketch_NewSketchEditor, self).__init__(parent)
         self.ui = newSketchProperty.Ui_newSketchEditor()
         self.ui.setupUi(self)
+        self.ui.uiXYPlane.setChecked(True)
         self._display = display
         self.ui.uiOk.accepted.connect(self.constructGrid)
         self.ui.uiOk.rejected.connect(self.close)
         self.setWindowModality(Qt.ApplicationModal)
+        self._plane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0))
         self.show()
 
     def constructGrid(self):
@@ -330,17 +330,10 @@ class Sketch_NewSketchEditor(QWidget):
         if self.ui.uiYZPlane.isChecked():
             self.dir = gp_Dir(1.0, 0.0, 0.0)
             self._display.View_Right()
-        aPlane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), self.dir)
-        self.displayGrid(aPlane, 0.0, 0.0, 1.0, 1.0, 0.0, 100, 100, self.ui.uiOffset.value())
+        self._plane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), self.dir)
+        ax3 = gp_Ax3(self._plane.Location(), self._plane.Axis().Direction())
+        self._display.Viewer.SetPrivilegedPlane(ax3)
         self.close()
 
-    def displayGrid(self, aPlane, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
-        ax3 = gp_Ax3(aPlane.Location(), aPlane.Axis().Direction())
-        self._display.Viewer.SetPrivilegedPlane(ax3)
-        assert isinstance(self._display.Viewer, V3d_Viewer)
-        theAx3 = self._display.Viewer.PrivilegedPlane()
-        dir = theAx3.Direction()
-        # print(dir.X(), dir.Y(), dir.Z())
-        self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
-        self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
-        self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
+    def plane(self):
+        return self._plane
