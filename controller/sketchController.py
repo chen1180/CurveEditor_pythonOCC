@@ -1,20 +1,18 @@
-from PyQt5.QtCore import QModelIndex, QObject, pyqtSignal
-from PyQt5.QtWidgets import QAction, QStatusBar
-from PyQt5.QtGui import QIcon
-from data.sketch.sketch import Sketch
-from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
-from data.sketch.sketch_type import *
-from controller.editorController import Sketch_NewSketchEditor
-from data.node import *
-from data.model import SceneGraphModel
-from OCC.Core.V3d import *
-from OCC.Core.gp import gp_Ax3
 from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
-from OCC.Core.V3d import V3d_Viewer
 from OCC.Core.Graphic3d import *
-from resources.icon import icon
-from OCC.Core.AIS import *
-from OCC.Core.Geom import *
+from OCC.Core.V3d import *
+from OCC.Core.V3d import V3d_Viewer
+from OCC.Core.gp import gp_Ax3
+from PyQt5.QtCore import QModelIndex, QObject, pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction, QStatusBar
+
+from controller.editorController import Sketch_NewSketchEditor
+from data.model import SceneGraphModel
+from data.node import *
+from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
+from data.sketch.sketch import Sketch
+from data.sketch.sketch_type import *
 
 
 class SketchController(QObject):
@@ -144,15 +142,12 @@ class SketchController(QObject):
         self.view: V3d_View = self._display.View
         # scale factor by mosue scroller
         self.camera: Graphic3d_Camera = self.view.Camera()
+        canvas_size = max(self.view.Size())
         grid_interval = self.camera.Distance() // self.view.Scale() / 5
-        self.displayGrid(self.new_sketch.plane(), 0.0, 0.0, grid_interval, grid_interval, 0.0, self.view.Size()[0],
-                         self.view.Size()[1], self.new_sketch.ui.uiOffset.value())
+        self.displayGrid( 0.0, 0.0, grid_interval, grid_interval, 0.0, canvas_size,
+                         canvas_size, self.new_sketch.ui.uiOffset.value())
 
-    def displayGrid(self, aPlane, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
-
-        assert isinstance(self._display.Viewer, V3d_Viewer)
-        theAx3 = self._display.Viewer.PrivilegedPlane()
-        dir = theAx3.Direction()
+    def displayGrid(self,xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
         self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
         self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)

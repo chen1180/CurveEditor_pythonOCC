@@ -30,7 +30,7 @@ class Window(QtWidgets.QMainWindow):
         self.setCentralWidget(self._glWindow)
 
         # sketch manager
-        self.sketchController = sketchController.SketchController(self._glWindow._display,self)
+        self.sketchController = sketchController.SketchController(self._glWindow._display, self)
         self.sketchController.setModel(self._model)
         self.sketchController.setRootNode(self._rootNode)
         self._glWindow.register_mousePress_callback(self.sketchController.OnMouseInputEvent)
@@ -40,7 +40,7 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.sketchController.OnCancel)
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.sketchController.DeleteSelectedObject)
         # part manager
-        self.partController = partController.PartController(self._glWindow._display,self)
+        self.partController = partController.PartController(self._glWindow._display, self)
         self.partController.setModel(self._model)
         self.partController.setRootNode(self._rootNode)
         self._glWindow.register_mousePress_callback(self.partController.OnMouseInputEvent)
@@ -112,12 +112,10 @@ class Window(QtWidgets.QMainWindow):
         self._uiTreeView.expandAll()
 
     def createToolBars(self):
+
         # Curve tool bar
         self._curveToolBar = QtWidgets.QToolBar("Curve")
         self._curveToolBar.setOrientation(QtCore.Qt.Vertical)
-        # self._curveToolBar.addAction(self._action_sketchMode_addBezierCurve)
-        # self._curveToolBar.addAction(self._action_sketchMode_addBSpline)
-        # self._curveToolBar.addAction(self._action_sketchMode_addNurbs)
         # Surface tool bar
         self._surfaceToolBar = QtWidgets.QToolBar("Surface")
         self._surfaceToolBar.setOrientation(QtCore.Qt.Vertical)
@@ -135,6 +133,18 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar.addAction(self._action_viewLeft)
         self._viewToolBar.addAction(self._action_viewRight)
         self._viewToolBar.addAction(self._action_viewIso)
+
+        self.button = QtWidgets.QToolButton(self)
+        self.button.setText("Add")
+        self.button.setDefaultAction(self.sketchController.action_createNewSketch)
+        # self.button.setIcon(QtGui.QIcon(":/newPlane.png"))
+        self.button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        # self.button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
+        #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
+        #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
+        self.button.setAutoRaise(True)
+        self._viewToolBar.addWidget(self.button)
+
         self._viewToolBar.addSeparator()
         self._swithModeButton = customToolButton.CustomToolButton()
         self._switchModeMenu = QtWidgets.QMenu()
@@ -144,10 +154,9 @@ class Window(QtWidgets.QMainWindow):
         self._swithModeButton.setMenu(self._switchModeMenu)
         self._swithModeButton.setDefaultAction(self._action_switchViewMode)
         self._viewToolBar.addWidget(self._swithModeButton)
+        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         # Toolbar for different modes
-        self.createSketchToolBar()
-
-    def createSketchToolBar(self):
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
         self._sketchToolBar.addAction(self.sketchController.action_createNewSketch)
         self._sketchToolBar.addAction(self.sketchController.action_addPoint)
@@ -172,18 +181,23 @@ class Window(QtWidgets.QMainWindow):
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
-        self._viewToolBar = QtWidgets.QToolBar("View")
-        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
-        self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
+        # self._viewToolBar = QtWidgets.QToolBar("View")
+        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+
         self._designToolBar = QtWidgets.QToolBar("Design")
-        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self._designToolBar.addAction(self.partController.action_addBezierSurface)
         self._designToolBar.addAction(self.partController.action_revolutedSurface)
         self._designToolBar.addAction(self.partController.action_extrudedSurface)
         self._designToolBar.addAction(self.partController.action_sweptSurface)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
-        self._sketchToolBar.setVisible(False)
-        self._designToolBar.setVisible(False)
+        # self._sketchToolBar.setVisible(False)
+        # self._designToolBar.setVisible(False)
+        self.tabbar = QtWidgets.QTabWidget()
+        self.tabbar.addTab(self._viewToolBar, "View")
+        self.tabbar.addTab(self._sketchToolBar, "Sketch")
+        self.tabbar.addTab(self._designToolBar, "Design")
+        self.setMenuWidget(self.tabbar)
 
     def createViewActions(self):
         def setView(a0):
