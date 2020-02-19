@@ -77,6 +77,7 @@ class Part_Command(object):
             return selectedObject
 
     def DetectObject(self, xPix, yPix) -> AIS_InteractiveObject:
+        print(xPix,yPix)
         self.myDisplay.MoveTo(xPix, yPix)
         self.myContext.InitDetected()
         if self.myContext.HasDetected():

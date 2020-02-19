@@ -23,9 +23,9 @@ log = logging.getLogger(__name__)
 
 
 class OpenGLEditor(GLWidget):
-    MODE_SKETCH = 0
-    MODE_DESIGN = 1
-    MODE_VIEW = 2
+    # MODE_SKETCH = 0
+    # MODE_DESIGN = 1
+    # MODE_VIEW = 2
 
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
@@ -36,8 +36,6 @@ class OpenGLEditor(GLWidget):
 
         self.parent = parent
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
-        # Acitivate selection automaticlly
-        # self._display.Context.SetAutoActivateSelection(False)
 
         # view_controller for view manipulation
         self._cubeManip = AIS_ViewCube()
@@ -52,7 +50,7 @@ class OpenGLEditor(GLWidget):
         self.myRubberBand.SetRectangle(0, 0, 0, 0)
         self._display.Context.Display(self.myRubberBand, True)
 
-        self._state = self.MODE_VIEW
+        # self._state = self.MODE_VIEW
 
         self._mousePress_callback = []
         self._mouseMove_callback = []
@@ -86,24 +84,24 @@ class OpenGLEditor(GLWidget):
     def fitSelection(self):
         self._display.Context.FitSelected(self._display.View, 0.0, True)
 
-    def state(self):
-        return self._state
+    # def state(self):
+    #     return self._state
 
-    def setState(self, state):
-        self._state = state
-        self.update()
+    # def setState(self, state):
+    #     self._state = state
+    #     self.update()
 
     def processActions(self):
-        if self._state == self.MODE_VIEW:
-            if self._display.Viewer.IsActive() == True:
-                self._display.Viewer.DeactivateGrid()
-        elif self._state == self.MODE_DESIGN:
-            pass
-        elif self._state == self.MODE_SKETCH:
-            pass
-        print(self.camera.Distance())
-        print(self.view.Scale())
-        print(self.camera.Eye().X(), self.camera.Eye().Y())
+        # if self._state == self.MODE_VIEW:
+        #     if self._display.Viewer.IsActive() == True:
+        #         self._display.Viewer.DeactivateGrid()
+        # elif self._state == self.MODE_DESIGN:
+        #     pass
+        # elif self._state == self.MODE_SKETCH:
+        #     pass
+        # print(self.camera.Distance())
+        # print(self.view.Scale())
+        # print(self.camera.Eye().X(), self.camera.Eye().Y())
         self._display.Repaint()
 
     def paintEvent(self, event):
@@ -160,12 +158,12 @@ class OpenGLEditor(GLWidget):
             else:
                 self.dragStartPosX = pt.x()
                 self.dragStartPosY = pt.y()
-        if self._state == self.MODE_VIEW:
-            pass
-        elif self._state == self.MODE_DESIGN:
-            pass
-        elif self._state == self.MODE_SKETCH:
-            pass
+        # if self._state == self.MODE_VIEW:
+        #     pass
+        # elif self._state == self.MODE_DESIGN:
+        #     pass
+        # elif self._state == self.MODE_SKETCH:
+        #     pass
         for callback in self._mousePress_callback:
             callback(pt.x(), pt.y(), buttons, modifiers)
 
@@ -224,12 +222,6 @@ class OpenGLEditor(GLWidget):
                 self.cursor = "rotate"
                 self._display.Rotation(pt.x(), pt.y())
                 self._drawbox = False
-                if self._state == self.MODE_VIEW:
-                    pass
-                elif self._state == self.MODE_DESIGN:
-                    pass
-                elif self._state == self.MODE_SKETCH:
-                    pass
             # PAN
             elif modifiers == QtCore.Qt.ShiftModifier:
                 dx = pt.x() - self.dragStartPosX

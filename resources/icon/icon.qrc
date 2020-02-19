@@ -3,11 +3,20 @@
         <file>camera.png</file>
         <file>light.png</file>
         <file>transform.png</file>
-        <file>bezier.png</file>
+        <file>bezier_curve.png</file>
+        <file>bezier_surface.png</file>
+         <file>bspline_curve.png</file>
+        <file>ruled_surface.png</file>
+        <file>arc.png</file>
         <file>spline.png</file>
         <file>nurbs.png</file>
         <file>inputLine.png</file>
         <file>point.png</file>
         <file>newPlane.png</file>
+        <file>bezier_patch.png</file>
+        <file>nurbs_patch.png</file>
+        <file>extrude.png</file>
+        <file>sweep.png</file>
+        <file>revolve.png</file>
     </qresource>
 </RCC>

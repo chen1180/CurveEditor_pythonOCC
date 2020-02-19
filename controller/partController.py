@@ -18,6 +18,7 @@ class PartController(QObject):
         self.part = Part(self._display, self._statusBar)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
+        self.actions = []
         self.createActions()
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
@@ -28,19 +29,23 @@ class PartController(QObject):
             self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
 
     def createActions(self):
-        self.action_addBezierSurface = QAction(QIcon(""), "Construct a Bezier Surface",
+        self.action_addBezierSurface = QAction(QIcon(":/bezier_surface.png"), "Bezier Surface",
                                                self,
                                                statusTip="Create from two Bezier curve",
                                                triggered=self.partBezierSurface)
-        self.action_revolutedSurface = QAction(QIcon(""), "revolve a shape", self,
+        self.actions.append(self.action_addBezierSurface)
+        self.action_revolutedSurface = QAction(QIcon(":/revolve.png"), "Revolve", self,
                                                statusTip="Create surface of revolution based on a selected shape",
                                                triggered=self.partRevolveSurface)
-        self.action_extrudedSurface = QAction(QIcon(""), "Extrude a curve", self,
+        self.actions.append(self.action_revolutedSurface)
+        self.action_extrudedSurface = QAction(QIcon(":/extrude.png"), "Extrude", self,
                                               statusTip="Create extruded surface based on a selected shape",
                                               triggered=self.partExtrudedSurface)
-        self.action_sweptSurface = QAction(QIcon(""), "Sweep a curve", self,
+        self.actions.append(self.action_extrudedSurface)
+        self.action_sweptSurface = QAction(QIcon(":/sweep.png"), "Sweep", self,
                                            statusTip="Select a profile and a path to create sweep surface",
                                            triggered=self.partSweptSurface)
+        self.actions.append(self.action_sweptSurface)
 
     def setModel(self, model):
         self.model = model
@@ -66,7 +71,7 @@ class PartController(QObject):
 
     def OnMouseMoveEvent(self, *kargs):
         self.part.OnMouseMoveEvent(*kargs)
-        self.model.layoutChanged.emit()
+        # self.model.layoutChanged.emit()
 
     def editGeometry(self):
         self.part.ViewProperties()

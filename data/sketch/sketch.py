@@ -164,6 +164,13 @@ class Sketch(object):
     def GetCurPoint3D(self):
         return elclib.To3d(self.myCoordinateSystem.Ax2(), self.myCurrentPnt2d)
 
+    def SetPickTolerance(self, thePrecision):
+        # selector
+        selector_manager = self.myContext.MainSelector()
+        # self._display.Context.SetPixelTolerance(5)
+        selector_manager.SetPixelTolerance(thePrecision)
+        print(selector_manager.PixelTolerance())
+
     def OnCancel(self):
         self.SelectCurCommand()
         self.myAnalyserSnap.Cancel()
@@ -172,6 +179,9 @@ class Sketch(object):
             self.PolylineFirstPointExist = self.CurCommand.GetPolylineFirstPnt(self.PolylineFirstPoint)
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
+        # Acitivate selection automaticlly
+        self.myContext.SetAutoActivateSelection(True)
+        self.SetPickTolerance(20)
         # for all the sketch object selectable
         self.myContext.Deactivate()
         self.myContext.Activate(0)
@@ -233,4 +243,6 @@ class Sketch(object):
         for idx in range(len(self.myCommands)):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             if self.CurCommand.GetTypeOfMethod() == self.myCurrentMethod:
+                # Acitivate selection automaticlly
+                self.myContext.SetAutoActivateSelection(False)
                 break

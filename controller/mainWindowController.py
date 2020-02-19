@@ -49,7 +49,6 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.partController.DeleteSelectedObject)
         # setup tool bar
         self.createViewActions()
-        self.createModeActions()
         self.createToolBars()
 
         # setup sceneGraph editor
@@ -135,57 +134,38 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar.addAction(self._action_viewIso)
 
         self._viewToolBar.addSeparator()
-        self._swithModeButton = customToolButton.CustomToolButton()
-        self._switchModeMenu = QtWidgets.QMenu()
-        self._switchModeMenu.addAction(self._action_switchViewMode)
-        self._switchModeMenu.addAction(self._action_switchDesignMode)
-        self._switchModeMenu.addAction(self._action_switchSketchMode)
-        self._swithModeButton.setMenu(self._switchModeMenu)
-        self._swithModeButton.setDefaultAction(self._action_switchViewMode)
-        self._viewToolBar.addWidget(self._swithModeButton)
+        # self._swithModeButton = customToolButton.CustomToolButton()
+        # self._switchModeMenu = QtWidgets.QMenu()
+        # self._switchModeMenu.addAction(self._action_switchViewMode)
+        # self._switchModeMenu.addAction(self._action_switchDesignMode)
+        # self._switchModeMenu.addAction(self._action_switchSketchMode)
+        # self._swithModeButton.setMenu(self._switchModeMenu)
+        # self._swithModeButton.setDefaultAction(self._action_switchViewMode)
+        # self._viewToolBar.addWidget(self._swithModeButton)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         # Toolbar for different modes
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
-        # self._sketchToolBar.addAction(self.sketchController.action_createNewSketch)
-        # self._sketchToolBar.addAction(self.sketchController.action_addPoint)
-        # self._sketchToolBar.addAction(self.sketchController.action_addLine)
-        # self._sketchToolBar.addAction(self.sketchController.action_addBezierCurve)
-        # self._sketchToolBar.addAction(self.sketchController.action_addBSpline)
-        # self._sketchToolBar.addAction(self.sketchController.action_addNurbsCircle)
-        # self._sketchToolBar.addAction(self.sketchController.action_pointsToBSpline)
-        # self._sketchToolBar.addAction(self.sketchController.action_addArc)
-        # self._sketchToolBar.addAction(self.sketchController.action_addCircle)
-        for action in self.sketchController.actions:
-            self.createToolButton(action,self._sketchToolBar)
-        self._sketchToolBar.addSeparator()
-        self._snapModeButton = customToolButton.CustomToolButton()
-        self._snapModeMenu = QtWidgets.QMenu()
-        self._snapModeMenu.addAction(self.sketchController.action_snapNothing)
-        self._snapModeMenu.addAction(self.sketchController.action_snapCenter)
-        self._snapModeMenu.addAction(self.sketchController.action_snapEnd)
-        self._snapModeMenu.addAction(self.sketchController.action_snapNearest)
-        self._snapModeButton.setMenu(self._snapModeMenu)
-        self._snapModeButton.setDefaultAction(self.sketchController.action_snapNothing)
-        self._sketchToolBar.addWidget(self._snapModeButton)
 
-        # self._viewToolBar = QtWidgets.QToolBar("View")
-        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+        for action in self.sketchController.actions:
+            if type(action) == list:
+                self.createToolButtonWithMenu(action, self._sketchToolBar)
+            else:
+                self.createToolButton(action, self._sketchToolBar)
 
         self._designToolBar = QtWidgets.QToolBar("Design")
-        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
-        self._designToolBar.addAction(self.partController.action_addBezierSurface)
-        self._designToolBar.addAction(self.partController.action_revolutedSurface)
-        self._designToolBar.addAction(self.partController.action_extrudedSurface)
-        self._designToolBar.addAction(self.partController.action_sweptSurface)
+        for action in self.partController.actions:
+            if type(action) == list:
+                self.createToolButtonWithMenu(action, self._designToolBar)
+            else:
+                self.createToolButton(action, self._designToolBar)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._designToolBar)
-        # self._sketchToolBar.setVisible(False)
-        # self._designToolBar.setVisible(False)
-        self.tabbar = QtWidgets.QTabWidget()
-        self.tabbar.addTab(self._viewToolBar, "View")
-        self.tabbar.addTab(self._sketchToolBar, "Sketch")
-        self.tabbar.addTab(self._designToolBar, "Design")
-        self.setMenuWidget(self.tabbar)
+
+        self._toolTabWidget = QtWidgets.QTabWidget()
+        self._toolTabWidget.addTab(self._viewToolBar, "View")
+        self._toolTabWidget.addTab(self._sketchToolBar, "Sketch")
+        self._toolTabWidget.addTab(self._designToolBar, "Design")
+        self.setMenuWidget(self._toolTabWidget)
 
     def createViewActions(self):
         def setView(a0):
@@ -228,40 +208,31 @@ class Window(QtWidgets.QMainWindow):
                                                  statusTip="Change view point",
                                                  triggered=self._glWindow._display.View_Iso)
 
-    def createModeActions(self):
-        self._action_switchViewMode = QtWidgets.QAction(QtGui.QIcon(""), "View", self,
-                                                        statusTip="The tools set will change to view mode",
-                                                        triggered=lambda state,
-                                                                         x=self._glWindow.MODE_VIEW: self.setState(x))
-        self._action_switchSketchMode = QtWidgets.QAction(QtGui.QIcon(""), "Sketch", self,
-                                                          statusTip="The tools set will change to sketch mode",
-                                                          triggered=lambda
-                                                              state, x=self._glWindow.MODE_SKETCH: self.setState(x))
-        self._action_switchDesignMode = QtWidgets.QAction(QtGui.QIcon(""), "Design", self,
-                                                          statusTip="The tools set will change to design mode",
-                                                          triggered=lambda
-                                                              state, x=self._glWindow.MODE_DESIGN: self.setState(x))
-
-    def setState(self, gl_state):
-        self._glWindow.setState(gl_state)
-        if gl_state == self._glWindow.MODE_DESIGN:
-            self._designToolBar.setVisible(True)
-            self._sketchToolBar.setVisible(False)
-            self._viewToolBar.setVisible(False)
-        elif gl_state == self._glWindow.MODE_SKETCH:
-            self._designToolBar.setVisible(False)
-            self._sketchToolBar.setVisible(True)
-            self._viewToolBar.setVisible(False)
-        elif gl_state == self._glWindow.MODE_VIEW:
-            self._designToolBar.setVisible(False)
-            self._sketchToolBar.setVisible(False)
-            self._viewToolBar.setVisible(True)
-
     def createToolButton(self, action, parent):
         button = QtWidgets.QToolButton(self)
         button.setDefaultAction(action)
         button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        # self.button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
+        # button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
+        #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
+        #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
+        # button.setMinimumSize(100,50)
+        # button.setIconSize(QtCore.QSize(100,50))
+        button.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        button.setAutoRaise(True)
+        parent.addWidget(button)
+
+    def createToolButtonWithMenu(self, actions, parent):
+        button = QtWidgets.QToolButton(self)
+        menu = QtWidgets.QMenu()
+        for action in actions:
+            menu.addAction(action)
+
+        button.setMenu(menu)
+        button.setDefaultAction(actions[0])
+        button.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
+        button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        button.triggered.connect(button.setDefaultAction)
+        # button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
         #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
         #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
         button.setAutoRaise(True)

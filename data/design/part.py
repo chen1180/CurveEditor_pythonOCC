@@ -31,19 +31,19 @@ class Part(object):
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
         self.myGUI.SetContext(theContext)
-        for idx in range(1, len(self.myCommands)):
+        for idx in range(len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetContext(self.myContext)
 
     def SetDisplay(self, theDisplay: Viewer3d):
         self.myDisplay = theDisplay
-        for idx in range(1, len(self.myCommands)):
+        for idx in range( len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetDisplay(self.myDisplay)
 
     def SetData(self, thedata: list):
         self.myData = thedata
-        for idx in range(1, len(self.myCommands)):
+        for idx in range( len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetData(self.myData)
 
@@ -81,6 +81,7 @@ class Part(object):
         aView: V3d_View = self.myView
         self.SelectCurCommand()
         if self.CurCommand.MouseInputEvent(theX, theY, buttons, modifier):
+            self.SelectCurCommand()
             self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
     def OnMouseMoveEvent(self, *kargs):

@@ -28,9 +28,8 @@ class SketchController(QObject):
         self.sketch = Sketch(self._display, self.sketchUI)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
-        self.createActions()
 
-        self.setActionEnabled(False)
+        self.createActions()
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
         node: SketchObjectNode = current.internalPointer()
@@ -41,7 +40,7 @@ class SketchController(QObject):
 
     def setStatusBar(self, theStatusBar):
         self.statusBar: QStatusBar = theStatusBar
-        self.statusBar.showMessage("status bar setted")
+        self.statusBar.showMessage("status bar setup")
 
     def createActions(self):
         self.action_createNewSketch = QAction(QIcon(":/newPlane.png"), "New sketch", self,
@@ -56,11 +55,11 @@ class SketchController(QObject):
                                       statusTip="add a line",
                                       triggered=self.sketchLine)
         self.actions.append(self.action_addLine)
-        self.action_addBezierCurve = QAction(QIcon(":/bezier.png"), "Bezier Curve", self,
+        self.action_addBezierCurve = QAction(QIcon(":/bezier_curve.png"), "Bezier Curve", self,
                                              statusTip="Add a cubic Bezier curve",
                                              triggered=self.sketchBezier)
         self.actions.append(self.action_addBezierCurve)
-        self.action_addBSpline = QAction(QIcon(":/spline.png"), "BSplines", self,
+        self.action_addBSpline = QAction(QIcon(":/bspline_curve.png"), "BSplines", self,
                                          statusTip="Add a B Spline curve",
                                          triggered=self.sketchBSpline)
         self.actions.append(self.action_addBSpline)
@@ -68,11 +67,11 @@ class SketchController(QObject):
                                              statusTip="Add a 9 control points nurbs circle",
                                              triggered=self.sketchNurbCircle)
         self.actions.append(self.action_addNurbsCircle)
-        self.action_pointsToBSpline = QAction(QIcon(""), "Interpolate BSpline", self,
+        self.action_pointsToBSpline = QAction(QIcon(":/spline.png"), "Interpolate", self,
                                               statusTip="Interpolate points with BSpline",
                                               triggered=self.sketchPointsToBSpline)
         self.actions.append(self.action_pointsToBSpline)
-        self.action_addArc = QAction(QIcon(""), "Add Arc", self,
+        self.action_addArc = QAction(QIcon(":/arc.png"), "Add Arc", self,
                                      statusTip="Add an arc",
                                      triggered=self.sketchArc3P)
         self.actions.append(self.action_addArc)
@@ -80,26 +79,32 @@ class SketchController(QObject):
                                         statusTip="Add a circle",
                                         triggered=self.sketchCircleCenterRadius)
         self.actions.append(self.action_addCircle)
-        self.action_snapEnd = QAction(QIcon(""), "Snap End", self,
-                                      statusTip="Snap to the end points",
-                                      triggered=self.snapEnd)
-        self.actions.append(self.action_snapEnd)
-        self.action_snapCenter = QAction(QIcon(""), "Snap Center", self,
-                                         statusTip="Snap to the center of circle or arc",
-                                         triggered=self.snapCenter)
-        self.actions.append(self.action_snapCenter)
-        self.action_snapNearest = QAction(QIcon(""), "Snap Nearest", self,
-                                          statusTip="Snap to the nearest points on the geometry",
-                                          triggered=self.snapNearest)
-        self.actions.append(self.action_snapNearest)
+        snap_action = []
         self.action_snapNothing = QAction(QIcon(""), "No Snap", self,
                                           statusTip="No Snap mode",
                                           triggered=self.snapNothing)
-        self.actions.append(self.action_snapNothing)
+        snap_action.append(self.action_snapNothing)
+        self.action_snapEnd = QAction(QIcon(""), "Snap End", self,
+                                      statusTip="Snap to the end points",
+                                      triggered=self.snapEnd)
+        snap_action.append(self.action_snapEnd)
+        self.action_snapCenter = QAction(QIcon(""), "Snap Center", self,
+                                         statusTip="Snap to the center of circle or arc",
+                                         triggered=self.snapCenter)
+        snap_action.append(self.action_snapCenter)
+        self.action_snapNearest = QAction(QIcon(""), "Snap Nearest", self,
+                                          statusTip="Snap to the nearest points on the geometry",
+                                          triggered=self.snapNearest)
+        snap_action.append(self.action_snapNearest)
+        self.actions.append(snap_action)
 
-    def setActionEnabled(self, a0):
-        for action in self.actions:
-            action.setEnabled(a0)
+    # def setActionEnabled(self, a0):
+    #     for action in self.actions:
+    #         if type(action) == list:
+    #             for i in action:
+    #                 i.setEnabled(a0)
+    #         else:
+    #             action.setEnabled(a0)
 
     def setModel(self, model):
         self.model = model
@@ -127,8 +132,8 @@ class SketchController(QObject):
         name = "Sketch "
         count = str(self.rootNode.childCount())
         name += count
-        if self.currentSketchNode is None:
-            self.setActionEnabled(True)
+        # if self.currentSketchNode is None:
+        #     self.setActionEnabled(True)
         self.currentSketchNode = SketchNode(name)
         coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
         # Display normal axis of the plane
