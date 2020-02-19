@@ -134,17 +134,6 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar.addAction(self._action_viewRight)
         self._viewToolBar.addAction(self._action_viewIso)
 
-        self.button = QtWidgets.QToolButton(self)
-        self.button.setText("Add")
-        self.button.setDefaultAction(self.sketchController.action_createNewSketch)
-        # self.button.setIcon(QtGui.QIcon(":/newPlane.png"))
-        self.button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        # self.button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
-        #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
-        #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
-        self.button.setAutoRaise(True)
-        self._viewToolBar.addWidget(self.button)
-
         self._viewToolBar.addSeparator()
         self._swithModeButton = customToolButton.CustomToolButton()
         self._switchModeMenu = QtWidgets.QMenu()
@@ -158,15 +147,17 @@ class Window(QtWidgets.QMainWindow):
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         # Toolbar for different modes
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
-        self._sketchToolBar.addAction(self.sketchController.action_createNewSketch)
-        self._sketchToolBar.addAction(self.sketchController.action_addPoint)
-        self._sketchToolBar.addAction(self.sketchController.action_addLine)
-        self._sketchToolBar.addAction(self.sketchController.action_addBezierCurve)
-        self._sketchToolBar.addAction(self.sketchController.action_addBSpline)
-        self._sketchToolBar.addAction(self.sketchController.action_addNurbsCircle)
-        self._sketchToolBar.addAction(self.sketchController.action_pointsToBSpline)
-        self._sketchToolBar.addAction(self.sketchController.action_addArc)
-        self._sketchToolBar.addAction(self.sketchController.action_addCircle)
+        # self._sketchToolBar.addAction(self.sketchController.action_createNewSketch)
+        # self._sketchToolBar.addAction(self.sketchController.action_addPoint)
+        # self._sketchToolBar.addAction(self.sketchController.action_addLine)
+        # self._sketchToolBar.addAction(self.sketchController.action_addBezierCurve)
+        # self._sketchToolBar.addAction(self.sketchController.action_addBSpline)
+        # self._sketchToolBar.addAction(self.sketchController.action_addNurbsCircle)
+        # self._sketchToolBar.addAction(self.sketchController.action_pointsToBSpline)
+        # self._sketchToolBar.addAction(self.sketchController.action_addArc)
+        # self._sketchToolBar.addAction(self.sketchController.action_addCircle)
+        for action in self.sketchController.actions:
+            self.createToolButton(action,self._sketchToolBar)
         self._sketchToolBar.addSeparator()
         self._snapModeButton = customToolButton.CustomToolButton()
         self._snapModeMenu = QtWidgets.QMenu()
@@ -177,9 +168,6 @@ class Window(QtWidgets.QMainWindow):
         self._snapModeButton.setMenu(self._snapModeMenu)
         self._snapModeButton.setDefaultAction(self.sketchController.action_snapNothing)
         self._sketchToolBar.addWidget(self._snapModeButton)
-        self._sketchToolBar.addSeparator()
-        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
-        self.addToolBar(QtCore.Qt.TopToolBarArea, self._sketchToolBar)
 
         # self._viewToolBar = QtWidgets.QToolBar("View")
         # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
@@ -268,3 +256,13 @@ class Window(QtWidgets.QMainWindow):
             self._designToolBar.setVisible(False)
             self._sketchToolBar.setVisible(False)
             self._viewToolBar.setVisible(True)
+
+    def createToolButton(self, action, parent):
+        button = QtWidgets.QToolButton(self)
+        button.setDefaultAction(action)
+        button.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        # self.button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
+        #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
+        #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
+        button.setAutoRaise(True)
+        parent.addWidget(button)

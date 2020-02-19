@@ -21,6 +21,7 @@ class SketchController(QObject):
     def __init__(self, display, parent=None):
         super(SketchController, self).__init__(parent)
         self._display = display
+        self.actions = []
         self.statusBar: QStatusBar = parent.statusBar()
 
         self.sketchUI = Sketch_QTGUI()
@@ -28,6 +29,7 @@ class SketchController(QObject):
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
         self.createActions()
+
         self.setActionEnabled(False)
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
@@ -42,59 +44,62 @@ class SketchController(QObject):
         self.statusBar.showMessage("status bar setted")
 
     def createActions(self):
-        self.action_createNewSketch = QAction(QIcon(":/newPlane.png"), "create a new sketch", self,
+        self.action_createNewSketch = QAction(QIcon(":/newPlane.png"), "New sketch", self,
                                               statusTip="create a new sketch",
                                               triggered=self.createNewSketch)
-        self.action_addPoint = QAction(QIcon(":/point.png"), "add points", self,
+        self.actions.append(self.action_createNewSketch)
+        self.action_addPoint = QAction(QIcon(":/point.png"), "Point", self,
                                        statusTip="add points on sketch",
                                        triggered=self.sketchPoint)
-        self.action_addLine = QAction(QIcon(":/inputLine.png"), "add lines", self,
+        self.actions.append(self.action_addPoint)
+        self.action_addLine = QAction(QIcon(":/inputLine.png"), "Line", self,
                                       statusTip="add a line",
                                       triggered=self.sketchLine)
-        self.action_addBezierCurve = QAction(QIcon(":/bezier.png"), "Add Bezier Curve", self,
+        self.actions.append(self.action_addLine)
+        self.action_addBezierCurve = QAction(QIcon(":/bezier.png"), "Bezier Curve", self,
                                              statusTip="Add a cubic Bezier curve",
                                              triggered=self.sketchBezier)
-        self.action_addBSpline = QAction(QIcon(":/spline.png"), "Add BSpline Curve", self,
+        self.actions.append(self.action_addBezierCurve)
+        self.action_addBSpline = QAction(QIcon(":/spline.png"), "BSplines", self,
                                          statusTip="Add a B Spline curve",
                                          triggered=self.sketchBSpline)
-        self.action_addNurbsCircle = QAction(QIcon(":/nurbs.png"), "Add a Nurbs Circle", self,
+        self.actions.append(self.action_addBSpline)
+        self.action_addNurbsCircle = QAction(QIcon(":/nurbs.png"), "Nurbs Circle", self,
                                              statusTip="Add a 9 control points nurbs circle",
                                              triggered=self.sketchNurbCircle)
+        self.actions.append(self.action_addNurbsCircle)
         self.action_pointsToBSpline = QAction(QIcon(""), "Interpolate BSpline", self,
                                               statusTip="Interpolate points with BSpline",
                                               triggered=self.sketchPointsToBSpline)
+        self.actions.append(self.action_pointsToBSpline)
         self.action_addArc = QAction(QIcon(""), "Add Arc", self,
                                      statusTip="Add an arc",
                                      triggered=self.sketchArc3P)
+        self.actions.append(self.action_addArc)
         self.action_addCircle = QAction(QIcon(""), "Add Circle", self,
                                         statusTip="Add a circle",
                                         triggered=self.sketchCircleCenterRadius)
+        self.actions.append(self.action_addCircle)
         self.action_snapEnd = QAction(QIcon(""), "Snap End", self,
                                       statusTip="Snap to the end points",
                                       triggered=self.snapEnd)
+        self.actions.append(self.action_snapEnd)
         self.action_snapCenter = QAction(QIcon(""), "Snap Center", self,
                                          statusTip="Snap to the center of circle or arc",
                                          triggered=self.snapCenter)
+        self.actions.append(self.action_snapCenter)
         self.action_snapNearest = QAction(QIcon(""), "Snap Nearest", self,
                                           statusTip="Snap to the nearest points on the geometry",
                                           triggered=self.snapNearest)
+        self.actions.append(self.action_snapNearest)
         self.action_snapNothing = QAction(QIcon(""), "No Snap", self,
                                           statusTip="No Snap mode",
                                           triggered=self.snapNothing)
+        self.actions.append(self.action_snapNothing)
 
     def setActionEnabled(self, a0):
-        self.action_addPoint.setEnabled(a0)
-        self.action_addLine.setEnabled(a0)
-        self.action_addBezierCurve.setEnabled(a0)
-        self.action_addBSpline.setEnabled(a0)
-        self.action_addNurbsCircle.setEnabled(a0)
-        self.action_pointsToBSpline.setEnabled(a0)
-        self.action_addArc.setEnabled(a0)
-        self.action_addCircle.setEnabled(a0)
-        self.action_snapEnd.setEnabled(a0)
-        self.action_snapCenter.setEnabled(a0)
-        self.action_snapNearest.setEnabled(a0)
-        self.action_snapNothing.setEnabled(a0)
+        for action in self.actions:
+            action.setEnabled(a0)
 
     def setModel(self, model):
         self.model = model
@@ -144,10 +149,10 @@ class SketchController(QObject):
         self.camera: Graphic3d_Camera = self.view.Camera()
         canvas_size = max(self.view.Size())
         grid_interval = self.camera.Distance() // self.view.Scale() / 5
-        self.displayGrid( 0.0, 0.0, grid_interval, grid_interval, 0.0, canvas_size,
+        self.displayGrid(0.0, 0.0, grid_interval, grid_interval, 0.0, canvas_size,
                          canvas_size, self.new_sketch.ui.uiOffset.value())
 
-    def displayGrid(self,xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
+    def displayGrid(self, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
         self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
         self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
