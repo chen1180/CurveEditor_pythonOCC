@@ -1,10 +1,11 @@
 from controller import mainWindowController
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 import traceback
 import logging
 import sys
-
+import time
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler(stream=sys.stdout)
 log.addHandler(handler)
@@ -57,7 +58,17 @@ if __name__ == '__main__':
     app = QApplication.instance()  # checks if QApplication already exists
     if not app:  # create QApplication if it doesnt exist
         app = QApplication(sys.argv)
+    # Create and display the splash screen
+    splash_pix = QPixmap(':/nurbs_patch.png')
+    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+    splash.setEnabled(False)
+    # splash.setMask(splash_pix.mask())
+    splash.show()
+    splash.showMessage("<h1><font color='green'>Welcome to Curve Editor</font></h1>", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
+
     mainWin = mainWindowController.Window()
     mainWin.showMaximized()
+    splash.finish(mainWin)
     app.exec_()
 
