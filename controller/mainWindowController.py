@@ -91,9 +91,11 @@ class Window(QtWidgets.QMainWindow):
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
         self._uiTreeView.selectionModel().currentChanged.connect(self.sketchController.highlightCurrentNode)
-        self.sketchController.modelUpdated.connect(self.updateModel)
 
-    def updateModel(self, item):
+        self.sketchController.sketchPlaneUpdated.connect(self.selectPlane)
+        self.sketchController.sketchObjectUpdated.connect(self.selectSketchObjects)
+
+    def selectPlane(self, item):
         '''
 
         Args:
@@ -107,8 +109,19 @@ class Window(QtWidgets.QMainWindow):
         self._propEditor.setModel(self._model)
         # select latest row
         self._uiTreeView.setCurrentIndex(self._model.index(position, 0, QtCore.QModelIndex()))
+        self.sketchController.currentSketchIndex=self._uiTreeView.currentIndex()
         self._uiTreeView.updateEditorData()
         self._uiTreeView.expandAll()
+
+    def selectSketchObjects(self, item):
+        row = self._rootNode.childCount()
+        column = item.childCount()
+        print(row,column)
+        index = self._model.index(row - 1, column, QtCore.QModelIndex())
+        self._uiTreeView.setCurrentIndex(index.child(index.column() - 1, 0))
+        self._uiTreeView.updateEditorData()
+        self._uiTreeView.expandAll()
+
 
     def createToolBars(self):
 

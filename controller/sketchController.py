@@ -3,7 +3,7 @@ from OCC.Core.Graphic3d import *
 from OCC.Core.V3d import *
 from OCC.Core.V3d import V3d_Viewer
 from OCC.Core.gp import gp_Ax3
-from PyQt5.QtCore import QModelIndex, QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QStatusBar
 
@@ -16,7 +16,8 @@ from data.sketch.sketch_type import *
 
 
 class SketchController(QObject):
-    modelUpdated = pyqtSignal(object)
+    sketchPlaneUpdated = pyqtSignal(object)
+    sketchObjectUpdated = pyqtSignal(object)
 
     def __init__(self, display, parent=None):
         super(SketchController, self).__init__(parent)
@@ -28,7 +29,7 @@ class SketchController(QObject):
         self.sketch = Sketch(self._display, self.sketchUI)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
-
+        self.currentSketchIndex=None
         self.createActions()
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
@@ -144,7 +145,8 @@ class SketchController(QObject):
         # self._display.Context.Display(ais_axis,True)
         self.createDynamicGrid()
         self.currentSketchNode.setSketchPlane(coordinate_system)
-        self.modelUpdated.emit(self.currentSketchNode)
+        self.sketchPlaneUpdated.emit(self.currentSketchNode)
+
         self.selectSketchNode(self.currentSketchNode)
 
     def createDynamicGrid(self):
@@ -197,6 +199,7 @@ class SketchController(QObject):
     def OnMouseInputEvent(self, *kargs):
         self.sketch.OnMouseInputEvent(*kargs)
         self.model.layoutChanged.emit()
+        self.sketchObjectUpdated.emit(self.currentSketchNode)
 
     def OnMouseMoveEvent(self, *kargs):
         self.sketch.OnMouseMoveEvent(*kargs)
@@ -212,4 +215,16 @@ class SketchController(QObject):
         self.sketch.OnCancel()
 
     def DeleteSelectedObject(self):
-        self.sketch.DeleteSelectedObject()
+        index = 0
+        while index < self.currentSketchNode.childCount():
+            child = self.currentSketchNode.child(index)
+            assert isinstance(child, SketchObjectNode)
+            myCurObject: Sketch_Geometry = child.getSketchObject()
+            if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
+                myCurObject.RemoveDisplay()
+                self.model.removeRows(index, 1, self.currentSketchIndex)
+            else:
+                index += 1
+
+        print(self.currentSketchNode)
+

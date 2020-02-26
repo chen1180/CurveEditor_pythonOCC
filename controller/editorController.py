@@ -53,8 +53,7 @@ class PropertyEditor(QWidget):
 
         if node is not None:
             typeInfo = node.typeInfo()
-
-        self.showEditor(typeInfo)
+            self.showEditor(typeInfo)
         for type, editor in self._editor_dict.items():
             editor.setSelection(current)
 

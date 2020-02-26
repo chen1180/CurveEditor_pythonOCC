@@ -154,12 +154,6 @@ class OpenGLEditor(GLWidget):
             else:
                 self.dragStartPosX = pt.x()
                 self.dragStartPosY = pt.y()
-        # if self._state == self.MODE_VIEW:
-        #     pass
-        # elif self._state == self.MODE_DESIGN:
-        #     pass
-        # elif self._state == self.MODE_SKETCH:
-        #     pass
         for callback in self._mousePress_callback:
             callback(pt.x(), pt.y(), buttons, modifiers)
 

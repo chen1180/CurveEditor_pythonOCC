@@ -80,4 +80,5 @@ class PartController(QObject):
         self.part.OnCancel()
 
     def DeleteSelectedObject(self):
-        self.part.DeleteSelectedObject()
+        # self.part.DeleteSelectedObject()
+        pass
