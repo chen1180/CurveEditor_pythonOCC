@@ -5,12 +5,10 @@ from PyQt5.QtGui import *
 import traceback
 import logging
 import sys
-import time
+
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler(stream=sys.stdout)
 log.addHandler(handler)
-
-
 def show_exception_box(log_msg):
     """Checks if a QApplication instance is available and shows a messagebox with the exception message.
     If unavailable (non-console application), log an additional notice.
@@ -65,7 +63,7 @@ if __name__ == '__main__':
     splash.setEnabled(False)
     # splash.setMask(splash_pix.mask())
     splash.show()
-    splash.showMessage("<h1><font color='green'>Welcome to Curve Editor</font></h1>", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
+    splash.showMessage("Loading Client Application", Qt.AlignBottom | Qt.AlignCenter, Qt.black)
 
     mainWin = mainWindowController.Window()
     mainWin.showMaximized()

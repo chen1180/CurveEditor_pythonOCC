@@ -29,11 +29,7 @@ class OpenGLEditor(GLWidget):
 
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
-        try:
-            self.InitDriver()
-        except Exception as e:
-            print(e)
-
+        self.InitDriver()
         self.parent = parent
         # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
 
