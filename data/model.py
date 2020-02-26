@@ -79,9 +79,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def index(self, row, column, parent):
 
         parentNode = self.getNode(parent)
-
         childItem = parentNode.child(row)
-
         if childItem:
             return self.createIndex(row, column, childItem)
         else:
@@ -139,10 +137,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     def removeRows(self, position, rows, parent=QtCore.QModelIndex()) -> bool:
         parentNode = self.getNode(parent)
+        if parentNode==None:
+            return False
         self.beginRemoveRows(parent, position, position + rows - 1)
         for row in range(rows):
             success = parentNode.removeChild(position)
-
         self.endRemoveRows()
         return success
 

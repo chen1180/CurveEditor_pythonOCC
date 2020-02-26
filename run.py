@@ -5,7 +5,6 @@ from PyQt5.QtGui import *
 import traceback
 import logging
 import sys
-import time
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler(stream=sys.stdout)
 log.addHandler(handler)
