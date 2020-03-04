@@ -29,7 +29,6 @@ class Sketch_CommandPoint(Sketch_Command):
             # myAIS_Point.SetMarker(Aspect_TOM_RING1)
             # self.myContext.Display(myAIS_Point, True)
             # node = PointNode(self.objectName + str(self.objectCounter+1), self.rootNode)
-
             # node.setSketchObject(sketchObject)
             sketch_point = Sketch_Point(self.myContext,self.curCoordinateSystem)
             sketch_point.Compute(self.curPnt2d)

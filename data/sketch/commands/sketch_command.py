@@ -89,11 +89,6 @@ class Sketch_Command(object):
         so.SetWidth(self.myWidth)
         self.data.append(so)
 
-    def AddNode(self, node: SketchObjectNode, theGeometry, theAIS_Object):
-        node.setGeometry(theGeometry)
-        node.setAisGeometry(theAIS_Object)
-        node.setAxis(self.curCoordinateSystem)
-
     def GetTypeOfMethod(self):
         raise NotImplementedError()
 

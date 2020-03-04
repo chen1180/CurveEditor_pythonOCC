@@ -24,8 +24,8 @@ class Sketch_CommandNurbCircle(Sketch_Command):
     def Action(self):
         self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_CenterPoint
         self.tempGeom_Circle.SetAxis(self.curCoordinateSystem.Axis())
-        if self.curCoordinateSystem.XDirection():
-            self.myCircleAx2d.SetDirection(gp_Dir2d(self.curCoordinateSystem.XDirection().X(), self.curCoordinateSystem.XDirection().Y()))
+        # if self.curCoordinateSystem.XDirection():
+        #     self.myCircleAx2d.SetDirection(gp_Dir2d(self.curCoordinateSystem.XDirection().X(), self.curCoordinateSystem.XDirection().Y()))
 
     def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         if self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Nothing:

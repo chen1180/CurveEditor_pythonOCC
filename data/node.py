@@ -264,7 +264,6 @@ from OCC.Core.gp import *
 from data.sketch.geometry import *
 from data.sketch.sketch_object import Sketch_Object
 
-
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
