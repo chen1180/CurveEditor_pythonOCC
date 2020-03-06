@@ -20,12 +20,18 @@ class PropertyEditor(QWidget):
         self._pointEditor = PointEditor(self)
         self._lineEditor = LineEditor(self)
         self._bezierCurveEditor = BezierCurveEditor(self)
-        self._surfaceEditor = SweepSurfaceEditor(self)
+        self._bezierSurfaceEditor = BezierSurfaceEditor(self)
+        self._ruledSurfaceEditor = RuledSurfaceEditor(self)
+        self._revolutedSurfaceEditor = RevolutedSurfaceEditor(self)
+        self._sweepSurfaceEditor = SweepSurfaceEditor(self)
         self.addEditor(self._nodeEditor, "Node")
         self.addEditor(self._pointEditor, "Point")
         self.addEditor(self._lineEditor, "Line")
         self.addEditor(self._bezierCurveEditor, "Bezier Curve")
-        self.addEditor(self._surfaceEditor, "Sweep Surface")
+        self.addEditor(self._bezierSurfaceEditor, "Bezier Surface")
+        self.addEditor(self._revolutedSurfaceEditor, "Surface of Revolution")
+        self.addEditor(self._ruledSurfaceEditor, "Ruled Surface")
+        self.addEditor(self._sweepSurfaceEditor, "Sweep Surface")
 
     def addEditor(self, editor: QWidget, type: str):
         if type == "Node":
@@ -284,9 +290,9 @@ from OCC.Core.Graphic3d import Graphic3d_ClipPlane, Graphic3d_Vec4d
 from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 
 
-class SweepSurfaceEditor(QWidget):
+class SurfaceEditor(QWidget):
     def __init__(self, parent=None):
-        super(SweepSurfaceEditor, self).__init__(parent)
+        super(SurfaceEditor, self).__init__(parent)
         self.ui = clippingPlaneProperty.Ui_Form()
         self.ui.setupUi(self)
         self._dataMapper = QDataWidgetMapper()
@@ -305,12 +311,6 @@ class SweepSurfaceEditor(QWidget):
         parent = current.parent()
         self._dataMapper.setRootIndex(parent)
         self._dataMapper.setCurrentModelIndex(current)
-        # node information can be obtained
-        node: SweepSurfaceNode = self._model.getNode(current)
-        if type(node) == SweepSurfaceNode:
-            self._surface: Surface_Sweep = node.getSketchObject()
-            self.setClippingPlane()
-            self.changeClippingPlane()
 
     def setClippingPlane(self):
         # clip plane number one, by default xOy
@@ -328,7 +328,6 @@ class SweepSurfaceEditor(QWidget):
         clip_plane_1.SetCappingMaterial(aMat)
         self.clippingPlane = clip_plane_1
 
-
     def clippingOn(self, checked):
         if checked:
             self._surface.GetAIS_Object().AddClipPlane(self.clippingPlane)
@@ -337,6 +336,7 @@ class SweepSurfaceEditor(QWidget):
             self._surface.GetAIS_Object().RemoveClipPlane(self.clippingPlane)
             self.clippingPlane.SetOn(False)
         self._surface.myContext.UpdateCurrentViewer()
+
     def changeClippingPlane(self):
         equation = Graphic3d_Vec4d(0., 0., 1., 0.0)
         checkedButton = self.ui.buttonGroup.checkedButton().text()
@@ -368,6 +368,62 @@ class SweepSurfaceEditor(QWidget):
             self.setClippingPlane()
             self._surface.GetAIS_Object().AddClipPlane(self.clippingPlane)
             self._surface.myContext.UpdateCurrentViewer()
+
+
+class RuledSurfaceEditor(SurfaceEditor):
+    def __init__(self, parent=None):
+        super(RuledSurfaceEditor, self).__init__(parent)
+
+    def setSelection(self, current):
+        super(RuledSurfaceEditor, self).setSelection(current)
+        # node information can be obtained
+        node = self._model.getNode(current)
+        if type(node) == ExtrudedSurfaceNode:
+            self._surface: Surface_LinearExtrusion = node.getSketchObject()
+            self.setClippingPlane()
+            self.changeClippingPlane()
+
+
+class BezierSurfaceEditor(SurfaceEditor):
+    def __init__(self, parent=None):
+        super(BezierSurfaceEditor, self).__init__(parent)
+
+    def setSelection(self, current):
+        super(BezierSurfaceEditor, self).setSelection(current)
+        # node information can be obtained
+        node = self._model.getNode(current)
+        if type(node) == BezierSurfaceNode:
+            self._surface = node.getSketchObject()
+            self.setClippingPlane()
+            self.changeClippingPlane()
+
+
+class RevolutedSurfaceEditor(SurfaceEditor):
+    def __init__(self, parent=None):
+        super(RevolutedSurfaceEditor, self).__init__(parent)
+
+    def setSelection(self, current):
+        super(RevolutedSurfaceEditor, self).setSelection(current)
+        # node information can be obtained
+        node = self._model.getNode(current)
+        if type(node) == RevolvedSurfaceNode:
+            self._surface = node.getSketchObject()
+            self.setClippingPlane()
+            self.changeClippingPlane()
+
+
+class SweepSurfaceEditor(SurfaceEditor):
+    def __init__(self, parent=None):
+        super(SweepSurfaceEditor, self).__init__(parent)
+
+    def setSelection(self, current):
+        super(SweepSurfaceEditor, self).setSelection(current)
+        # node information can be obtained
+        node = self._model.getNode(current)
+        if type(node) == SweepSurfaceNode:
+            self._surface = node.getSketchObject()
+            self.setClippingPlane()
+            self.changeClippingPlane()
 
 
 from OCC.Core.gp import gp_Pnt, gp_Pln, gp_Dir, gp_Ax3, gp

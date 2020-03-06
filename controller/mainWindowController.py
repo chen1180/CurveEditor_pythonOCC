@@ -1,5 +1,5 @@
 from view import mainWindow, customToolButton
-from controller import editorController, openglWindowController, toolController, sketchController, partController
+from controller import editorController, openglWindowController, toolController, sketchController, partController,viewController
 import resources.icon.icon
 from PyQt5 import QtWidgets, QtCore, QtGui
 from data.node import *
@@ -29,6 +29,8 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow = openglWindowController.OpenGLEditor(self)
         self.setCentralWidget(self._glWindow)
 
+        #view manager
+        self.viewController=viewController.ViewController(self._glWindow._display,self)
         # sketch manager
         self.sketchController = sketchController.SketchController(self._glWindow._display, self)
         self.sketchController.setModel(self._model)
@@ -48,7 +50,6 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.partController.OnCancel)
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.partController.DeleteSelectedObject)
         # setup tool bar
-        self.createViewActions()
         self.createToolBars()
 
         # setup sceneGraph editor
@@ -135,13 +136,12 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar = QtWidgets.QToolBar("View")
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         self._viewToolBar.setOrientation(QtCore.Qt.Horizontal)
-        self._viewToolBar.addAction(self._action_transform)
-        self._viewToolBar.addAction(self._action_fitAll)
-        self._viewToolBar.addAction(self._action_setView)
-        self._viewToolBar.addAction(self._action_viewIso)
+        for action in self.viewController.actions:
+            self.createToolButton(action, self._viewToolBar)
 
-        self._viewToolBar.addSeparator()
-        self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
+
+        # self._viewToolBar.addSeparator()
+        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         # Toolbar for different modes
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
@@ -165,30 +165,6 @@ class Window(QtWidgets.QMainWindow):
         self._toolTabWidget.addTab(self._sketchToolBar, "Sketch")
         self._toolTabWidget.addTab(self._designToolBar, "Design")
         self.setMenuWidget(self._toolTabWidget)
-
-    def createViewActions(self):
-        def setView(a0):
-            if a0 == True:
-                self._glWindow._display.SetPerspectiveProjection()
-            else:
-                self._glWindow._display.SetOrthographicProjection()
-            self._glWindow._display.Repaint()
-
-        self._action_transform = QtWidgets.QAction(QtGui.QIcon(""), "Transform", self,
-                                                   statusTip="Transform a object",
-                                                   triggered=self._glWindow._display.View.SetFront)
-        self._action_fitAll = QtWidgets.QAction(QtGui.QIcon(""), "Fit all shape on screen", self,
-                                                statusTip="Fit all shapes on screen",
-                                                triggered=self._glWindow._display.FitAll)
-
-        self._action_setView = QtWidgets.QAction(QtGui.QIcon(""), "Projective/Orthor", self,
-                                                 statusTip="set view type",
-                                                 triggered=setView)
-        self._action_setView.setCheckable(True)
-        self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Iso)
-
 
     def createToolButton(self, action, parent):
         button = QtWidgets.QToolButton(self)

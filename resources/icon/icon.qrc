@@ -18,5 +18,7 @@
         <file>extrude.png</file>
         <file>sweep.png</file>
         <file>revolve.png</file>
+        <file>wireframe.png</file>
+        <file>shading.png</file>
     </qresource>
 </RCC>
