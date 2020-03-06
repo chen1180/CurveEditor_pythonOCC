@@ -61,6 +61,7 @@ class Sketch_Bspline(Sketch_Geometry):
             self.myAIS_InteractiveObject.Redisplay(True)
         else:
             self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
+            self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
             self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def DragTo(self, index, newPnt2d):

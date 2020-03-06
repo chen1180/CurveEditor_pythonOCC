@@ -1,8 +1,6 @@
 from view import mainWindow, customToolButton
-from controller import editorController, openglWindowController, toolController, sketchController, partController,viewController
+from controller import editorController, openglWindowController, sketchController, partController,viewController
 import resources.icon.icon
-from PyQt5 import QtWidgets, QtCore, QtGui
-from data.node import *
 from data.model import *
 
 
@@ -125,7 +123,6 @@ class Window(QtWidgets.QMainWindow):
 
 
     def createToolBars(self):
-
         # Curve tool bar
         self._curveToolBar = QtWidgets.QToolBar("Curve")
         self._curveToolBar.setOrientation(QtCore.Qt.Vertical)
@@ -138,20 +135,14 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar.setOrientation(QtCore.Qt.Horizontal)
         for action in self.viewController.actions:
             self.createToolButton(action, self._viewToolBar)
-
-
-        # self._viewToolBar.addSeparator()
-        # self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         # Toolbar for different modes
         self._sketchToolBar = QtWidgets.QToolBar("Sketch")
-
         for action in self.sketchController.actions:
             if type(action) == list:
                 self.createToolButtonWithMenu(action, self._sketchToolBar)
             else:
                 self.createToolButton(action, self._sketchToolBar)
-
         self._designToolBar = QtWidgets.QToolBar("Design")
         for action in self.partController.actions:
             if type(action) == list:
@@ -173,9 +164,9 @@ class Window(QtWidgets.QMainWindow):
         # button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
         #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
         #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
-        # button.setMinimumSize(100,50)
-        # button.setIconSize(QtCore.QSize(100,50))
-        button.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        button.setMinimumSize(100,50)
+        button.setIconSize(QtCore.QSize(50,30))
+        button.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         button.setAutoRaise(True)
         parent.addWidget(button)
 
@@ -193,5 +184,8 @@ class Window(QtWidgets.QMainWindow):
         # button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
         #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
         #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
+        button.setMinimumSize(100, 50)
+        button.setIconSize(QtCore.QSize(50, 30))
+        button.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         button.setAutoRaise(True)
         parent.addWidget(button)

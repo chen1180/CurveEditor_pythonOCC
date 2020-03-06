@@ -35,6 +35,7 @@ class Sketch_Line(Sketch_Geometry):
         self.myGeometry = Geom_Line(startPnt, dir)
 
         self.myAIS_InteractiveObject = AIS_Line(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
+        self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def Recompute(self):
