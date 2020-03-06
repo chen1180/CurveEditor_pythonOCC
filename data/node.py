@@ -87,7 +87,6 @@ class Node(object):
         return None
 
 
-
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
@@ -111,34 +110,41 @@ class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
         self.sketchObject: Sketch_Geometry = None
+
     def setData(self, column, value):
-        super(SketchObjectNode, self).setData(column,value)
+        super(SketchObjectNode, self).setData(column, value)
         # show in viewport
         if column == 2:
-            if value==True:
-                self.sketchObject.myContext.Display(self.sketchObject.GetAIS_Object(),True)
+            if value == True:
+                self.sketchObject.myContext.Display(self.sketchObject.GetAIS_Object(), True)
             else:
-                self.sketchObject.myContext.Erase(self.sketchObject.GetAIS_Object(),True)
+                self.sketchObject.myContext.Erase(self.sketchObject.GetAIS_Object(), True)
         # shows auxiliry line
         elif column == 3:
-                if value==True:
-                    self.sketchObject.myContext.Activate(self.sketchObject.GetAIS_Object())
-                else:
-                    self.sketchObject.myContext.Deactivate(self.sketchObject.GetAIS_Object())
+            pass
+        # viewport name
+        elif column == 4:
+            self.sketchObject.showViewportName=value
+            self.sketchObject.DisplayName()
+        # viewport coordinate
+        elif column == 5:
+            self.sketchObject.showViewportCoordinate = value
+            self.sketchObject.DisplayCoordinate()
+
     def data(self, column):
         r = super(SketchObjectNode, self).data(column)
-        #show in viewport
-        if column==2:
-            r=self.sketchObject.myContext.IsDisplayed(self.sketchObject.GetAIS_Object())
-        #selectable
-        elif column==3:
-            r=True
-        #viewport name
-        elif column == 4:
+        # show in viewport
+        if column == 2:
+            r = self.sketchObject.myContext.IsDisplayed(self.sketchObject.GetAIS_Object())
+        # selectable
+        elif column == 3:
             r = True
-        #viewport coordinate
-        elif column==5:
-            r=True
+        # viewport name
+        elif column == 4:
+            r = self.sketchObject.showViewportName
+        # viewport coordinate
+        elif column == 5:
+            r = self.sketchObject.showViewportCoordinate
         return r
 
     def setSketchObject(self, theObject: Sketch_Object):
@@ -320,6 +326,7 @@ class BezierSurfaceNode(SketchObjectNode):
     def resource(self):
         return ":/bezier_surface.png"
 
+
 class RevolvedSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(RevolvedSurfaceNode, self).__init__(name, parent)
@@ -361,17 +368,17 @@ class ExtrudedSurfaceNode(SketchObjectNode):
 class SweepSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(SweepSurfaceNode, self).__init__(name, parent)
-        self.sketchObject:Surface_Sweep=None
+        self.sketchObject: Surface_Sweep = None
+
     def data(self, column):
         r = super(SweepSurfaceNode, self).data(column)
         if self.sketchObject:
             myGeometry = self.sketchObject.GetGeometry()
-            myAISObject=self.sketchObject.GetAIS_Object()
+            myAISObject = self.sketchObject.GetAIS_Object()
         return r
 
     def setData(self, column, value):
         super(SweepSurfaceNode, self).setData(column, value)
-
 
     def typeInfo(self):
         return "Sweep Surface"

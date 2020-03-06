@@ -193,3 +193,19 @@ class Sketch_Bspline(Sketch_Geometry):
             else:
                 self.myMultiplicities, self.myKnots = setPiecewiseBezierKnots(len(self.myPoles), self.myDegree)
         self.Compute()
+
+    def DisplayName(self):
+        if self.showViewportName:
+            for point in self.myPoles:
+                self.myContext.Display(point.myAIS_Name, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.myAIS_Name, True)
+
+    def DisplayCoordinate(self):
+        if self.showViewportCoordinate:
+            for point in self.myPoles:
+                self.myContext.Display(point.myAIS_Coordinate, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.myAIS_Coordinate, True)

@@ -62,7 +62,7 @@ class Sketch_BezierCurve(Sketch_Geometry):
         self.myGeometry = Geom_BezierCurve(arrayOfPoles, arrayOfWeights)
 
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
-        shape=edge.Edge()
+        shape = edge.Edge()
         self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
         self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
@@ -107,3 +107,19 @@ class Sketch_BezierCurve(Sketch_Geometry):
             point.RemoveDisplay()
         for line in self.myAIS_Lines:
             self.myContext.Remove(line, True)
+
+    def DisplayName(self):
+        if self.showViewportName:
+            for point in self.myPoles:
+                self.myContext.Display(point.myAIS_Name, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.myAIS_Name, True)
+
+    def DisplayCoordinate(self):
+        if self.showViewportCoordinate:
+            for point in self.myPoles:
+                self.myContext.Display(point.myAIS_Coordinate, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.myAIS_Coordinate, True)
