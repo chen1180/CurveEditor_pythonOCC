@@ -77,7 +77,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return self.createIndex(parentNode.row(), 0, parentNode)
 
     def index(self, row, column, parent):
-
         parentNode = self.getNode(parent)
         childItem = parentNode.child(row)
         if childItem:
@@ -145,13 +144,6 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.endRemoveRows()
         return success
 
-    def render(self):
-        '''
-
-        Returns: ObjectNode render() method
-
-        '''
-        self._rootNode.render()
 class ListModel(QtCore.QAbstractListModel):
     def __init__(self,array:[],title="",parent=None):
         super(ListModel, self).__init__(parent)

@@ -263,6 +263,8 @@ from OCC.Core.gp import *
 
 from data.sketch.geometry import *
 from data.sketch.sketch_object import Sketch_Object
+from data.design.geometry import *
+
 
 class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
@@ -303,6 +305,9 @@ class PointNode(SketchObjectNode):
 
     def typeInfo(self):
         return "Point"
+
+    def resource(self):
+        return ":/point.png"
 
 
 class LineNode(SketchObjectNode):
@@ -349,6 +354,9 @@ class LineNode(SketchObjectNode):
 
     def typeInfo(self):
         return "Line"
+
+    def resource(self):
+        return ":/inputLine.png"
 
 
 from OCC.Core.Geom2d import Geom2d_BezierCurve
@@ -399,7 +407,10 @@ class BezierNode(SketchObjectNode):
         self.sketchObject.Recompute()
 
     def typeInfo(self):
-        return "Bezier curve"
+        return "Bezier Curve"
+
+    def resource(self):
+        return ":/bezier_curve.png"
 
 
 class BsplineNode(SketchObjectNode):
@@ -417,6 +428,9 @@ class BsplineNode(SketchObjectNode):
     def typeInfo(self):
         return "BSpline"
 
+    def resource(self):
+        return ":/bspline_curve.png"
+
 
 class BezierSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
@@ -433,6 +447,8 @@ class BezierSurfaceNode(SketchObjectNode):
     def typeInfo(self):
         return "Bezier Surface"
 
+    def resource(self):
+        return ":/bezier_surface.png"
 
 class RevolvedSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
@@ -449,6 +465,9 @@ class RevolvedSurfaceNode(SketchObjectNode):
     def typeInfo(self):
         return "Surface of Revolution"
 
+    def resource(self):
+        return ":/revolve.png"
+
 
 class ExtrudedSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
@@ -463,20 +482,29 @@ class ExtrudedSurfaceNode(SketchObjectNode):
         super(ExtrudedSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Surface of Linear Extrusion"
+        return "Ruled Surface"
+
+    def resource(self):
+        return ":/ruled_surface.png"
 
 
 class SweepSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(SweepSurfaceNode, self).__init__(name, parent)
-
+        self.sketchObject:Surface_Sweep=None
     def data(self, column):
         r = super(SweepSurfaceNode, self).data(column)
-
+        if self.sketchObject:
+            myGeometry = self.sketchObject.GetGeometry()
+            myAISObject=self.sketchObject.GetAIS_Object()
         return r
 
     def setData(self, column, value):
         super(SweepSurfaceNode, self).setData(column, value)
 
+
     def typeInfo(self):
         return "Sweep Surface"
+
+    def resource(self):
+        return ":/sweep.png"

@@ -138,23 +138,9 @@ class Window(QtWidgets.QMainWindow):
         self._viewToolBar.addAction(self._action_transform)
         self._viewToolBar.addAction(self._action_fitAll)
         self._viewToolBar.addAction(self._action_setView)
-        self._viewToolBar.addAction(self._action_viewTop)
-        self._viewToolBar.addAction(self._action_viewBot)
-        self._viewToolBar.addAction(self._action_viewFront)
-        self._viewToolBar.addAction(self._action_viewRear)
-        self._viewToolBar.addAction(self._action_viewLeft)
-        self._viewToolBar.addAction(self._action_viewRight)
         self._viewToolBar.addAction(self._action_viewIso)
 
         self._viewToolBar.addSeparator()
-        # self._swithModeButton = customToolButton.CustomToolButton()
-        # self._switchModeMenu = QtWidgets.QMenu()
-        # self._switchModeMenu.addAction(self._action_switchViewMode)
-        # self._switchModeMenu.addAction(self._action_switchDesignMode)
-        # self._switchModeMenu.addAction(self._action_switchSketchMode)
-        # self._swithModeButton.setMenu(self._switchModeMenu)
-        # self._swithModeButton.setDefaultAction(self._action_switchViewMode)
-        # self._viewToolBar.addWidget(self._swithModeButton)
         self.addToolBarBreak(QtCore.Qt.TopToolBarArea)
         self.addToolBar(QtCore.Qt.TopToolBarArea, self._viewToolBar)
         # Toolbar for different modes
@@ -199,27 +185,10 @@ class Window(QtWidgets.QMainWindow):
                                                  statusTip="set view type",
                                                  triggered=setView)
         self._action_setView.setCheckable(True)
-        self._action_viewTop = QtWidgets.QAction(QtGui.QIcon(""), "View Top", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Top)
-        self._action_viewBot = QtWidgets.QAction(QtGui.QIcon(""), "View Bottom", self,
-                                                 statusTip="Change view point",
-                                                 triggered=self._glWindow._display.View_Bottom)
-        self._action_viewFront = QtWidgets.QAction(QtGui.QIcon(""), "View Front", self,
-                                                   statusTip="Change view point",
-                                                   triggered=self._glWindow._display.View_Front)
-        self._action_viewRear = QtWidgets.QAction(QtGui.QIcon(), "View Rear", self,
-                                                  statusTip="Change view point",
-                                                  triggered=self._glWindow._display.View_Rear)
-        self._action_viewLeft = QtWidgets.QAction(QtGui.QIcon(), "View Left", self,
-                                                  statusTip="Change view point",
-                                                  triggered=self._glWindow._display.View_Left)
-        self._action_viewRight = QtWidgets.QAction(QtGui.QIcon(), "View Right", self,
-                                                   statusTip="Change view point",
-                                                   triggered=self._glWindow._display.View_Right)
         self._action_viewIso = QtWidgets.QAction(QtGui.QIcon(), "View ISO", self,
                                                  statusTip="Change view point",
                                                  triggered=self._glWindow._display.View_Iso)
+
 
     def createToolButton(self, action, parent):
         button = QtWidgets.QToolButton(self)

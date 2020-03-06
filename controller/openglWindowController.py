@@ -23,22 +23,17 @@ log = logging.getLogger(__name__)
 
 
 class OpenGLEditor(GLWidget):
-    # MODE_SKETCH = 0
-    # MODE_DESIGN = 1
-    # MODE_VIEW = 2
 
     def __init__(self, parent=None):
         super(OpenGLEditor, self).__init__(parent)
         self.InitDriver()
         self.parent = parent
-        # self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
+        self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
 
         # view_controller for view manipulation
         self._cubeManip = AIS_ViewCube()
         self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
         self._cubeManip.SetInfiniteState(True)
-        self._cubeManip.UnsetAttributes()
-        self._cubeManip.UnsetColor()
         self._display.Context.Display(self._cubeManip, True)
         # rubberband for selection
         self.myRubberBand = AIS_RubberBand()
@@ -54,9 +49,6 @@ class OpenGLEditor(GLWidget):
         self._mouseDoubleClick_callback = []
         self._mouseScroll_callback = []
 
-        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.sketchManager.ExitDrawingMode)
-        # self._key_map.setdefault(QtCore.Qt.Key_Escape, []).append(self.viewManager.setDeactive)
-
         self._display.display_triedron()
         # self.setReferenceAxe()
         assert isinstance(self._display.Context, AIS_InteractiveContext)
@@ -65,7 +57,6 @@ class OpenGLEditor(GLWidget):
         selector_manager: StdSelect_ViewerSelector3d = self._display.Context.MainSelector()
         # self._display.Context.SetPixelTolerance(5)
         selector_manager.SetPixelTolerance(20)
-        print(selector_manager.PixelTolerance())
         # camera attribute
         self.view: V3d_View = self._display.View
         # scale factor by mosue scroller
@@ -80,31 +71,11 @@ class OpenGLEditor(GLWidget):
     def fitSelection(self):
         self._display.Context.FitSelected(self._display.View, 0.0, True)
 
-    # def state(self):
-    #     return self._state
-
-    # def setState(self, state):
-    #     self._state = state
-    #     self.update()
-
-    def processActions(self):
-        # if self._state == self.MODE_VIEW:
-        #     if self._display.Viewer.IsActive() == True:
-        #         self._display.Viewer.DeactivateGrid()
-        # elif self._state == self.MODE_DESIGN:
-        #     pass
-        # elif self._state == self.MODE_SKETCH:
-        #     pass
-        # print(self.camera.Distance())
-        # print(self.view.Scale())
-        # print(self.camera.Eye().X(), self.camera.Eye().Y())
-        self._display.Repaint()
 
     def paintEvent(self, event):
         super(OpenGLEditor, self).paintEvent(event)
         if self._inited:
             self._display.Context.UpdateCurrentViewer()
-            self.processActions()
             self.update()
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
@@ -300,7 +271,6 @@ if __name__ == '__main__':
         # Call the normal Exception hook after
         sys._excepthook(exctype, value, traceback)
         sys.exit(1)
-
 
     sys.excepthook = my_exception_hook
     application = QtWidgets.QApplication([])

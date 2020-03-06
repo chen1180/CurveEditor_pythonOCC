@@ -56,7 +56,7 @@ if __name__ == '__main__':
     if not app:  # create QApplication if it doesnt exist
         app = QApplication(sys.argv)
     # Create and display the splash screen
-    splash_pix = QPixmap(':/nurbs_patch.png')
+    splash_pix = QPixmap(':/bezier_patch.png')
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
     splash.setEnabled(False)

@@ -1,9 +1,8 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-import sys
-from view import lightProperty, nodeProperty, property, transformProperty, cameraProperty, curveProperty, \
-    newSketchProperty, lineProperty
+from view import nodeProperty, property, curveProperty, \
+    newSketchProperty, clippingPlaneProperty
 from data.model import SceneGraphModel
 from data.node import *
 
@@ -21,10 +20,12 @@ class PropertyEditor(QWidget):
         self._pointEditor = PointEditor(self)
         self._lineEditor = LineEditor(self)
         self._bezierCurveEditor = BezierCurveEditor(self)
+        self._surfaceEditor = SweepSurfaceEditor(self)
         self.addEditor(self._nodeEditor, "Node")
         self.addEditor(self._pointEditor, "Point")
         self.addEditor(self._lineEditor, "Line")
-        self.addEditor(self._bezierCurveEditor, "Bezier curve")
+        self.addEditor(self._bezierCurveEditor, "Bezier Curve")
+        self.addEditor(self._surfaceEditor, "Sweep Surface")
 
     def addEditor(self, editor: QWidget, type: str):
         if type == "Node":
@@ -238,25 +239,6 @@ class BezierCurveEditor(QWidget):
             weight_display.setSingleStep(0.1)
             weight_display.setRange(0.1, 1.0)
             self.ui.treeWidget.setItemWidget(weights, 1, weight_display)
-        # self.poles_list = QTreeWidgetItem(self.ui.treeWidget)
-        # self.poles_list.setText(0, "Points")
-        # self.poles_list.setText(1, str(point_size))
-        # for i in range(point_size):
-        #     pole = QTreeWidgetItem(self.poles_list)
-        #     pole.setText(0, "Point" + str(i + 1))
-        #     pole_display = QLineEdit()
-        #     pole_display.setDisabled(True)
-        #     self.ui.treeWidget.setItemWidget(pole, 1, pole_display)
-        #     coorinate_x_item = QTreeWidgetItem(pole)
-        #     coorinate_x_item.setText(0, "x")
-        #     coorinate_y_item = QTreeWidgetItem(pole)
-        #     coorinate_y_item.setText(0, "y")
-        #     x_spinbox = QDoubleSpinBox()
-        #     x_spinbox.setRange(-10000, 10000)
-        #     y_spinbox = QDoubleSpinBox()
-        #     y_spinbox.setRange(-10000, 10000)
-        #     self.ui.treeWidget.setItemWidget(coorinate_x_item, 1, x_spinbox)
-        #     self.ui.treeWidget.setItemWidget(coorinate_y_item, 1, y_spinbox)
 
     def updateUI(self, point_size):
         self.weights_list.setText(1, str(point_size))
@@ -279,12 +261,6 @@ class BezierCurveEditor(QWidget):
         for i in range(1, self.weights_list.childCount() + 1):
             weight = self.weights_list.child(i - 1)
             self._dataMapper.addMapping(self.ui.treeWidget.itemWidget(weight, 1), 5 + i)
-        # count = 5 + self.weights_list.childCount()
-        # for i in range(1, self.poles_list.childCount() + 1, 2):
-        #     poles = self.poles_list.child(i - 1)
-        #     self._dataMapper.addMapping(self.ui.treeWidget.itemWidget(poles.child(0), 1), count + i)
-        #     self._dataMapper.addMapping(self.ui.treeWidget.itemWidget(poles.child(1), 1), count + i + 1)
-        #     print(count + i, count + i + 1)
 
     """INPUTS: QModelIndex"""
 
@@ -300,6 +276,98 @@ class BezierCurveEditor(QWidget):
             if self.pole_size != point_size:
                 self.updateUI(point_size)
                 self.poles_size = point_size
+
+
+from data.design.geometry import *
+from OCC.Core.gp import gp_Vec
+from OCC.Core.Graphic3d import Graphic3d_ClipPlane, Graphic3d_Vec4d
+from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
+
+
+class SweepSurfaceEditor(QWidget):
+    def __init__(self, parent=None):
+        super(SweepSurfaceEditor, self).__init__(parent)
+        self.ui = clippingPlaneProperty.Ui_Form()
+        self.ui.setupUi(self)
+        self._dataMapper = QDataWidgetMapper()
+        self.ui.checkBox.stateChanged.connect(self.clippingOn)
+        self.ui.buttonGroup.buttonClicked.connect(self.changeClippingPlane)
+        self.ui.animatePushButton.pressed.connect(self.animateClipping)
+        self.ui.resetPushButton.pressed.connect(self.resetClipping)
+
+    def setModel(self, model):
+        self._model = model
+        self._dataMapper.setModel(model)
+
+    """INPUTS: QModelIndex"""
+
+    def setSelection(self, current):
+        parent = current.parent()
+        self._dataMapper.setRootIndex(parent)
+        self._dataMapper.setCurrentModelIndex(current)
+        # node information can be obtained
+        node: SweepSurfaceNode = self._model.getNode(current)
+        if type(node) == SweepSurfaceNode:
+            self._surface: Surface_Sweep = node.getSketchObject()
+            self.setClippingPlane()
+            self.changeClippingPlane()
+
+    def setClippingPlane(self):
+        # clip plane number one, by default xOy
+        clip_plane_1 = Graphic3d_ClipPlane()
+        # set hatch on
+        clip_plane_1.SetCapping(True)
+        clip_plane_1.SetCappingHatch(True)
+        # off by default, user will have to enable it
+        clip_plane_1.SetOn(True)
+        # set clip plane color
+        aMat = clip_plane_1.CappingMaterial()
+        aColor = Quantity_Color(0.5, 0.6, 0.7, Quantity_TOC_RGB)
+        aMat.SetAmbientColor(aColor)
+        aMat.SetDiffuseColor(aColor)
+        clip_plane_1.SetCappingMaterial(aMat)
+        self.clippingPlane = clip_plane_1
+
+
+    def clippingOn(self, checked):
+        if checked:
+            self._surface.GetAIS_Object().AddClipPlane(self.clippingPlane)
+            self.clippingPlane.SetOn(True)
+        else:
+            self._surface.GetAIS_Object().RemoveClipPlane(self.clippingPlane)
+            self.clippingPlane.SetOn(False)
+        self._surface.myContext.UpdateCurrentViewer()
+    def changeClippingPlane(self):
+        equation = Graphic3d_Vec4d(0., 0., 1., 0.0)
+        checkedButton = self.ui.buttonGroup.checkedButton().text()
+        if checkedButton == "X":
+            equation = Graphic3d_Vec4d(1., 0., 0., 0.)
+        elif checkedButton == "Y":
+            equation = Graphic3d_Vec4d(0., 1., 0., 0.)
+        self.clippingPlane.SetEquation(equation)
+        self._surface.myContext.UpdateCurrentViewer()
+
+    def animateClipping(self):
+        if self.ui.checkBox.isChecked():
+            plane_definition = self.clippingPlane.ToPlane()  # it's a gp_Pln
+            h = 1.0
+            direction = gp_Vec(0., 0., h)
+            checkedButton = self.ui.buttonGroup.checkedButton().text()
+            if checkedButton == "X":
+                direction = gp_Vec(h, 0., 0.)
+            elif checkedButton == "Y":
+                direction = gp_Vec(0., h, 0.)
+            for i in range(100):
+                plane_definition.Translate(direction)
+                self.clippingPlane.SetEquation(plane_definition)
+                self._surface.myContext.UpdateCurrentViewer()
+
+    def resetClipping(self):
+        if self.ui.checkBox.isChecked():
+            self._surface.GetAIS_Object().RemoveClipPlane(self.clippingPlane)
+            self.setClippingPlane()
+            self._surface.GetAIS_Object().AddClipPlane(self.clippingPlane)
+            self._surface.myContext.UpdateCurrentViewer()
 
 
 from OCC.Core.gp import gp_Pnt, gp_Pln, gp_Dir, gp_Ax3, gp

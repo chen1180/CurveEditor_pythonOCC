@@ -20,9 +20,6 @@ class BSplineCurveAction(Enum):
     Input_OtherPoints = 3
 
 
-
-
-
 class Sketch_CommandBSpline(Sketch_Command):
     def __init__(self):
         super(Sketch_CommandBSpline, self).__init__("BSplineCurve.")

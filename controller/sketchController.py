@@ -2,7 +2,6 @@ from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
 from OCC.Core.Graphic3d import *
 from OCC.Core.V3d import *
 from OCC.Core.V3d import V3d_Viewer
-from OCC.Core.gp import gp_Ax3
 from PyQt5.QtCore import QObject, pyqtSignal, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QStatusBar
@@ -76,19 +75,23 @@ class SketchController(QObject):
                                      statusTip="Add an arc",
                                      triggered=self.sketchArc3P)
         self.actions.append(self.action_addArc)
-        self.action_addCircle = QAction(QIcon(""), "Add Circle", self,
-                                        statusTip="Add a circle",
-                                        triggered=self.sketchCircleCenterRadius)
-        self.actions.append(self.action_addCircle)
+        #for test
+        # self.action_addCircle = QAction(QIcon(""), "Add Circle", self,
+        #                                 statusTip="Add a circle",
+        #                                 triggered=self.sketchCircleCenterRadius)
+        # self.actions.append(self.action_addCircle)
         snap_action = []
+
         self.action_snapNothing = QAction(QIcon(""), "No Snap", self,
                                           statusTip="No Snap mode",
                                           triggered=self.snapNothing)
         snap_action.append(self.action_snapNothing)
-        self.action_snapEnd = QAction(QIcon(""), "Snap End", self,
+
+        self.action_snapEnd = QAction(QIcon(""), "Snap to Point", self,
                                       statusTip="Snap to the end points",
                                       triggered=self.snapEnd)
         snap_action.append(self.action_snapEnd)
+
         self.action_snapCenter = QAction(QIcon(""), "Snap Center", self,
                                          statusTip="Snap to the center of circle or arc",
                                          triggered=self.snapCenter)
@@ -98,14 +101,6 @@ class SketchController(QObject):
                                           triggered=self.snapNearest)
         snap_action.append(self.action_snapNearest)
         self.actions.append(snap_action)
-
-    # def setActionEnabled(self, a0):
-    #     for action in self.actions:
-    #         if type(action) == list:
-    #             for i in action:
-    #                 i.setEnabled(a0)
-    #         else:
-    #             action.setEnabled(a0)
 
     def setModel(self, model):
         self.model = model
@@ -226,5 +221,4 @@ class SketchController(QObject):
             else:
                 index += 1
 
-        print(self.currentSketchNode)
 

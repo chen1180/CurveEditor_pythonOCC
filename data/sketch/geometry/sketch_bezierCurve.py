@@ -64,7 +64,6 @@ class Sketch_BezierCurve(Sketch_Geometry):
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
         shape=edge.Edge()
         location=shape.Location()
-        print()
         self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
