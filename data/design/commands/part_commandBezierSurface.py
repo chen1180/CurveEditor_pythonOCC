@@ -1,6 +1,5 @@
 from data.design.commands.part_command import *
-
-
+from data.design.gui import bezierSurfaceForm
 
 
 class BezierSurfaceAction(Enum):
@@ -65,6 +64,7 @@ class Part_CommandBezierSurface(Part_Command):
                     face.Build()
                     self.myRubberSurface.SetShape(face.Shape())
                     self.myContext.Redisplay(self.myRubberSurface, True)
+                    self.CloseSurface()
                     self.myBezierSurfaceAction = BezierSurfaceAction.Nothing
 
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
@@ -91,7 +91,6 @@ class Part_CommandBezierSurface(Part_Command):
             self.CloseSurface()
         elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve4:
             self.CloseSurface()
-
         self.myCurves.clear()
         self.myBezierSurfaceAction = BezierSurfaceAction.Nothing
 
@@ -102,6 +101,7 @@ class Part_CommandBezierSurface(Part_Command):
         self.myGeomSurface.Compute()
         self.bezierSurfaceNode = BezierSurfaceNode(self.myGeomSurface.GetName(), self.myNode)
         self.bezierSurfaceNode.setSketchObject(self.myGeomSurface)
+        self.myModel.layoutChanged.emit()
 
     def GetTypeOfMethod(self):
         return Part_ObjectTypeOfMethod.BezierSurface_Method

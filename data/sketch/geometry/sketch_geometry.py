@@ -41,12 +41,12 @@ class Sketch_Geometry:
         '''
         self.myPointStyle = Aspect_TOM_O_POINT
         self.myPointWidth = 5.0
-        self.myPointColor = Quantity_NOC_BLUE1
+        self.myPointColor = Quantity_NOC_YELLOW
         self.myPointAspect = Prs3d_PointAspect(self.myPointStyle, Quantity_Color(self.myPointColor), self.myPointWidth)
 
         self.myLineStyle = Aspect_TOL_SOLID
         self.myLineWidth = 2.0
-        self.myLineColor = Quantity_NOC_WHITE
+        self.myLineColor = Quantity_NOC_BLUE1
         self.myLineAspect = Prs3d_LineAspect(Quantity_Color(self.myLineColor), self.myLineStyle, self.myLineWidth)
 
         self.myWireStyle = Aspect_TOL_SOLID
@@ -61,6 +61,10 @@ class Sketch_Geometry:
         self.myDrawer.SetPointAspect(self.myPointAspect)
         # for bezier curve or bspline
         self.myDrawer.SetWireAspect(self.myWireAspect)
+        # set selection color
+        self.mySelectDrawer = Prs3d_Drawer()
+        self.mySelectDrawer.SetColor(Quantity_Color(Quantity_NOC_CYAN1))
+        self.myContext.SetSelectionStyle(self.mySelectDrawer)
 
     def SetAxis(self, theAxis):
         self.curCoordinateSystem = theAxis

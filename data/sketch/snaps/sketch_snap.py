@@ -24,8 +24,8 @@ class Sketch_Snap(object):
         self.FirstEdge = TopoDS_Edge()
         self.SecondEdge = TopoDS_Edge()
 
-        self.curPnt2d = gp.Origin2d()
-        self.objectPnt2d = gp.Origin2d()
+        self.curPnt2d = gp.Origin()
+        self.objectPnt2d = gp.Origin()
         self.bestPnt2d = gp.Origin2d()
         self.findbestPnt2d = False
 
@@ -37,7 +37,7 @@ class Sketch_Snap(object):
         self.minimumSnapDistance = MINIMUMSNAP
         self.minDistance = 0
         self.curDistance = 0
-        self.curGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
+        self.curGeom2d_Point = Geom_CartesianPoint(self.curPnt2d)
         self.myPlane = Geom_Plane(self.curCoordinateSystem)
 
     def SetContext(self, theContext: AIS_InteractiveContext):

@@ -68,3 +68,4 @@ class Part_CommandExtrudedSurface(Part_Command):
         self.mySurface.Compute()
         self.surfaceNode = ExtrudedSurfaceNode(self.mySurface.GetName(), self.myNode)
         self.surfaceNode.setSketchObject(self.mySurface)
+        self.myModel.layoutChanged.emit()

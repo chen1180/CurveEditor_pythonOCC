@@ -13,8 +13,8 @@ class Sketch_SnapEnd(Sketch_Snap):
             mySObject: Sketch_Object = self.data[idx]
             myGeometryType = mySObject.GetGeometryType()
             if myGeometryType == Sketch_GeometryType.PointSketchObject:
-                self.curGeom2d_Point: Geom2d_CartesianPoint = mySObject.GetGeometry()
-                self.objectPnt2d = self.curGeom2d_Point.Pnt2d()
+                self.curGeom2d_Point: Geom_CartesianPoint = mySObject.GetGeometry()
+                self.objectPnt2d = self.curGeom2d_Point.Pnt()
                 if self.count():
                     self.bestPnt2d = self.objectPnt2d
                     self.curHilightedObj = mySObject.GetAIS_Object()

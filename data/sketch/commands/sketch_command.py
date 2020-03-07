@@ -13,6 +13,7 @@ from OCC.Core.TCollection import TCollection_ExtendedString
 from data.node import *
 from data.sketch.sketch_utils import *
 from PyQt5.QtCore import Qt
+from data.model import SceneGraphModel
 
 SKETCH_RADIUS = 10.0
 
@@ -21,6 +22,7 @@ class Sketch_Command(object):
     def __init__(self, name):
         self.data = []
         self.rootNode: Node = None
+        self.myModel: SceneGraphModel = None
         self.objectName = name
         self.objectCounter = 0
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
@@ -49,6 +51,9 @@ class Sketch_Command(object):
 
     def SetRootNode(self, theNode: Node):
         self.rootNode: Node = theNode
+
+    def SetModel(self, theModel):
+        self.myModel = theModel
 
     def SetAx3(self, theAx3: gp_Ax3):
         self.curCoordinateSystem = theAx3
@@ -87,6 +92,7 @@ class Sketch_Command(object):
         so.SetType(self.myType)
         so.SetStyle(self.myStyle)
         so.SetWidth(self.myWidth)
+        self.myModel.layoutChanged.emit()
         self.data.append(so)
 
     def GetTypeOfMethod(self):

@@ -104,6 +104,7 @@ class Sketch_BezierCurve(Sketch_Geometry):
 
     def RemoveDisplay(self):
         super(Sketch_BezierCurve, self).RemoveDisplay()
+        self.RemoveLabel()
 
     def RemoveLabel(self):
         for point in self.myPoles:

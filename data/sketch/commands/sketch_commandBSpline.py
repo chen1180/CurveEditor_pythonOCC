@@ -46,7 +46,6 @@ class Sketch_CommandBSpline(Sketch_Command):
                                                      curgp_Array1CurveMulti, self.myDegree)
 
         self.myRubberAIS_Shape = AIS_Shape(self.curEdge)
-        self.myRubberAIS_Shape.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
 
     def Action(self):
         self.myBSplineCurveAction = BSplineCurveAction.Input_1Point

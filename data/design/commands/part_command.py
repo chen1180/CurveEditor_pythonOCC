@@ -14,10 +14,11 @@ from OCC.Core.BRepBuilderAPI import *
 from enum import Enum
 from data.design.geometry import *
 
+
 class Part_Command(object):
     def __init__(self, name):
         self.data = []
-
+        self.myModel = None
         self.objectName = name
         self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
@@ -30,6 +31,9 @@ class Part_Command(object):
         self.mySecondPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
         self.myRubberLine = AIS_Line(self.myFirstPoint, self.mySecondPoint)
         self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
+
+    def SetModel(self, theModel):
+        self.myModel = theModel
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext

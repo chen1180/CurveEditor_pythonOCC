@@ -32,6 +32,7 @@ class Sketch(object):
 
         self.myData = []
         self.myNode: SketchObjectNode = None
+        self.myModel=None
         self.myCommands = []
 
         self.myAnalyserSnap = Sketch_AnalyserSnap(self.myContext, self.myData, self.myCoordinateSystem)
@@ -65,7 +66,11 @@ class Sketch(object):
         for idx in range(len(self.myCommands)):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             self.CurCommand.SetRootNode(self.myNode)
-
+    def SetModel(self,theModel):
+        self.myModel=theModel
+        for idx in range(len(self.myCommands)):
+            self.CurCommand: Sketch_Command = self.myCommands[idx]
+            self.CurCommand.SetModel(self.myModel)
     def GetData(self):
         return self.myData
 

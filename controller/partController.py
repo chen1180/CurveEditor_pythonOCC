@@ -5,6 +5,7 @@ from data.design.part import Part
 from data.design.part_type import *
 from data.node import *
 from data.model import SceneGraphModel
+from data.design.gui import part_qtgui
 
 
 class PartController(QObject):
@@ -14,8 +15,9 @@ class PartController(QObject):
         super(PartController, self).__init__(parent)
         self._display = display
         self._statusBar: QStatusBar = parent.statusBar()
+        self.partGUI = part_qtgui.Part_QTGUI(parent)
+        self.part = Part(self._display, self._statusBar,self.partGUI)
 
-        self.part = Part(self._display, self._statusBar)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
         self.actions = []
@@ -49,6 +51,7 @@ class PartController(QObject):
 
     def setModel(self, model):
         self.model = model
+        self.part.SetModel(self.model)
 
     def setRootNode(self, root):
         self.rootNode: Node = root

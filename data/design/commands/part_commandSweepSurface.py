@@ -68,3 +68,4 @@ class Part_CommandSweepSurface(Part_Command):
         self.mySurface.Compute()
         self.surfaceNode = SweepSurfaceNode(self.mySurface.GetName(), self.myNode)
         self.surfaceNode.setSketchObject(self.mySurface)
+        self.myModel.layoutChanged.emit()

@@ -34,7 +34,7 @@ class Sketch_CommandLine2P(Sketch_Command):
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
             self.myContext.Display(self.myRubberLine, True)
 
-            self.line = Sketch_Line(self.myContext,self.curCoordinateSystem)
+            self.line = Sketch_Line(self.myContext, self.curCoordinateSystem)
             self.line.AddPoints(self.curPnt2d)
 
             self.myLine2PAction = Line2PAction.Input_SecondPointLine
@@ -47,7 +47,7 @@ class Sketch_CommandLine2P(Sketch_Command):
             self.line.Compute()
             node = LineNode(self.objectName + str(self.objectCounter), self.rootNode)
             node.setSketchObject(self.line)
-            self.AddObject(self.line.GetGeometry2d(),self.line.GetAIS_Object(), Sketch_GeometryType.LineSketchObject)
+            self.AddObject(self.line.GetGeometry2d(), self.line.GetAIS_Object(), Sketch_GeometryType.LineSketchObject)
             if self.myPolylineMode:
                 self.myFirstgp_Pnt2d = self.curPnt2d
                 self.myFirstPoint.SetPnt(self.mySecondPoint.Pnt())
@@ -79,6 +79,8 @@ class Sketch_CommandLine2P(Sketch_Command):
         elif self.myLine2PAction == Line2PAction.Input_FirstPointLine:
             pass
         elif self.myLine2PAction == Line2PAction.Input_SecondPointLine:
+            self.line.RemoveLabel()
+            self.line.RemoveDisplay()
             self.myContext.Remove(self.myRubberLine, True)
         self.myLine2PAction = Line2PAction.Nothing
 

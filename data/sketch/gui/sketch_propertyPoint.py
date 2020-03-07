@@ -16,8 +16,6 @@ class Sketch_PropertyPoint(Sketch_Property):
         self.ui.ComboBoxWidth.close()
         self.ui.TextLabelStyle.close()
         self.ui.ComboBoxStyle.close()
-        self.ui.TextLabelType.close()
-        self.ui.ComboBoxType.close()
 
     def SetGeometry(self, *__args):
         self.curGeom2d_Point: Geom2d_CartesianPoint =  self.mySObject.GetGeometry2d()

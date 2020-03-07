@@ -70,7 +70,6 @@ class Sketch_Property(QWidget):
 
         self.SetID()
         self.SetColor()
-        self.SetObjectType()
 
         self.SetGeometry()
         self.show()
@@ -155,9 +154,6 @@ class Sketch_Property(QWidget):
         if self.myID != tempID:
             self.myID = tempID
             self.mySObject.SetObjectName(self.myID)
-        if self.myObjectType != self.GetObjectType():
-            self.myObjectType = self.GetObjectType()
-            self.mySObject.SetType(self.myObjectType)
 
     def SetColor(self):
         if self.myNameOfColor == Quantity_NOC_BLACK:
@@ -275,12 +271,6 @@ class Sketch_Property(QWidget):
 
         else:
             return Quantity_NOC_YELLOW
-
-    def SetObjectType(self):
-        self.ui.ComboBoxType.setCurrentIndex(self.myObjectType)
-
-    def GetObjectType(self):
-        return self.ui.ComboBoxType.currentIndex()
 
     def SetObjectStyle(self):
         self.ui.ComboBoxStyle.setCurrentIndex(self.myObjectStyle)

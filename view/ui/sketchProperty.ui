@@ -83,71 +83,7 @@
       <string>Attributes</string>
      </property>
      <layout class="QGridLayout" name="GroupBoxAttributesLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="TextLabelColor">
-        <property name="text">
-         <string>Color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="ComboBoxColor">
-        <item>
-         <property name="text">
-          <string>BLACK</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>BROWN</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RED</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ORANGE</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>YELLOW</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="TextLabelType">
-        <property name="text">
-         <string>Type</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="ComboBoxType">
-        <item>
-         <property name="text">
-          <string>Main</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Auxiliary</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="TextLabelStyle">
-        <property name="text">
-         <string>Style</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
        <widget class="QComboBox" name="ComboBoxStyle">
         <item>
          <property name="text">
@@ -171,14 +107,7 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="TextLabelWidth">
-        <property name="text">
-         <string>Width</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
+      <item row="2" column="1">
        <widget class="QComboBox" name="ComboBoxWidth">
         <item>
          <property name="text">
@@ -225,6 +154,56 @@
           <string>9.0</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="TextLabelColor">
+        <property name="text">
+         <string>Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="TextLabelWidth">
+        <property name="text">
+         <string>Width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="ComboBoxColor">
+        <item>
+         <property name="text">
+          <string>BLACK</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BROWN</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>RED</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ORANGE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>YELLOW</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="TextLabelStyle">
+        <property name="text">
+         <string>Style</string>
+        </property>
        </widget>
       </item>
      </layout>

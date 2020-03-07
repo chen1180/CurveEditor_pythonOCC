@@ -15,12 +15,13 @@ class Part(object):
         self.myContext: AIS_InteractiveContext = theDisplay.Context
         self.myView: V3d_View = theDisplay.View
         self.myStatusBar = statusBar
-
+        self.myGUI=sg
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
         self.myIntCS = GeomAPI_IntCS()
 
         self.myNode: SketchNode = None
+        self.myModel=None
 
         self.myData = []
         self.myCommands = []
@@ -52,7 +53,11 @@ class Part(object):
         for idx in range(len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetRootNode(self.myNode)
-
+    def SetModel(self,theModel):
+        self.myModel=theModel
+        for idx in range(len(self.myCommands)):
+            self.CurCommand: Part_Command = self.myCommands[idx]
+            self.CurCommand.SetModel(self.myModel)
     def GetData(self):
         return self.myData
 
@@ -70,6 +75,7 @@ class Part(object):
 
     def ObjectAction(self, theMethod: Part_ObjectTypeOfMethod):
         self.myCurrentMethod = theMethod
+        self.myGUI.SetGui(theMethod)
         self.SelectCurCommand()
         self.CurCommand.Action()
 
@@ -92,6 +98,7 @@ class Part(object):
 
     def OnCancel(self):
         self.SelectCurCommand()
+        self.myGUI.Hide()
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 

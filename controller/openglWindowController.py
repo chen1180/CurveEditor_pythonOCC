@@ -28,13 +28,10 @@ class OpenGLEditor(GLWidget):
         super(OpenGLEditor, self).__init__(parent)
         self.InitDriver()
         self.parent = parent
-        self._display.set_bg_gradient_color([206, 215, 222],[128, 128, 128])
-
-        # view_controller for view manipulation
-        self._cubeManip = AIS_ViewCube()
-        self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
-        self._cubeManip.SetInfiniteState(True)
-        self._display.Context.Display(self._cubeManip, True)
+        self._display.set_bg_gradient_color([206, 215, 222], [128, 128, 128])
+        self.setDisplayQuality()
+        self.setViewCubeController()
+        self._display.EnableAntiAliasing()
         # rubberband for selection
         self.myRubberBand = AIS_RubberBand()
         self.myRubberBand.SetFilling(Quantity_Color(Quantity_NOC_GRAY), 0.8)
@@ -56,11 +53,49 @@ class OpenGLEditor(GLWidget):
         # selector
         selector_manager: StdSelect_ViewerSelector3d = self._display.Context.MainSelector()
         # self._display.Context.SetPixelTolerance(5)
-        selector_manager.SetPixelTolerance(20)
+        selector_manager.SetPixelTolerance(10)
         # camera attribute
         self.view: V3d_View = self._display.View
         # scale factor by mosue scroller
         self.camera: Graphic3d_Camera = self.view.Camera()
+
+    def setDisplayQuality(self):
+        ais_context = self._display.GetContext()
+        #
+        # Display current quality
+        dc = ais_context.DeviationCoefficient()
+        dc_hlr = ais_context.HLRDeviationCoefficient()
+        da = ais_context.DeviationAngle()
+        da_hlr = ais_context.HLRAngle()
+        print("Default display quality settings:")
+        print("Deviation Coefficient: %f" % dc)
+        print("Deviation Coefficient Hidden Line Removal: %f" % dc_hlr)
+        print("Deviation Angle: %f" % da)
+        print("Deviation Angle Hidden Line Removal: %f" % da_hlr)
+        #
+        # Improve quality by a factor 10
+        #
+        factor = 1
+        ais_context.SetDeviationCoefficient(dc / factor)
+        ais_context.SetDeviationAngle(da / factor)
+        ais_context.SetHLRDeviationCoefficient(dc_hlr / factor)
+        ais_context.SetHLRAngle(da_hlr / factor)
+        print("Quality display improved by a factor {0}".format(factor))
+
+    def setViewCubeController(self):
+        # view_controller for view manipulation
+        self._cubeManip = AIS_ViewCube()
+        self._cubeManip.SetTransformPersistence(Graphic3d_TMF_TriedronPers, gp_Pnt(1, 1, 100))
+        self._cubeManip.SetInfiniteState(True)
+        self._cubeManip.BoxEdgeStyle().SetColor(Quantity_Color(Quantity_NOC_LIGHTGRAY))
+        self._cubeManip.BoxCornerStyle().SetColor(Quantity_Color(Quantity_NOC_LIGHTGRAY))
+        self._cubeManip.BoxSideStyle().SetColor(Quantity_Color(Quantity_NOC_WHITE))
+        self._cubeManip.BoxSideStyle().SetTransparency(0, 1)
+        # self._cubeManip.SetDrawVertices(False)
+        # self._cubeManip.SetDrawEdges(False)
+        # self._cubeManip.SetBoxFacetExtension(0)
+        # self._cubeManip.SetInnerColor(Quantity_Color(Quantity_NOC_GRAY))
+        self._display.Context.Display(self._cubeManip, True)
 
     def setReferenceAxe(self):
         geom_axe = Geom_Axis2Placement(gp_XOY())
@@ -70,7 +105,6 @@ class OpenGLEditor(GLWidget):
 
     def fitSelection(self):
         self._display.Context.FitSelected(self._display.View, 0.0, True)
-
 
     def paintEvent(self, event):
         super(OpenGLEditor, self).paintEvent(event)
@@ -253,7 +287,7 @@ class OpenGLEditor(GLWidget):
         else:
             self._key_map.setdefault(key, []).append(callback)
 
-    def register_mouseScroll_callback(self,callback):
+    def register_mouseScroll_callback(self, callback):
         if not callable(callback):
             raise AssertionError("You must provide a callable to register the callback")
         else:
@@ -271,6 +305,7 @@ if __name__ == '__main__':
         # Call the normal Exception hook after
         sys._excepthook(exctype, value, traceback)
         sys.exit(1)
+
 
     sys.excepthook = my_exception_hook
     application = QtWidgets.QApplication([])

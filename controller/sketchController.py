@@ -28,7 +28,7 @@ class SketchController(QObject):
         self.sketch = Sketch(self._display, self.sketchUI)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
-        self.currentSketchIndex=None
+        self.currentSketchIndex = None
         self.createActions()
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
@@ -37,6 +37,8 @@ class SketchController(QObject):
             self.selectSketchNode(node)
         elif isinstance(node, SketchObjectNode):
             self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
+        self._display.View.SetFront()
+        self._display.Context.FitSelected(self._display.View)
 
     def setStatusBar(self, theStatusBar):
         self.statusBar: QStatusBar = theStatusBar
@@ -75,7 +77,7 @@ class SketchController(QObject):
                                      statusTip="Add an arc",
                                      triggered=self.sketchArc3P)
         self.actions.append(self.action_addArc)
-        #for test
+        # for test
         # self.action_addCircle = QAction(QIcon(""), "Add Circle", self,
         #                                 statusTip="Add a circle",
         #                                 triggered=self.sketchCircleCenterRadius)
@@ -104,6 +106,7 @@ class SketchController(QObject):
 
     def setModel(self, model):
         self.model = model
+        self.sketch.SetModel(self.model)
 
     def setRootNode(self, root):
         self.rootNode: Node = root
@@ -193,8 +196,8 @@ class SketchController(QObject):
 
     def OnMouseInputEvent(self, *kargs):
         self.sketch.OnMouseInputEvent(*kargs)
-        self.model.layoutChanged.emit()
-        self.sketchObjectUpdated.emit(self.currentSketchNode)
+        # self.model.layoutChanged.emit()
+        # self.sketchObjectUpdated.emit(self.currentSketchNode)
 
     def OnMouseMoveEvent(self, *kargs):
         self.sketch.OnMouseMoveEvent(*kargs)
@@ -210,15 +213,16 @@ class SketchController(QObject):
         self.sketch.OnCancel()
 
     def DeleteSelectedObject(self):
-        index = 0
-        while index < self.currentSketchNode.childCount():
-            child = self.currentSketchNode.child(index)
-            assert isinstance(child, SketchObjectNode)
-            myCurObject: Sketch_Geometry = child.getSketchObject()
-            if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
-                myCurObject.RemoveDisplay()
-                self.model.removeRows(index, 1, self.currentSketchIndex)
-            else:
-                index += 1
-
-
+        root: Node = self.currentSketchNode.parent()
+        for i, planeNode in enumerate(root.children()):
+            index = 0
+            while index < planeNode.childCount():
+                child = planeNode.child(index)
+                myCurObject: Sketch_Geometry = child.getSketchObject()
+                if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
+                    myCurObject.RemoveDisplay()
+                    planeNode.removeChild(index)
+                else:
+                    index += 1
+        # inform model to update
+        self.model.layoutChanged.emit()

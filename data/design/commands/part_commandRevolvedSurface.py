@@ -45,6 +45,7 @@ class Part_CommandRevolvedSurface(Part_Command):
                         self.mySurface.Compute()
                         self.surfaceNode = RevolvedSurfaceNode(self.mySurface.GetName(), self.myNode)
                         self.surfaceNode.setSketchObject(self.mySurface)
+                        self.myModel.layoutChanged.emit()
                         self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Nothing
 
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
