@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>288</width>
-    <height>246</height>
+    <height>97</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
@@ -56,52 +56,6 @@
        <widget class="QLineEdit" name="uiTypeInfo">
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Visibility</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QCheckBox" name="uiViewport">
-        <property name="text">
-         <string>Shows in viewport</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="uiSelectable">
-        <property name="text">
-         <string>Display auxiliry line</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Viewport Display</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QCheckBox" name="uiViewportName">
-        <property name="text">
-         <string>Name</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="uiViewportCoordinate">
-        <property name="text">
-         <string>Coordinate</string>
         </property>
        </widget>
       </item>

@@ -27,6 +27,8 @@ class Sketch_Geometry:
         # flags for showing object name and coordinate on screen
         self.showViewportName = False
         self.showViewportCoordinate = False
+        self.showViewportObject = True
+        self.showVieportAuxilirayLine = True
 
         self.myNameOfColor = Quantity_NOC_GREEN
         self.myObjectType = AIS_SD_None
@@ -92,4 +94,12 @@ class Sketch_Geometry:
         pass
 
     def DisplayCoordinate(self):
+        pass
+
+    def DisplayObject(self):
+        if self.showViewportObject == True:
+            self.myContext.Display(self.GetAIS_Object(), True)
+        else:
+            self.myContext.Erase(self.GetAIS_Object(), True)
+    def DisplayAuxiliryLine(self):
         pass

@@ -75,3 +75,19 @@ class Sketch_Line(Sketch_Geometry):
 
     def GetTypeOfMethod(self):
         return Sketch_ObjectTypeOfMethod.Line2P_Method
+
+    def DisplayName(self):
+        if self.showViewportName:
+            for point in self.myPoles:
+                self.myContext.Display(point.myAIS_Name, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.myAIS_Name, True)
+
+    def DisplayCoordinate(self):
+        if self.showViewportCoordinate:
+            for point in self.myPoles:
+                self.myContext.Display(point.myAIS_Coordinate, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.myAIS_Coordinate, True)

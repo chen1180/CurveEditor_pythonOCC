@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from view import nodeProperty, property, curveProperty, \
-    newSketchProperty, clippingPlaneProperty
+    newSketchProperty, clippingPlaneProperty,viewPortProperty
 from data.model import SceneGraphModel
 from data.node import *
 
@@ -77,29 +77,27 @@ class NodeEditor(QWidget):
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiName, 0)
         self._dataMapper.addMapping(self.ui.uiTypeInfo, 1)
-        self._dataMapper.addMapping(self.ui.uiViewport, 2)
-        self._dataMapper.addMapping(self.ui.uiSelectable, 3)
-        self._dataMapper.addMapping(self.ui.uiViewportName, 4)
-        self._dataMapper.addMapping(self.ui.uiViewportCoordinate, 5)
+
     def setSelection(self, current: QModelIndex):
         parent = current.parent()
         self._dataMapper.setRootIndex(parent)
         self._dataMapper.setCurrentModelIndex(current)
 
 
-from view.geometryProperty import Ui_SketchProperty
-
-
 class PointEditor(QWidget):
     def __init__(self, parent=None):
         super(PointEditor, self).__init__(parent)
-        self.ui = Ui_SketchProperty()
+        self.ui = viewPortProperty.Ui_Form()
         self.ui.setupUi(self)
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
+        self._dataMapper.addMapping(self.ui.uiViewport, 2)
+        self._dataMapper.addMapping(self.ui.uiViewportAuxiliry, 3)
+        self._dataMapper.addMapping(self.ui.uiViewportName, 4)
+        self._dataMapper.addMapping(self.ui.uiViewportCoordinate, 5)
 
     """INPUTS: QModelIndex"""
 
@@ -114,13 +112,17 @@ class PointEditor(QWidget):
 class LineEditor(QWidget):
     def __init__(self, parent=None):
         super(LineEditor, self).__init__(parent)
-        self.ui = Ui_SketchProperty()
+        self.ui = viewPortProperty.Ui_Form()
         self.ui.setupUi(self)
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
+        self._dataMapper.addMapping(self.ui.uiViewport, 2)
+        self._dataMapper.addMapping(self.ui.uiViewportAuxiliry, 3)
+        self._dataMapper.addMapping(self.ui.uiViewportName, 4)
+        self._dataMapper.addMapping(self.ui.uiViewportCoordinate, 5)
 
     """INPUTS: QModelIndex"""
 
@@ -133,60 +135,17 @@ class LineEditor(QWidget):
 class BezierCurveEditor(QWidget):
     def __init__(self, parent=None):
         super(BezierCurveEditor, self).__init__(parent)
-        self.ui = Ui_SketchProperty()
+        self.ui = viewPortProperty.Ui_Form()
         self.ui.setupUi(self)
         self._dataMapper = QDataWidgetMapper()
-        # self.setupUI()
-        # self.generateUI(20)
-        # self.pole_size = 0
-
-    # def setupUI(self):
-    #     self.degree = QTreeWidgetItem(self.ui.treeWidget, ["degree"])
-    #     degree_display = QLineEdit()
-    #     degree_display.setDisabled(True)
-    #     self.ui.treeWidget.setItemWidget(self.degree, 1, degree_display)
-    #
-    #     self.closed = QTreeWidgetItem(self.ui.treeWidget, ["Is closed"])
-    #     closed_display = QLineEdit()
-    #     closed_display.setDisabled(True)
-    #     self.ui.treeWidget.setItemWidget(self.closed, 1, closed_display)
-    #
-    #     self.rational = QTreeWidgetItem(self.ui.treeWidget, ["Is rational"])
-    #     rational_display = QLineEdit()
-    #     rational_display.setDisabled(True)
-    #     self.ui.treeWidget.setItemWidget(self.rational, 1, rational_display)
-    #
-    #     self.continuity = QTreeWidgetItem(self.ui.treeWidget, ["Continuity"])
-    #     continuity_display = QLineEdit()
-    #     continuity_display.setDisabled(True)
-    #     self.ui.treeWidget.setItemWidget(self.continuity, 1, continuity_display)
-    #
-    # def generateUI(self, point_size):
-    #     self.weights_list = QTreeWidgetItem(self.ui.treeWidget)
-    #     self.weights_list.setText(0, "Weights")
-    #     self.weights_list.setText(1, str(point_size))
-    #     for i in range(point_size):
-    #         weights = QTreeWidgetItem(self.weights_list)
-    #         weights.setText(0, str(i + 1))
-    #         weight_display = QDoubleSpinBox()
-    #         weight_display.setSingleStep(0.1)
-    #         weight_display.setRange(0.1, 1.0)
-    #         self.ui.treeWidget.setItemWidget(weights, 1, weight_display)
-
-    # def updateUI(self, point_size):
-    #     self.weights_list.setText(1, str(point_size))
-    #     # self.poles_list.setText(1, str(point_size))
-    #     for i in range(0, self.weights_list.childCount()):
-    #         if i < point_size:
-    #             self.weights_list.child(i).setHidden(False)
-    #             # self.poles_list.child(i).setHidden(False)
-    #         else:
-    #             self.weights_list.child(i).setHidden(True)
-    #             # self.poles_list.child(i).setHidden(True)
 
     def setModel(self, model):
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
+        self._dataMapper.addMapping(self.ui.uiViewport, 2)
+        self._dataMapper.addMapping(self.ui.uiViewportAuxiliry, 3)
+        self._dataMapper.addMapping(self.ui.uiViewportName, 4)
+        self._dataMapper.addMapping(self.ui.uiViewportCoordinate, 5)
 
     """INPUTS: QModelIndex"""
 

@@ -123,3 +123,14 @@ class Sketch_BezierCurve(Sketch_Geometry):
         else:
             for point in self.myPoles:
                 self.myContext.Erase(point.myAIS_Coordinate, True)
+    def DisplayAuxiliryLine(self):
+        if self.showVieportAuxilirayLine:
+            for point in self.myPoles:
+                self.myContext.Display(point.GetAIS_Object(), True)
+            for line in self.myAIS_Lines:
+                self.myContext.Display(line, True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.GetAIS_Object(), True)
+            for line in self.myAIS_Lines:
+                self.myContext.Erase(line, True)

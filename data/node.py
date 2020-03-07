@@ -111,17 +111,30 @@ class SketchObjectNode(Node):
         super(SketchObjectNode, self).__init__(name, parent)
         self.sketchObject: Sketch_Geometry = None
 
+    def setSketchObject(self, theObject: Sketch_Object):
+        self.sketchObject = theObject
+
+    def getSketchObject(self):
+        return self.sketchObject
+
+    def typeInfo(self):
+        return "SketchObject"
+
+
+class PointNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(PointNode, self).__init__(name, parent)
+        self.sketchObject: Sketch_Point = None
     def setData(self, column, value):
         super(SketchObjectNode, self).setData(column, value)
         # show in viewport
         if column == 2:
-            if value == True:
-                self.sketchObject.myContext.Display(self.sketchObject.GetAIS_Object(), True)
-            else:
-                self.sketchObject.myContext.Erase(self.sketchObject.GetAIS_Object(), True)
+            self.sketchObject.showViewportObject=value
+            self.sketchObject.DisplayObject()
         # shows auxiliry line
         elif column == 3:
-            pass
+            self.sketchObject.showVieportAuxilirayLine=value
+            self.sketchObject.DisplayAuxiliryLine()
         # viewport name
         elif column == 4:
             self.sketchObject.showViewportName=value
@@ -138,7 +151,7 @@ class SketchObjectNode(Node):
             r = self.sketchObject.myContext.IsDisplayed(self.sketchObject.GetAIS_Object())
         # selectable
         elif column == 3:
-            r = True
+            r = self.sketchObject.showVieportAuxilirayLine
         # viewport name
         elif column == 4:
             r = self.sketchObject.showViewportName
@@ -146,39 +159,6 @@ class SketchObjectNode(Node):
         elif column == 5:
             r = self.sketchObject.showViewportCoordinate
         return r
-
-    def setSketchObject(self, theObject: Sketch_Object):
-        self.sketchObject = theObject
-
-    def getSketchObject(self):
-        return self.sketchObject
-
-    def typeInfo(self):
-        return "SketchObject"
-
-
-class PointNode(SketchObjectNode):
-    def __init__(self, name, parent=None):
-        super(PointNode, self).__init__(name, parent)
-        self.sketchObject: Sketch_Point = None
-
-    # def data(self, column):
-    #     r = super(PointNode, self).data(column)
-    #     self.myGeometry = self.sketchObject.GetGeometry2d()
-    #     if column == 2:
-    #         r = self.myGeometry.Pnt2d().X()
-    #     elif column == 3:
-    #         r = self.myGeometry.Pnt2d().Y()
-    #     return r
-    #
-    # def setData(self, column, value):
-    #     super(PointNode, self).setData(column, value)
-    #     if column == 2:
-    #         self.myGeometry.SetX(value)
-    #     elif column == 3:
-    #         self.myGeometry.SetY(value)
-    #     self.sketchObject.DragTo(self.myGeometry.Pnt2d())
-
     def typeInfo(self):
         return "Point"
 
@@ -190,44 +170,40 @@ class LineNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(LineNode, self).__init__(name, parent)
         self.sketchObject: Sketch_Line = None
+    def setData(self, column, value):
+        super(SketchObjectNode, self).setData(column, value)
+        # show in viewport
+        if column == 2:
+            self.sketchObject.showViewportObject=value
+            self.sketchObject.DisplayObject()
+        # shows auxiliry line
+        elif column == 3:
+            self.sketchObject.showVieportAuxilirayLine=value
+            self.sketchObject.DisplayAuxiliryLine()
+        # viewport name
+        elif column == 4:
+            self.sketchObject.showViewportName=value
+            self.sketchObject.DisplayName()
+        # viewport coordinate
+        elif column == 5:
+            self.sketchObject.showViewportCoordinate = value
+            self.sketchObject.DisplayCoordinate()
 
-    # def data(self, column):
-    #     r = super(LineNode, self).data(column)
-    #     self.myGeometry: list = self.sketchObject.GetPoles()
-    #     self.startPnt2d: gp_Pnt2d = self.myGeometry[0].GetGeometry2d().Pnt2d()
-    #     self.endPnt2d: gp_Pnt2d = self.myGeometry[1].GetGeometry2d().Pnt2d()
-    #     if column == 2:
-    #         r = str((round(self.startPnt2d.X(), 1), round(self.startPnt2d.Y(), 1)))
-    #     elif column == 3:
-    #         r = self.startPnt2d.X()
-    #     elif column == 4:
-    #         r = self.startPnt2d.Y()
-    #     elif column == 5:
-    #         r = str((round(self.endPnt2d.X(), 1), round(self.endPnt2d.Y(), 1)))
-    #     elif column == 6:
-    #         r = self.endPnt2d.X()
-    #     elif column == 7:
-    #         r = self.endPnt2d.Y()
-    #     elif column == 8:
-    #         r = self.startPnt2d.Distance(self.endPnt2d)
-    #     return r
-    #
-    # def setData(self, column, value):
-    #     super(LineNode, self).setData(column, value)
-    #     if column == 3:
-    #         self.startPnt2d.SetX(value)
-    #     elif column == 4:
-    #         self.startPnt2d.SetY(value)
-    #     elif column == 6:
-    #         self.endPnt2d.SetX(value)
-    #     elif column == 7:
-    #         self.endPnt2d.SetY(value)
-    #     elif column == 8:
-    #         pass
-    #     self.myGeometry[0].DragTo(self.startPnt2d)
-    #     self.myGeometry[1].DragTo(self.endPnt2d)
-    #     self.sketchObject.Recompute()
-
+    def data(self, column):
+        r = super(SketchObjectNode, self).data(column)
+        # show in viewport
+        if column == 2:
+            r = self.sketchObject.myContext.IsDisplayed(self.sketchObject.GetAIS_Object())
+        # selectable
+        elif column == 3:
+            r = self.sketchObject.showVieportAuxilirayLine
+        # viewport name
+        elif column == 4:
+            r = self.sketchObject.showViewportName
+        # viewport coordinate
+        elif column == 5:
+            r = self.sketchObject.showViewportCoordinate
+        return r
     def typeInfo(self):
         return "Line"
 
@@ -243,45 +219,40 @@ class BezierNode(SketchObjectNode):
         super(BezierNode, self).__init__(name, parent)
         self.sketchObject: Sketch_BezierCurve = None
 
-    # def data(self, column):
-    #     r = super(BezierNode, self).data(column)
-    #     if self.sketchObject:
-    #         self.myGeometry2d: Geom2d_BezierCurve = self.sketchObject.GetGeometry2d()
-    #         self.degree = self.myGeometry2d.Degree()
-    #         self.continuity = self.myGeometry2d.Continuity()
-    #         self.closed_flag = self.myGeometry2d.IsClosed()
-    #         self.rational_flag = self.myGeometry2d.IsRational()
-    #         self.weights = self.sketchObject.GetWeights()
-    #         self.poles = self.sketchObject.GetPoles()
-    #         if column == 2:
-    #             r = self.degree
-    #         elif column == 3:
-    #             r = self.rational_flag
-    #         elif column == 4:
-    #             r = self.closed_flag
-    #         elif column == 5:
-    #             r = self.continuity
-    #         for i in range(1, len(self.weights) + 1):
-    #             if column == 5 + i:
-    #                 r = self.weights[i - 1]
-    #
-    #     return r
-    #
-    # def setData(self, column, value):
-    #     if column == 2:
-    #         self.degree = value
-    #     elif column == 3:
-    #         self.rational_flag = value
-    #     elif column == 4:
-    #         self.closed_flag = value
-    #     elif column == 5:
-    #         self.continuity = value
-    #     super(BezierNode, self).setData(column, value)
-    #     for i in range(1, len(self.weights) + 1):
-    #         if column == 5 + i:
-    #             self.weights[i - 1] = value
-    #     self.sketchObject.Recompute()
+    def setData(self, column, value):
+        super(SketchObjectNode, self).setData(column, value)
+        # show in viewport
+        if column == 2:
+            self.sketchObject.showViewportObject=value
+            self.sketchObject.DisplayObject()
+        # shows auxiliry line
+        elif column == 3:
+            self.sketchObject.showVieportAuxilirayLine=value
+            self.sketchObject.DisplayAuxiliryLine()
+        # viewport name
+        elif column == 4:
+            self.sketchObject.showViewportName=value
+            self.sketchObject.DisplayName()
+        # viewport coordinate
+        elif column == 5:
+            self.sketchObject.showViewportCoordinate = value
+            self.sketchObject.DisplayCoordinate()
 
+    def data(self, column):
+        r = super(SketchObjectNode, self).data(column)
+        # show in viewport
+        if column == 2:
+            r = self.sketchObject.myContext.IsDisplayed(self.sketchObject.GetAIS_Object())
+        # selectable
+        elif column == 3:
+            r = self.sketchObject.showVieportAuxilirayLine
+        # viewport name
+        elif column == 4:
+            r = self.sketchObject.showViewportName
+        # viewport coordinate
+        elif column == 5:
+            r = self.sketchObject.showViewportCoordinate
+        return r
     def typeInfo(self):
         return "Bezier Curve"
 
@@ -293,13 +264,40 @@ class BsplineNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(BsplineNode, self).__init__(name, parent)
 
-    def data(self, column):
-        r = super(BsplineNode, self).data(column)
-
-        return r
-
     def setData(self, column, value):
-        super(BsplineNode, self).setData(column, value)
+        super(SketchObjectNode, self).setData(column, value)
+        # show in viewport
+        if column == 2:
+            self.sketchObject.showViewportObject = value
+            self.sketchObject.DisplayObject()
+        # shows auxiliry line
+        elif column == 3:
+            self.sketchObject.showVieportAuxilirayLine = value
+            self.sketchObject.DisplayAuxiliryLine()
+        # viewport name
+        elif column == 4:
+            self.sketchObject.showViewportName = value
+            self.sketchObject.DisplayName()
+        # viewport coordinate
+        elif column == 5:
+            self.sketchObject.showViewportCoordinate = value
+            self.sketchObject.DisplayCoordinate()
+
+    def data(self, column):
+        r = super(SketchObjectNode, self).data(column)
+        # show in viewport
+        if column == 2:
+            r = self.sketchObject.myContext.IsDisplayed(self.sketchObject.GetAIS_Object())
+        # selectable
+        elif column == 3:
+            r = self.sketchObject.showVieportAuxilirayLine
+        # viewport name
+        elif column == 4:
+            r = self.sketchObject.showViewportName
+        # viewport coordinate
+        elif column == 5:
+            r = self.sketchObject.showViewportCoordinate
+        return r
 
     def typeInfo(self):
         return "BSpline"
