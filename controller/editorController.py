@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from view import nodeProperty, property, curveProperty, \
-    newSketchProperty, clippingPlaneProperty,viewPortProperty
+    newSketchProperty, clippingPlaneProperty, viewPortProperty
 from data.model import SceneGraphModel
 from data.node import *
 
@@ -20,6 +20,7 @@ class PropertyEditor(QWidget):
         self._pointEditor = PointEditor(self)
         self._lineEditor = LineEditor(self)
         self._bezierCurveEditor = BezierCurveEditor(self)
+        self._bsplineEditor = BsplineEditor(self)
         self._bezierSurfaceEditor = BezierSurfaceEditor(self)
         self._ruledSurfaceEditor = RuledSurfaceEditor(self)
         self._revolutedSurfaceEditor = RevolutedSurfaceEditor(self)
@@ -28,6 +29,7 @@ class PropertyEditor(QWidget):
         self.addEditor(self._pointEditor, "Point")
         self.addEditor(self._lineEditor, "Line")
         self.addEditor(self._bezierCurveEditor, "Bezier Curve")
+        self.addEditor(self._bsplineEditor, "Bspline")
         self.addEditor(self._bezierSurfaceEditor, "Bezier Surface")
         self.addEditor(self._revolutedSurfaceEditor, "Surface of Revolution")
         self.addEditor(self._ruledSurfaceEditor, "Ruled Surface")
@@ -135,6 +137,29 @@ class LineEditor(QWidget):
 class BezierCurveEditor(QWidget):
     def __init__(self, parent=None):
         super(BezierCurveEditor, self).__init__(parent)
+        self.ui = viewPortProperty.Ui_Form()
+        self.ui.setupUi(self)
+        self._dataMapper = QDataWidgetMapper()
+
+    def setModel(self, model):
+        self._model: SceneGraphModel = model
+        self._dataMapper.setModel(model)
+        self._dataMapper.addMapping(self.ui.uiViewport, 2)
+        self._dataMapper.addMapping(self.ui.uiViewportAuxiliry, 3)
+        self._dataMapper.addMapping(self.ui.uiViewportName, 4)
+        self._dataMapper.addMapping(self.ui.uiViewportCoordinate, 5)
+
+    """INPUTS: QModelIndex"""
+
+    def setSelection(self, current):
+        parent: QModelIndex = current.parent()
+        self._dataMapper.setRootIndex(parent)
+        self._dataMapper.setCurrentModelIndex(current)
+
+
+class BsplineEditor(QWidget):
+    def __init__(self, parent=None):
+        super(BsplineEditor, self).__init__(parent)
         self.ui = viewPortProperty.Ui_Form()
         self.ui.setupUi(self)
         self._dataMapper = QDataWidgetMapper()

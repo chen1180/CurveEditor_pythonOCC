@@ -75,7 +75,6 @@ class Sketch_Bspline(Sketch_Geometry):
             line.Redisplay(True)
 
     def Recompute(self):
-        self.RemoveAIS_Lines()
         poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
         poles_list = [pole.GetGeometry().Pnt() for pole in self.myPoles]
         for index, pole2d in enumerate(poles2d_list):
@@ -90,10 +89,14 @@ class Sketch_Bspline(Sketch_Geometry):
         if theDegree < self.myGeometry2d.Degree():
             print("Degree elevation: degree can't be lower than 2 or lower than current degree")
         else:
+            self.RemoveLabel()
             self.myGeometry2d.IncreaseDegree(theDegree)
             self.myGeometry.IncreaseDegree(theDegree)
             self.myDegree = theDegree
             self.updateGeomAttributes()
+            self.DisplayName()
+            self.DisplayCoordinate()
+            self.DisplayAuxiliryLine()
             self.myAIS_InteractiveObject.Redisplay(True)
 
     def IncreaseMultiplicity(self, theIndex, theMulti):
@@ -102,6 +105,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def updateGeomAttributes(self):
+
         poles2d_array = self.myGeometry2d.Poles()
         poles2d_list = TColgp_Array1OfPnt2d_to_point_list(poles2d_array)
 
@@ -109,10 +113,9 @@ class Sketch_Bspline(Sketch_Geometry):
         multiplicity = self.myGeometry2d.Multiplicities()
         self.myKnots = TColStd_Array1OfNumber_to_list(knots_array)
         self.myMultiplicities = TColStd_Array1OfNumber_to_list(multiplicity)
-        for p in self.myPoles:
-            p.RemoveDisplay()
         self.myPoles.clear()
         self.myWeights.clear()
+        self.myAIS_Lines.clear()
         for new_point in poles2d_list:
             self.AddPoles(new_point)
 
@@ -123,6 +126,7 @@ class Sketch_Bspline(Sketch_Geometry):
         else:
             self.myGeometry2d.SetNotPeriodic()
             self.myGeometry.SetNotPeriodic()
+        self.RemoveLabel()
         self.myContext.Remove(self.myAIS_Lines[-1], True)
         self.updateGeomAttributes()
         # display the last lines
@@ -130,6 +134,9 @@ class Sketch_Bspline(Sketch_Geometry):
         ais_line.SetAttributes(self.myDrawer)
         self.myAIS_Lines.append(ais_line)
         self.myContext.Display(ais_line, True)
+        self.DisplayName()
+        self.DisplayCoordinate()
+        self.DisplayAuxiliryLine()
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def RemoveAIS_Lines(self):
@@ -221,3 +228,28 @@ class Sketch_Bspline(Sketch_Geometry):
                 self.myContext.Erase(point.GetAIS_Object(), True)
             for line in self.myAIS_Lines:
                 self.myContext.Erase(line, True)
+
+    def GetStyle(self):
+        return self.myWireStyle
+
+    def SetStyle(self, theStyle):
+        self.myWireStyle = theStyle
+
+    def GetWidth(self):
+        return self.myWireWidth
+
+    def SetWidth(self, theWidth):
+        self.myWireWidth = theWidth
+
+    def GetColor(self):
+        return self.myWireColor
+
+    def SetColor(self, theColor):
+        self.myWireColor = theColor
+
+    def RemoveLabel(self):
+        for point in self.myPoles:
+            point.RemoveDisplay()
+            point.RemoveLabel()
+        for line in self.myAIS_Lines:
+            self.myContext.Remove(line, True)

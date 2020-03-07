@@ -68,9 +68,6 @@ class Sketch_BezierCurve(Sketch_Geometry):
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def Recompute(self):
-        # remove auxiliry line
-        for line in self.myAIS_Lines:
-            self.myContext.Remove(line, True)
         poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
         for index, pole2d in enumerate(poles2d_list):
             self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
@@ -83,16 +80,20 @@ class Sketch_BezierCurve(Sketch_Geometry):
         if theDegree <= 2 or theDegree < self.myGeometry2d.Degree():
             print("Degree elevation: degree can't be lower than 2 or lower than current degree")
         else:
+            self.RemoveLabel()
             self.myGeometry2d.Increase(theDegree)
             self.myGeometry.Increase(theDegree)
             poles2d_array = self.myGeometry2d.Poles()
             poles2d_list = TColgp_Array1OfPnt2d_to_point_list(poles2d_array)
-            for p in self.myPoles:
-                p.RemoveDisplay()
+
             self.myPoles.clear()
             self.myWeights.clear()
+            self.myAIS_Lines.clear()
             for new_point in poles2d_list:
                 self.AddPoles(new_point)
+            self.DisplayName()
+            self.DisplayCoordinate()
+            self.DisplayAuxiliryLine()
             self.myAIS_InteractiveObject.Redisplay(True)
 
     def GetGeometryType(self):
@@ -103,8 +104,11 @@ class Sketch_BezierCurve(Sketch_Geometry):
 
     def RemoveDisplay(self):
         super(Sketch_BezierCurve, self).RemoveDisplay()
+
+    def RemoveLabel(self):
         for point in self.myPoles:
             point.RemoveDisplay()
+            point.RemoveLabel()
         for line in self.myAIS_Lines:
             self.myContext.Remove(line, True)
 
@@ -123,6 +127,7 @@ class Sketch_BezierCurve(Sketch_Geometry):
         else:
             for point in self.myPoles:
                 self.myContext.Erase(point.myAIS_Coordinate, True)
+
     def DisplayAuxiliryLine(self):
         if self.showVieportAuxilirayLine:
             for point in self.myPoles:
@@ -134,3 +139,21 @@ class Sketch_BezierCurve(Sketch_Geometry):
                 self.myContext.Erase(point.GetAIS_Object(), True)
             for line in self.myAIS_Lines:
                 self.myContext.Erase(line, True)
+
+    def GetStyle(self):
+        return self.myWireStyle
+
+    def SetStyle(self, theStyle):
+        self.myWireStyle = theStyle
+
+    def GetWidth(self):
+        return self.myWireWidth
+
+    def SetWidth(self, theWidth):
+        self.myWireWidth = theWidth
+
+    def GetColor(self):
+        return self.myWireColor
+
+    def SetColor(self, theColor):
+        self.myWireColor = theColor

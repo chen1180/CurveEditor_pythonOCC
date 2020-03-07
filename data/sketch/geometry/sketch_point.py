@@ -67,3 +67,25 @@ class Sketch_Point(Sketch_Geometry):
             self.myContext.Display(self.myAIS_Coordinate, True)
         else:
             self.myContext.Erase(self.myAIS_Coordinate, True)
+
+    def RemoveLabel(self):
+        self.myContext.Remove(self.myAIS_Coordinate, True)
+        self.myContext.Remove(self.myAIS_Name, True)
+
+    def GetStyle(self):
+        return self.myPointStyle
+
+    def SetStyle(self, theStyle):
+        self.myPointStyle = theStyle
+
+    def GetColor(self):
+        return self.myPointColor
+
+    def SetColor(self, theColor):
+        self.myPointColor = theColor
+
+    def GetWidth(self):
+        return self.myPointWidth
+
+    def SetWidth(self, theWidth):
+        self.myPointWidth = theWidth

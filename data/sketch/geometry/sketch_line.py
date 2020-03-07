@@ -91,3 +91,21 @@ class Sketch_Line(Sketch_Geometry):
         else:
             for point in self.myPoles:
                 self.myContext.Erase(point.myAIS_Coordinate, True)
+
+    def GetStyle(self):
+        return self.myLineStyle
+
+    def SetStyle(self, theStyle):
+        self.myLineStyle = theStyle
+
+    def GetWidth(self):
+        return self.myLineWidth
+
+    def SetWidth(self, theWidth):
+        self.myLineWidth = theWidth
+
+    def GetColor(self):
+        return self.myLineColor
+
+    def SetColor(self, theColor):
+        self.myLineColor = theColor

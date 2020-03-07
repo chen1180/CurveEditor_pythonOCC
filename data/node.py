@@ -300,7 +300,7 @@ class BsplineNode(SketchObjectNode):
         return r
 
     def typeInfo(self):
-        return "BSpline"
+        return "Bspline"
 
     def resource(self):
         return ":/bspline_curve.png"

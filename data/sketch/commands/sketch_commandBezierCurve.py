@@ -98,7 +98,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             self.myGeom_BezierCurve.SetPole(self.IndexCounter, self.tempPnt)
 
             self.mySecondPoint.SetPnt(self.tempPnt)
-            ME = BRepBuilderAPI_MakeEdge(self.myGeom_BezierCurve, self.myFirstgp_Pnt, self.tempPnt)
+            ME = BRepBuilderAPI_MakeEdge(self.myGeom_BezierCurve)
             if ME.IsDone():
                 self.storePoles()
                 self.curEdge = ME.Edge()
@@ -128,7 +128,7 @@ class Sketch_CommandBezierCurve(Sketch_Command):
             self.myGeom2d_BezierCurve.SetPole(self.IndexCounter, self.curPnt2d)
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
             self.myGeom_BezierCurve.SetPole(self.IndexCounter, self.mySecondPoint.Pnt())
-            ME = BRepBuilderAPI_MakeEdge(self.myGeom_BezierCurve, self.myFirstgp_Pnt, self.mySecondPoint.Pnt())
+            ME = BRepBuilderAPI_MakeEdge(self.myGeom_BezierCurve)
             if ME.IsDone():
                 self.curEdge = ME.Edge()
                 self.myRubberAIS_Shape.Set(self.curEdge)

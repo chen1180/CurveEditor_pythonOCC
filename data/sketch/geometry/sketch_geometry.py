@@ -30,7 +30,6 @@ class Sketch_Geometry:
         self.showViewportObject = True
         self.showVieportAuxilirayLine = True
 
-        self.myNameOfColor = Quantity_NOC_GREEN
         self.myObjectType = AIS_SD_None
         '''
         Line style:
@@ -42,15 +41,18 @@ class Sketch_Geometry:
         '''
         self.myPointStyle = Aspect_TOM_O_POINT
         self.myPointWidth = 5.0
-        self.myPointAspect = Prs3d_PointAspect(self.myPointStyle, Quantity_Color(Quantity_NOC_BLUE1), self.myPointWidth)
+        self.myPointColor = Quantity_NOC_BLUE1
+        self.myPointAspect = Prs3d_PointAspect(self.myPointStyle, Quantity_Color(self.myPointColor), self.myPointWidth)
 
         self.myLineStyle = Aspect_TOL_SOLID
         self.myLineWidth = 2.0
-        self.myLineAspect = Prs3d_LineAspect(Quantity_Color(Quantity_NOC_WHITE), self.myLineStyle, self.myLineWidth)
+        self.myLineColor = Quantity_NOC_WHITE
+        self.myLineAspect = Prs3d_LineAspect(Quantity_Color(self.myLineColor), self.myLineStyle, self.myLineWidth)
 
         self.myWireStyle = Aspect_TOL_SOLID
         self.myWireWidth = 3.0
-        self.myWireAspect = Prs3d_LineAspect(Quantity_Color(self.myNameOfColor), self.myWireStyle, self.myWireWidth)
+        self.myWireColor = Quantity_NOC_GREEN
+        self.myWireAspect = Prs3d_LineAspect(Quantity_Color(self.myWireColor), self.myWireStyle, self.myWireWidth)
 
         self.myDrawer = Prs3d_Drawer()
         # for stright line
@@ -81,10 +83,34 @@ class Sketch_Geometry:
     def GetName(self):
         return self.myName
 
+    def GetType(self):
+        return self.myObjectType
+
+    def GetColor(self):
+        pass
+
+    def SetColor(self, theColor):
+        pass
+
+    def GetWidth(self):
+        pass
+
+    def SetWidth(self, theWidth):
+        pass
+
+    def GetStyle(self):
+        pass
+
+    def SetStyle(self, theStyle):
+        pass
+
     def Display(self, theContext: AIS_InteractiveContext):
         pass
 
     def Redisplay(self, theContext: AIS_InteractiveContext):
+        pass
+
+    def RemoveLabel(self):
         pass
 
     def RemoveDisplay(self):
@@ -101,5 +127,6 @@ class Sketch_Geometry:
             self.myContext.Display(self.GetAIS_Object(), True)
         else:
             self.myContext.Erase(self.GetAIS_Object(), True)
+
     def DisplayAuxiliryLine(self):
         pass
