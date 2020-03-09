@@ -250,5 +250,6 @@ class Sketch(object):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             if self.CurCommand.GetTypeOfMethod() == self.myCurrentMethod:
                 # Acitivate selection automaticlly
+                #This is a bug!! Remove the following line will lead to critical error when enable sketch command.
                 self.myContext.SetAutoActivateSelection(False)
                 break

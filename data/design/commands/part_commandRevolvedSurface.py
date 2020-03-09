@@ -8,9 +8,10 @@ class RevolvedSurfaceAction(Enum):
 
 
 class Part_CommandRevolvedSurface(Part_Command):
-    def __init__(self):
+    def __init__(self, gui):
         super(Part_CommandRevolvedSurface, self).__init__("RevolvedSurface.")
         self.myCurve = Geom_Line(gp.OX())
+        self.myGUI: part_qtgui.Part_QTGUI = gui
         self.myAxis = gp_Ax1()
         self.myGeomSurface = Geom_SurfaceOfRevolution(self.myCurve, self.myAxis)
         self.myRubberSurface = None
@@ -23,30 +24,20 @@ class Part_CommandRevolvedSurface(Part_Command):
         myObjects = self.SelectObject(xPix, yPix)
         if myObjects is None:
             return False
-        if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
-            pass
-        elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
-            if myObjects.Type() == AIS_KOI_Shape:
-                curve = self.FindGeometry(myObjects)
-                if curve:
-                    self.myCurve = curve
-                    self.myGeomSurface.SetBasisCurve(self.myCurve)
-                    self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Input_Axis
-        elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
-            if myObjects.Type() == AIS_KOI_Datum:
-                datum = self.FindDatum(myObjects)
-                if datum:
-                    if type(datum) == AIS_Line:
-                        self.myContext.Remove(self.myRubberSurface, True)
-                        self.myAxis = datum.Line().Position()
-                        self.mySurface = Surface_Revolved(self.myContext)
-                        self.mySurface.SetCurves(self.myCurve)
-                        self.mySurface.SetRevolveAxis(self.myAxis)
-                        self.mySurface.Compute()
-                        self.surfaceNode = RevolvedSurfaceNode(self.mySurface.GetName(), self.myNode)
-                        self.surfaceNode.setSketchObject(self.mySurface)
-                        self.myModel.layoutChanged.emit()
-                        self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Nothing
+        if self.myGUI.form_createRevolSurface.selectProfile==True:
+            self.myGUI.form_createRevolSurface.SetProfile()
+            self.myGUI.form_createRevolSurface.selectProfile=False
+        if self.myGUI.form_createRevolSurface.selectAxis==True:
+            self.myGUI.form_createRevolSurface.SetAxis()
+            self.myGUI.form_createRevolSurface.selectAxis=False
+        # if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
+        #     pass
+        # elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
+        #     if myObjects.Type() == AIS_KOI_Shape:
+        #         curve = self.FindGeometry(myObjects)
+        # elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
+        #     if myObjects.Type() == AIS_KOI_Datum:
+        #         datum = self.FindDatum(myObjects)
 
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)

@@ -1,6 +1,7 @@
 from view import createRevolSurfaceForm
-from PyQt5.QtWidgets import QWidget, QApplication, QAbstractItemView
-from PyQt5.QtCore import QModelIndex, Qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from OCC.Core.AIS import *
 from data.model import SceneGraphModel
 from data.sketch.geometry import *
@@ -22,6 +23,8 @@ class RevolSurfaceForm(QWidget):
         self.ui.uiChangeAxis.clicked.connect(self.SelectAxis)
         self.ui.uiPreview.clicked.connect(self.PreviewSurface)
         self.ui.uiOk.clicked.connect(self.ApplyChange)
+        self.selectProfile = False
+        self.selectAxis = False
 
     def SetContext(self, theContext):
         self.myContext: AIS_InteractiveContext = theContext
@@ -30,6 +33,11 @@ class RevolSurfaceForm(QWidget):
         self.myModel: SceneGraphModel = theModel
 
     def SelectProfile(self):
+        self.parent.Hide()
+        self.selectProfile = True
+
+    def SetProfile(self):
+        self.parent.Show()
         root = self.myModel.getNode(QModelIndex())
         for i, planeNode in enumerate(root.children()):
             for child in planeNode.children():
@@ -39,6 +47,12 @@ class RevolSurfaceForm(QWidget):
                     self.myProfile = myCurObject
 
     def SelectAxis(self):
+        self.parent.Hide()
+        self.ui.uiChangeAxis.setText("Selecting")
+        self.selectAxis = True
+
+    def SetAxis(self):
+        self.parent.Show()
         root = self.myModel.getNode(QModelIndex())
         for i, planeNode in enumerate(root.children()):
             for child in planeNode.children():

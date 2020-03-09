@@ -27,44 +27,44 @@ class Part_CommandBezierSurface(Part_Command):
             return False
         if myObjects.Type() == AIS_KOI_Shape:
             curve = self.FindGeometry(myObjects)
-            if curve:
-                if type(curve) == Geom_BSplineCurve:
-                    raise Exception("Curve must be bezier type")
-                if self.myBezierSurfaceAction == BezierSurfaceAction.Nothing:
-                    pass
-                elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve1:
-                    self.myCurves.append(curve)
-                    self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve2
-                elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve2:
-                    self.myCurves.append(curve)
-                    surface1 = GeomFill_BezierCurves(self.myCurves[0], curve, GeomFill_CurvedStyle)
-                    face = BRepBuilderAPI_MakeFace()
-                    face.Init(surface1.Surface(), True, 1.0e-6)
-                    face.Build()
-
-                    self.myRubberSurface = AIS_Shape(face.Shape())
-                    self.myContext.Display(self.myRubberSurface, True)
-                    self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve3
-                elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve3:
-                    self.myCurves.append(curve)
-                    surface1 = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], curve, GeomFill_CurvedStyle)
-                    face = BRepBuilderAPI_MakeFace()
-                    face.Init(surface1.Surface(), True, 1.0e-6)
-                    face.Build()
-                    self.myRubberSurface.SetShape(face.Shape())
-                    self.myContext.Redisplay(self.myRubberSurface, True)
-                    self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve4
-                elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve4:
-                    self.myCurves.append(curve)
-                    surface1 = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2], curve,
-                                                     GeomFill_CurvedStyle)
-                    face = BRepBuilderAPI_MakeFace()
-                    face.Init(surface1.Surface(), True, 1.0e-6)
-                    face.Build()
-                    self.myRubberSurface.SetShape(face.Shape())
-                    self.myContext.Redisplay(self.myRubberSurface, True)
-                    self.CloseSurface()
-                    self.myBezierSurfaceAction = BezierSurfaceAction.Nothing
+            # if curve:
+            #     if type(curve) == Geom_BSplineCurve:
+            #         raise Exception("Curve must be bezier type")
+            #     if self.myBezierSurfaceAction == BezierSurfaceAction.Nothing:
+            #         pass
+            #     elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve1:
+            #         self.myCurves.append(curve)
+            #         self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve2
+            #     elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve2:
+            #         self.myCurves.append(curve)
+            #         surface1 = GeomFill_BezierCurves(self.myCurves[0], curve, GeomFill_CurvedStyle)
+            #         face = BRepBuilderAPI_MakeFace()
+            #         face.Init(surface1.Surface(), True, 1.0e-6)
+            #         face.Build()
+            #
+            #         self.myRubberSurface = AIS_Shape(face.Shape())
+            #         self.myContext.Display(self.myRubberSurface, True)
+            #         self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve3
+            #     elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve3:
+            #         self.myCurves.append(curve)
+            #         surface1 = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], curve, GeomFill_CurvedStyle)
+            #         face = BRepBuilderAPI_MakeFace()
+            #         face.Init(surface1.Surface(), True, 1.0e-6)
+            #         face.Build()
+            #         self.myRubberSurface.SetShape(face.Shape())
+            #         self.myContext.Redisplay(self.myRubberSurface, True)
+            #         self.myBezierSurfaceAction = BezierSurfaceAction.Input_Curve4
+            #     elif self.myBezierSurfaceAction == BezierSurfaceAction.Input_Curve4:
+            #         self.myCurves.append(curve)
+            #         surface1 = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2], curve,
+            #                                          GeomFill_CurvedStyle)
+            #         face = BRepBuilderAPI_MakeFace()
+            #         face.Init(surface1.Surface(), True, 1.0e-6)
+            #         face.Build()
+            #         self.myRubberSurface.SetShape(face.Shape())
+            #         self.myContext.Redisplay(self.myRubberSurface, True)
+            #         self.CloseSurface()
+            #         self.myBezierSurfaceAction = BezierSurfaceAction.Nothing
 
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)

@@ -13,6 +13,7 @@ from OCC.Core.GeomFill import *
 from OCC.Core.BRepBuilderAPI import *
 from enum import Enum
 from data.design.geometry import *
+from data.design.gui import part_qtgui
 
 
 class Part_Command(object):
@@ -46,7 +47,6 @@ class Part_Command(object):
 
     def SetStatusBar(self, theStatusBar):
         self.myStatusBar: QStatusBar = theStatusBar
-
 
     def SetRootNode(self, theNode):
         self.myNode: SketchNode = theNode

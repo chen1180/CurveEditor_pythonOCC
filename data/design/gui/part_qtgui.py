@@ -32,6 +32,7 @@ class Part_QTGUI(object):
         elif theActionType == Part_ObjectTypeOfMethod.Nothing_Method:
             self.dockWidget.hide()
         self.dockWidget.show()
-
+    def Show(self):
+        self.dockWidget.show()
     def Hide(self):
         self.dockWidget.hide()

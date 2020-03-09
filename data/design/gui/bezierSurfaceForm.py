@@ -1,6 +1,7 @@
 from view import createBezierSurfaceForm
-from PyQt5.QtWidgets import QWidget, QApplication, QAbstractItemView
-from PyQt5.QtCore import QModelIndex, Qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from OCC.Core.AIS import *
 from data.model import SceneGraphModel
 from data.sketch.geometry import *
@@ -48,6 +49,10 @@ class BezierSurfaceForm(QWidget):
 
     def CheckType(self):
         if self.myCurves:
+            if len(self.myCurves)<2:
+                raise ValueError("At least 2 curves required !")
+            if len(self.myCurves)>4:
+                raise ValueError("At most 4 curves needed!\nPlease delete extra geometry!")
             for curve in self.myCurves:
                 if curve.GetTypeOfMethod() is not Sketch_ObjectTypeOfMethod.BezierCurve_Method:
                     raise TypeError("Selections must be BezierCurve. Pls remove the other types of geometry")
