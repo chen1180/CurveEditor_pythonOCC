@@ -92,6 +92,18 @@ class Sketch_Line(Sketch_Geometry):
             for point in self.myPoles:
                 self.myContext.Erase(point.myAIS_Coordinate, True)
 
+    def DisplayAuxiliryLine(self):
+        if self.showVieportAuxilirayLine:
+            for point in self.myPoles:
+                self.myContext.Display(point.GetAIS_Object(), True)
+        else:
+            for point in self.myPoles:
+                self.myContext.Erase(point.GetAIS_Object(), True)
+
+    def RemoveLabel(self):
+        for point in self.myPoles:
+            point.RemoveLabel()
+
     def GetStyle(self):
         return self.myLineStyle
 

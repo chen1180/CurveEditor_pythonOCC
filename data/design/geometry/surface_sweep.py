@@ -7,8 +7,8 @@ from OCC.Core.GeomFill import *
 class Surface_Sweep(Surface_Geometry):
     IndexCounter = 0
 
-    def __init__(self, theContext, theAxis):
-        super(Surface_Sweep, self).__init__("Sweep Surface", theContext, theAxis)
+    def __init__(self, theContext):
+        super(Surface_Sweep, self).__init__("Sweep Surface", theContext)
         Surface_Sweep.IndexCounter += 1
         self.myName = self.myName + str(self.IndexCounter)
         self.myProfile = None

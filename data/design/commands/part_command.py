@@ -20,7 +20,6 @@ class Part_Command(object):
         self.data = []
         self.myModel = None
         self.objectName = name
-        self.curCoordinateSystem = gp_Ax3(gp.XOY())
         self.objectCounter = 0
 
         self.myPolylineMode = False
@@ -48,11 +47,6 @@ class Part_Command(object):
     def SetStatusBar(self, theStatusBar):
         self.myStatusBar: QStatusBar = theStatusBar
 
-    def SetAx3(self, theAx3: gp_Ax3):
-        dir = theAx3.Direction()
-        location = theAx3.Location()
-        self.curCoordinateSystem.SetDirection(dir)
-        self.curCoordinateSystem.SetLocation(location)
 
     def SetRootNode(self, theNode):
         self.myNode: SketchNode = theNode

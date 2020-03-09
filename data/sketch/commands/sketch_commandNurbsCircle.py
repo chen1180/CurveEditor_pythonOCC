@@ -57,7 +57,7 @@ class Sketch_CommandNurbCircle(Sketch_Command):
             self.bspline_node.setSketchObject(nurbs)
             self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(),
                            Sketch_GeometryType.CurveSketchObject)
-            self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_CenterPoint
+            self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
 
         return False
 

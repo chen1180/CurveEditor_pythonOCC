@@ -11,18 +11,14 @@ from OCC.Core.Prs3d import *
 
 class Surface_Geometry:
 
-    def __init__(self, name, theContext, theAxis):
+    def __init__(self, name, theContext):
         self.myGeometry = None
         self.myAIS_InteractiveObject = None
-        self.curCoordinateSystem: gp_Ax3 = theAxis
         self.myContext = theContext
 
         self.myName = name
         self.myGeometryType = None
         self.myTypeOfMethod = None
-
-    def SetAxis(self, theAxis):
-        self.curCoordinateSystem = theAxis
 
     def SetContext(self, theContext):
         self.myContext: AIS_InteractiveContext = theContext

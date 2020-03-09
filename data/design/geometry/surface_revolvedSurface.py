@@ -14,8 +14,8 @@ from .surface_geometry import Surface_Geometry
 class Surface_Revolved(Surface_Geometry):
     IndexCounter = 0
 
-    def __init__(self, theContext, theAxis):
-        super(Surface_Revolved, self).__init__("Revolved Surface", theContext, theAxis)
+    def __init__(self, theContext):
+        super(Surface_Revolved, self).__init__("Revolved Surface", theContext)
         Surface_Revolved.IndexCounter += 1
         self.myName = self.myName + str(self.IndexCounter)
         self.myCurve = None

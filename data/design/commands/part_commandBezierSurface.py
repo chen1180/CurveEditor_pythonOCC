@@ -9,7 +9,6 @@ class BezierSurfaceAction(Enum):
     Input_Curve3 = 3
     Input_Curve4 = 4
 
-
 class Part_CommandBezierSurface(Part_Command):
     def __init__(self):
         super(Part_CommandBezierSurface, self).__init__("BezierSurface.")
@@ -96,7 +95,7 @@ class Part_CommandBezierSurface(Part_Command):
 
     def CloseSurface(self):
         self.myContext.Remove(self.myRubberSurface, True)
-        self.myGeomSurface = Surface_Bezier(self.myContext, self.curCoordinateSystem)
+        self.myGeomSurface = Surface_Bezier(self.myContext)
         self.myGeomSurface.SetCurves(self.myCurves)
         self.myGeomSurface.Compute()
         self.bezierSurfaceNode = BezierSurfaceNode(self.myGeomSurface.GetName(), self.myNode)

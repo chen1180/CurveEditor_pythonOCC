@@ -185,10 +185,11 @@ class Sketch(object):
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method
         # Acitivate selection automaticlly
-        self.myContext.SetAutoActivateSelection(True)
-        self.SetPickTolerance(20)
-        # for all the sketch object selectable
-        self.myContext.Deactivate()
+        # self.myContext.SetAutoActivateSelection(True)
+        # self.SetPickTolerance(20)
+        # self.myContext.ActivatedModes()
+        # # for all the sketch object selectable
+        # self.myContext.Deactivate()
         self.myContext.Activate(0)
 
     def DeleteSelectedObject(self):

@@ -1,3 +1,4 @@
+
 class Node(object):
 
     def __init__(self, name, parent=None):
@@ -6,6 +7,7 @@ class Node(object):
             name: name of the node
             parent: parent pointer
         '''
+        super(Node, self).__init__()
         self._name = name
         self._parent = parent
         self._children = []
@@ -125,19 +127,20 @@ class PointNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(PointNode, self).__init__(name, parent)
         self.sketchObject: Sketch_Point = None
+
     def setData(self, column, value):
         super(SketchObjectNode, self).setData(column, value)
         # show in viewport
         if column == 2:
-            self.sketchObject.showViewportObject=value
+            self.sketchObject.showViewportObject = value
             self.sketchObject.DisplayObject()
         # shows auxiliry line
         elif column == 3:
-            self.sketchObject.showVieportAuxilirayLine=value
+            self.sketchObject.showVieportAuxilirayLine = value
             self.sketchObject.DisplayAuxiliryLine()
         # viewport name
         elif column == 4:
-            self.sketchObject.showViewportName=value
+            self.sketchObject.showViewportName = value
             self.sketchObject.DisplayName()
         # viewport coordinate
         elif column == 5:
@@ -159,6 +162,7 @@ class PointNode(SketchObjectNode):
         elif column == 5:
             r = self.sketchObject.showViewportCoordinate
         return r
+
     def typeInfo(self):
         return "Point"
 
@@ -170,19 +174,20 @@ class LineNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(LineNode, self).__init__(name, parent)
         self.sketchObject: Sketch_Line = None
+
     def setData(self, column, value):
         super(SketchObjectNode, self).setData(column, value)
         # show in viewport
         if column == 2:
-            self.sketchObject.showViewportObject=value
+            self.sketchObject.showViewportObject = value
             self.sketchObject.DisplayObject()
         # shows auxiliry line
         elif column == 3:
-            self.sketchObject.showVieportAuxilirayLine=value
+            self.sketchObject.showVieportAuxilirayLine = value
             self.sketchObject.DisplayAuxiliryLine()
         # viewport name
         elif column == 4:
-            self.sketchObject.showViewportName=value
+            self.sketchObject.showViewportName = value
             self.sketchObject.DisplayName()
         # viewport coordinate
         elif column == 5:
@@ -204,6 +209,7 @@ class LineNode(SketchObjectNode):
         elif column == 5:
             r = self.sketchObject.showViewportCoordinate
         return r
+
     def typeInfo(self):
         return "Line"
 
@@ -223,15 +229,15 @@ class BezierNode(SketchObjectNode):
         super(SketchObjectNode, self).setData(column, value)
         # show in viewport
         if column == 2:
-            self.sketchObject.showViewportObject=value
+            self.sketchObject.showViewportObject = value
             self.sketchObject.DisplayObject()
         # shows auxiliry line
         elif column == 3:
-            self.sketchObject.showVieportAuxilirayLine=value
+            self.sketchObject.showVieportAuxilirayLine = value
             self.sketchObject.DisplayAuxiliryLine()
         # viewport name
         elif column == 4:
-            self.sketchObject.showViewportName=value
+            self.sketchObject.showViewportName = value
             self.sketchObject.DisplayName()
         # viewport coordinate
         elif column == 5:
@@ -253,6 +259,7 @@ class BezierNode(SketchObjectNode):
         elif column == 5:
             r = self.sketchObject.showViewportCoordinate
         return r
+
     def typeInfo(self):
         return "Bezier Curve"
 

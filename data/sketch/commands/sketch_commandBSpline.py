@@ -91,7 +91,7 @@ class Sketch_CommandBSpline(Sketch_Command):
 
             ME = BRepBuilderAPI_MakeEdge(self.myFirstgp_Pnt, self.tempPnt)
             if ME.IsDone():
-                self.storePoles()
+                self.bspline.AddPoles(self.curPnt2d)
                 self.curEdge = ME.Edge()
                 self.myRubberAIS_Shape.Set(self.curEdge)
                 self.myContext.Remove(self.myRubberLine, True)
@@ -114,7 +114,7 @@ class Sketch_CommandBSpline(Sketch_Command):
             self.mySecondPoint.SetPnt(self.tempPnt)
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
             if ME.IsDone():
-                self.storePoles()
+                self.bspline.AddPoles(self.curPnt2d)
                 self.curEdge = ME.Edge()
                 if self.IndexCounter > MAXIMUMPOLES:
                     self.closeBSpline()
@@ -175,8 +175,6 @@ class Sketch_CommandBSpline(Sketch_Command):
     def GetTypeOfMethod(self):
         return Sketch_ObjectTypeOfMethod.BSpline_Method
 
-    def storePoles(self):
-        self.bspline.AddPoles(self.curPnt2d)
 
     def closeBSpline(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)

@@ -5,6 +5,8 @@ from data.sketch.sketch_utils import *
 from OCC.Core.gp import *
 from OCC.Core.Aspect import *
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeVertex
+from OCC.Core.Geom2dAPI import *
+from OCC.Core.GeomAPI import *
 from OCC.Core.Prs3d import *
 from data.sketch.sketch_object import *
 

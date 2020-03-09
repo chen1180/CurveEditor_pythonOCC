@@ -14,24 +14,25 @@ from .surface_geometry import Surface_Geometry
 class Surface_Bezier(Surface_Geometry):
     IndexCounter = 0
 
-    def __init__(self, theContext, theAxis):
-        super(Surface_Bezier, self).__init__("Bezier surface", theContext, theAxis)
+    def __init__(self, theContext):
+        super(Surface_Bezier, self).__init__("Bezier surface", theContext)
         Surface_Bezier.IndexCounter += 1
         self.myName = self.myName + str(self.IndexCounter)
         self.myCurves = []
         self.myGeometry = None
         self.myAIS_InteractiveObject = None
+        self.myStyle = GeomFill_StretchStyle
 
     def Compute(self):
         if len(self.myCurves) == 2:
-            self.myGeometry = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], GeomFill_CurvedStyle)
+            self.myGeometry = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], self.myStyle)
         elif len(self.myCurves) == 3:
             self.myGeometry = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2],
-                                                    GeomFill_CurvedStyle)
+                                                    self.myStyle)
         elif len(self.myCurves) == 4:
             self.myGeometry = GeomFill_BezierCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2],
-                                                    self.myCurves[3], GeomFill_CurvedStyle)
-        self.myGeometry=self.myGeometry.Surface()
+                                                    self.myCurves[3], self.myStyle)
+        self.myGeometry = self.myGeometry.Surface()
         face = BRepBuilderAPI_MakeFace()
         face.Init(self.myGeometry, True, 1.0e-6)
         face.Build()
@@ -40,3 +41,6 @@ class Surface_Bezier(Surface_Geometry):
 
     def SetCurves(self, theCurves):
         self.myCurves = theCurves
+
+    def SetStyle(self, theStyle):
+        self.myStyle = theStyle

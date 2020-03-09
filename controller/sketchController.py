@@ -37,7 +37,7 @@ class SketchController(QObject):
             self.selectSketchNode(node)
         elif isinstance(node, SketchObjectNode):
             self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
-        self._display.View.SetFront()
+        # self._display.View.SetFront()
         self._display.Context.FitSelected(self._display.View)
 
     def setStatusBar(self, theStatusBar):
@@ -195,15 +195,18 @@ class SketchController(QObject):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.PointsToBSpline_Method)
 
     def OnMouseInputEvent(self, *kargs):
-        self.sketch.OnMouseInputEvent(*kargs)
+        if self.currentSketchNode:
+            self.sketch.OnMouseInputEvent(*kargs)
         # self.model.layoutChanged.emit()
         # self.sketchObjectUpdated.emit(self.currentSketchNode)
 
     def OnMouseMoveEvent(self, *kargs):
-        self.sketch.OnMouseMoveEvent(*kargs)
+        if self.currentSketchNode:
+            self.sketch.OnMouseMoveEvent(*kargs)
 
     def OnMouseReleaseEvent(self, *kargs):
-        self.sketch.OnMouseReleaseEvent(*kargs)
+        if self.currentSketchNode:
+            self.sketch.OnMouseReleaseEvent(*kargs)
 
     def editGeometry(self):
         if self.currentSketchNode:
@@ -221,7 +224,10 @@ class SketchController(QObject):
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
                     myCurObject.RemoveDisplay()
-                    planeNode.removeChild(index)
+                    myCurObject.RemoveLabel()
+                    #get parent sketch node
+                    planeIndex=self.model.index(i,0,QModelIndex())
+                    self.model.removeRow(index,planeIndex)
                 else:
                     index += 1
         # inform model to update

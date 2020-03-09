@@ -64,6 +64,27 @@ class Sketch_Bspline(Sketch_Geometry):
             self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
             self.myContext.Display(self.myAIS_InteractiveObject, True)
 
+    def ComputeInterpolation(self):
+        poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
+        arrayOfPoles2d = point_list_to_TColgp_Array1OfPnt2d(poles2d_list)
+        self.myGeometry2d = Geom2dAPI_PointsToBSpline(arrayOfPoles2d)
+        if self.myGeometry2d.IsDone():
+            self.myGeometry2d = self.myGeometry2d.Curve()
+        poles_list = [pole.GetGeometry().Pnt() for pole in self.myPoles]
+        arrayOfPoles = point_list_to_TColgp_Array1OfPnt(poles_list)
+        self.myGeometry = GeomAPI_PointsToBSpline(arrayOfPoles)
+        if self.myGeometry.IsDone():
+            self.myGeometry = self.myGeometry.Curve()
+
+        edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
+        if self.myAIS_InteractiveObject:
+            self.myAIS_InteractiveObject.SetShape(edge.Edge())
+            self.myAIS_InteractiveObject.Redisplay(True)
+        else:
+            self.myAIS_InteractiveObject = AIS_Shape(edge.Edge())
+            self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
+            self.myContext.Display(self.myAIS_InteractiveObject, True)
+
     def DragTo(self, index, newPnt2d):
         self.myPoles[index].DragTo(newPnt2d)
         pole2d = self.myPoles[index].GetGeometry2d().Pnt2d()
@@ -105,7 +126,6 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def updateGeomAttributes(self):
-
         poles2d_array = self.myGeometry2d.Poles()
         poles2d_list = TColgp_Array1OfPnt2d_to_point_list(poles2d_array)
 
@@ -141,6 +161,8 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def RemoveAIS_Lines(self):
         # remove auxiliry line
+        for point in self.myPoles:
+            point.RemoveDisplay()
         for line in self.myAIS_Lines:
             self.myContext.Remove(line, True)
 
@@ -249,7 +271,6 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def RemoveLabel(self):
         for point in self.myPoles:
-            point.RemoveDisplay()
             point.RemoveLabel()
         for line in self.myAIS_Lines:
             self.myContext.Remove(line, True)

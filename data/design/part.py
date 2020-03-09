@@ -15,13 +15,14 @@ class Part(object):
         self.myContext: AIS_InteractiveContext = theDisplay.Context
         self.myView: V3d_View = theDisplay.View
         self.myStatusBar = statusBar
-        self.myGUI=sg
+        self.myGUI = sg
+        self.myGUI.SetContext(self.myContext)
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 
         self.myIntCS = GeomAPI_IntCS()
 
         self.myNode: SketchNode = None
-        self.myModel=None
+        self.myModel = None
 
         self.myData = []
         self.myCommands = []
@@ -29,6 +30,7 @@ class Part(object):
         self.addCommand(Part_CommandRevolvedSurface())
         self.addCommand(Part_CommandExtrudedSurface())
         self.addCommand(Part_CommandSweepSurface())
+
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
         self.myGUI.SetContext(theContext)
@@ -38,13 +40,13 @@ class Part(object):
 
     def SetDisplay(self, theDisplay: Viewer3d):
         self.myDisplay = theDisplay
-        for idx in range( len(self.myCommands)):
+        for idx in range(len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetDisplay(self.myDisplay)
 
     def SetData(self, thedata: list):
         self.myData = thedata
-        for idx in range( len(self.myCommands)):
+        for idx in range(len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetData(self.myData)
 
@@ -53,11 +55,14 @@ class Part(object):
         for idx in range(len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetRootNode(self.myNode)
-    def SetModel(self,theModel):
-        self.myModel=theModel
+
+    def SetModel(self, theModel):
+        self.myModel = theModel
+        self.myGUI.SetModel(self.myModel)
         for idx in range(len(self.myCommands)):
             self.CurCommand: Part_Command = self.myCommands[idx]
             self.CurCommand.SetModel(self.myModel)
+
     def GetData(self):
         return self.myData
 
@@ -105,7 +110,7 @@ class Part(object):
     def DeleteSelectedObject(self):
         for index in range(self.myNode.childCount()):
             child = self.myNode.child(index)
-            if isinstance(child,SketchObjectNode):
+            if isinstance(child, SketchObjectNode):
                 myObject = child.getSketchObject()
                 if self.myContext.IsSelected(myObject.GetAIS_Object()):
                     myObject.RemoveDisplay()

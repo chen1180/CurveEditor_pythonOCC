@@ -37,10 +37,6 @@ class Part_CommandExtrudedSurface(Part_Command):
                     self.myCurve = datum.Circle()
                     self.myGeomSurface.SetBasisCurve(self.myCurve)
                     self.CloseSurface()
-                # elif type(datum) == AIS_Line:
-                #     self.myCurve = datum.Line()
-                #     self.myGeomSurface.SetBasisCurve(self.myCurve)
-                #     self.CloseSurface()
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)
         if self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Nothing:
@@ -59,13 +55,14 @@ class Part_CommandExtrudedSurface(Part_Command):
         return Part_ObjectTypeOfMethod.ExtrudedSurface_Method
 
     def CloseSurface(self):
-        self.mySurface = Surface_LinearExtrusion(self.myContext, self.curCoordinateSystem)
-        normal_axis = self.curCoordinateSystem.Axis()
-        self.myDir = normal_axis.Direction()
+        self.mySurface = Surface_LinearExtrusion(self.myContext)
+        normal_axis = gp.XOY().Axis()
+        self.myDir = gp_Vec(normal_axis.Direction())
 
         self.mySurface.SetCurves(self.myCurve)
         self.mySurface.SetDirection(self.myDir)
         self.mySurface.Compute()
         self.surfaceNode = ExtrudedSurfaceNode(self.mySurface.GetName(), self.myNode)
         self.surfaceNode.setSketchObject(self.mySurface)
+        self.myContext.SetIsoNumber(10)
         self.myModel.layoutChanged.emit()

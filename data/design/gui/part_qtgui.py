@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QDockWidget,QWidget
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QWidget
 from PyQt5.QtCore import Qt
 from data.design.gui.bezierSurfaceForm import BezierSurfaceForm
 from data.design.part_type import *
@@ -12,11 +12,18 @@ class Part_QTGUI(object):
         self.form_createBezierSurface = BezierSurfaceForm()
         self.dockWidget.hide()
 
+    def SetContext(self, theContext):
+        self.form_createBezierSurface.SetContext(theContext)
+
+    def SetModel(self, theModel):
+        self.form_createBezierSurface.SetModel(theModel)
+
     def SetGui(self, theActionType: Part_ObjectTypeOfMethod):
-        if theActionType==Part_ObjectTypeOfMethod.BezierSurface_Method:
+        if theActionType == Part_ObjectTypeOfMethod.BezierSurface_Method:
             self.dockWidget.setWidget(self.form_createBezierSurface)
-        elif theActionType==Part_ObjectTypeOfMethod.Nothing_Method:
+        elif theActionType == Part_ObjectTypeOfMethod.Nothing_Method:
             self.dockWidget.hide()
         self.dockWidget.show()
+
     def Hide(self):
         self.dockWidget.hide()

@@ -33,11 +33,10 @@ class ViewController(QObject):
                                        triggered=setView)
         self._action_setView.setCheckable(True)
         self.actions.append(self._action_setView)
-        self._action_viewIso = QAction(QIcon(), "View ISO", self,
+        self._action_viewIso = QAction(QIcon(":/viewIso.png"), "View ISO", self,
                                        statusTip="Change view point",
                                        triggered=self._display.View_Iso)
         self.actions.append(self._action_viewIso)
-
         def switchDisplayMode(state):
             if state:
                 self._display.SetModeWireFrame()
