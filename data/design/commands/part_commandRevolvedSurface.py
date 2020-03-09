@@ -12,9 +12,6 @@ class Part_CommandRevolvedSurface(Part_Command):
         super(Part_CommandRevolvedSurface, self).__init__("RevolvedSurface.")
         self.myCurve = Geom_Line(gp.OX())
         self.myGUI: part_qtgui.Part_QTGUI = gui
-        self.myAxis = gp_Ax1()
-        self.myGeomSurface = Geom_SurfaceOfRevolution(self.myCurve, self.myAxis)
-        self.myRubberSurface = None
         self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Nothing
 
     def Action(self):

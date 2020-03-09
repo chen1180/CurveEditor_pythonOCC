@@ -96,7 +96,8 @@ class SketchNode(Node):
 
     def setSketchPlane(self, thePlane):
         self.sketch_plane = thePlane
-
+    def getSketchPlane(self):
+        return self.sketch_plane
     def typeInfo(self):
         return "Plane"
 

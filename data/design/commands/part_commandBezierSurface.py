@@ -10,9 +10,10 @@ class BezierSurfaceAction(Enum):
     Input_Curve4 = 4
 
 class Part_CommandBezierSurface(Part_Command):
-    def __init__(self):
+    def __init__(self,gui):
         super(Part_CommandBezierSurface, self).__init__("BezierSurface.")
         self.myCurves = []
+        self.myGUI: part_qtgui.Part_QTGUI = gui
         self.myAxis = gp_Ax1()
         self.myGeomSurface = None
         self.myRubberSurface = None

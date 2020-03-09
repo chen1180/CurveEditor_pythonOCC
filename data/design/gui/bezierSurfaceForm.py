@@ -22,6 +22,7 @@ class BezierSurfaceForm(QWidget):
         self.ui.uiDeleteCurve.clicked.connect(self.DeleteCurve)
         self.ui.uiPreview.clicked.connect(self.PreviewSurface)
         self.ui.uiOk.clicked.connect(self.ApplyChange)
+        self.parent = parent
         self.myCurves = []
         self.myGeomSurface=None
 

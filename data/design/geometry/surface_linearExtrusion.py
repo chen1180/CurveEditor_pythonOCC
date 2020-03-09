@@ -4,7 +4,7 @@ from OCC.Core.Geom import *
 from data.sketch.sketch_utils import *
 from OCC.Core.gp import *
 from OCC.Core.Aspect import *
-from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace,BRepBuilderAPI_MakeEdge
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakeEdge
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
 from OCC.Core.Prs3d import *
 from data.sketch.sketch_object import *
@@ -21,7 +21,7 @@ class Surface_LinearExtrusion(Surface_Geometry):
         self.myName = self.myName + str(self.IndexCounter)
         self.myCurve = None
         self.myVec = None
-        self.myMagnitude=200
+        self.myLength = 200
         self.myGeometry = None
         self.myAIS_InteractiveObject = None
 
@@ -31,7 +31,7 @@ class Surface_LinearExtrusion(Surface_Geometry):
         # face.Init(self.myGeometry, True, 1.0e-6)
         # face.Build()
         profile = BRepBuilderAPI_MakeEdge(self.myCurve).Edge()
-        prism = BRepPrimAPI_MakePrism(profile, self.myVec*self.myMagnitude).Shape()
+        prism = BRepPrimAPI_MakePrism(profile, self.myVec * self.myLength).Shape()
         self.myAIS_InteractiveObject = AIS_Shape(prism)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
@@ -40,3 +40,6 @@ class Surface_LinearExtrusion(Surface_Geometry):
 
     def SetDirection(self, theAxis):
         self.myVec = theAxis
+
+    def SetLength(self, theLength):
+        self.myLength = theLength

@@ -7,12 +7,9 @@ class ExtrudedSurfaceAction(Enum):
 
 
 class Part_CommandExtrudedSurface(Part_Command):
-    def __init__(self):
+    def __init__(self, gui):
         super(Part_CommandExtrudedSurface, self).__init__("ExtrudedSurface.")
-        self.myCurve = Geom_Line(gp.OX())
-        self.myDir = gp_Dir()
-        self.myGeomSurface = Geom_SurfaceOfLinearExtrusion(self.myCurve, self.myDir)
-        self.myRubberSurface = None
+        self.myGUI: part_qtgui.Part_QTGUI = gui
         self.myRevolvedSurfaceAction = ExtrudedSurfaceAction.Nothing
 
     def Action(self):
@@ -22,21 +19,28 @@ class Part_CommandExtrudedSurface(Part_Command):
         myObjects = self.SelectObject(xPix, yPix)
         if myObjects is None:
             return False
-        if self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Nothing:
-            pass
-        elif self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Input_Curve:
-            if myObjects.Type() == AIS_KOI_Shape:
-                curve = self.FindGeometry(myObjects)
-                if curve:
-                    self.myCurve = curve
-                    self.myGeomSurface.SetBasisCurve(self.myCurve)
-                    self.CloseSurface()
-            elif myObjects.Type() == AIS_KOI_Datum:
-                datum = self.FindDatum(myObjects)
-                if type(datum) == AIS_Circle:
-                    self.myCurve = datum.Circle()
-                    self.myGeomSurface.SetBasisCurve(self.myCurve)
-                    self.CloseSurface()
+        if self.myGUI.form_createExtrudedSurface.selectProfile == True:
+            self.myGUI.form_createExtrudedSurface.SetProfile()
+            self.myGUI.form_createExtrudedSurface.selectProfile = False
+        if self.myGUI.form_createExtrudedSurface.selectDirection == True:
+            self.myGUI.form_createExtrudedSurface.SetDirections()
+            self.myGUI.form_createExtrudedSurface.selectDirection = False
+        # if self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Nothing:
+        #     pass
+        # elif self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Input_Curve:
+        #     if myObjects.Type() == AIS_KOI_Shape:
+        #         curve = self.FindGeometry(myObjects)
+        #         if curve:
+        #             self.myCurve = curve
+        #             self.myGeomSurface.SetBasisCurve(self.myCurve)
+        #             self.CloseSurface()
+        #     elif myObjects.Type() == AIS_KOI_Datum:
+        #         datum = self.FindDatum(myObjects)
+        #         if type(datum) == AIS_Circle:
+        #             self.myCurve = datum.Circle()
+        #             self.myGeomSurface.SetBasisCurve(self.myCurve)
+        #             self.CloseSurface()
+
     def MouseMoveEvent(self, xPix, yPix, buttons, modifier):
         myObjects = self.DetectObject(xPix, yPix)
         if self.myRevolvedSurfaceAction == ExtrudedSurfaceAction.Nothing:
