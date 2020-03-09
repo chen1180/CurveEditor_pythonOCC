@@ -15,8 +15,8 @@ class ExtrudedSurfaceForm(QWidget):
         self.ui = createExtrudedSurfaceForm.Ui_Form()
         self.ui.setupUi(self)
         self.ui.uiAlongNormal.setChecked(True)
-        self.enableEdgeForm(False)
-        self.ui.uiAlongEdge.toggled.connect(self.enableEdgeForm)
+        self.EnableEdgeWidgets(False)
+        self.ui.uiAlongEdge.toggled.connect(self.EnableEdgeWidgets)
         self.ui.uiSelectButton.clicked.connect(self.SelectProfile)
         self.ui.uiSelectEdgeButton.clicked.connect(self.SelectDirection)
         self.ui.uiPreview.clicked.connect(self.PreviewSurface)
@@ -28,7 +28,7 @@ class ExtrudedSurfaceForm(QWidget):
         self.selectProfile = False
         self.selectDirection = False
 
-    def enableEdgeForm(self, checked):
+    def EnableEdgeWidgets(self, checked):
         self.ui.uiEdgeLineEdit.setEnabled(checked)
         self.ui.uiSelectEdgeButton.setEnabled(checked)
 

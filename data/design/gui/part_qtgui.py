@@ -5,6 +5,7 @@ from data.design.part_type import *
 from .bezierSurfaceForm import BezierSurfaceForm
 from .revolSurfaceForm import RevolSurfaceForm
 from .extrudedSurfaceForm import ExtrudedSurfaceForm
+from .sweepSurfaceForm import SweepSurfaceForm
 
 class Part_QTGUI(object):
     def __init__(self, parent: QMainWindow):
@@ -14,7 +15,8 @@ class Part_QTGUI(object):
         self.form_createBezierSurface = BezierSurfaceForm(self)
         self.form_createRevolSurface = RevolSurfaceForm(self)
         self.form_createExtrudedSurface=ExtrudedSurfaceForm(self)
-        self.forms = [self.form_createBezierSurface, self.form_createRevolSurface,self.form_createExtrudedSurface]
+        self.form_createSweepSurface=SweepSurfaceForm(self)
+        self.forms = [self.form_createBezierSurface, self.form_createRevolSurface,self.form_createExtrudedSurface,self.form_createSweepSurface]
         self.dockWidget.hide()
 
     def SetContext(self, theContext):
@@ -32,6 +34,8 @@ class Part_QTGUI(object):
             self.dockWidget.setWidget(self.form_createRevolSurface)
         elif theActionType == Part_ObjectTypeOfMethod.ExtrudedSurface_Method:
             self.dockWidget.setWidget(self.form_createExtrudedSurface)
+        elif theActionType == Part_ObjectTypeOfMethod.SweptSurface_Method:
+            self.dockWidget.setWidget(self.form_createSweepSurface)
         elif theActionType == Part_ObjectTypeOfMethod.Nothing_Method:
             self.dockWidget.hide()
         self.dockWidget.show()

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>299</width>
+    <height>388</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_4">
+   <item row="2" column="1">
+    <widget class="QPushButton" name="uiOk">
+     <property name="text">
+      <string>Ok</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Path</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="uiPathLineEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="uiSelectPathButton">
+        <property name="toolTip">
+         <string>Select a path</string>
+        </property>
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="uiPreview">
+     <property name="text">
+      <string>Preview</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Section</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="6" column="0">
+       <widget class="QLineEdit" name="uiLastSectionLineEdit"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="uiRadiusSpinBox">
+        <property name="minimum">
+         <number>50</number>
+        </property>
+        <property name="maximum">
+         <number>500</number>
+        </property>
+        <property name="singleStep">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="uiConstantSectionRadioButton">
+        <property name="text">
+         <string>Constant Section</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="uiSelectConstantSectionButton">
+        <property name="toolTip">
+         <string>Select a constant cross section</string>
+        </property>
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="uiSelectFirstSectionButton">
+        <property name="toolTip">
+         <string>Select an inital cross section</string>
+        </property>
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QPushButton" name="uiSelectLastSectionButton">
+        <property name="toolTip">
+         <string>Select an end cross section</string>
+        </property>
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLineEdit" name="uiConstantSectionLineEdit"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QRadioButton" name="uiEvolvingSectionRadioButton">
+        <property name="text">
+         <string>Evolving Section</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLineEdit" name="uiFirstSectionLineEdit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="uiRadiusLabel">
+        <property name="text">
+         <string>Radius:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="uiCircularRadioButton">
+        <property name="text">
+         <string>Circular</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
+</ui>

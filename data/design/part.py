@@ -29,7 +29,7 @@ class Part(object):
         self.addCommand(Part_CommandBezierSurface(self.myGUI))
         self.addCommand(Part_CommandRevolvedSurface(self.myGUI))
         self.addCommand(Part_CommandExtrudedSurface(self.myGUI))
-        self.addCommand(Part_CommandSweepSurface())
+        self.addCommand(Part_CommandSweepSurface(self.myGUI))
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
