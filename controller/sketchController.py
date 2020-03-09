@@ -225,9 +225,9 @@ class SketchController(QObject):
                 if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
                     myCurObject.RemoveDisplay()
                     myCurObject.RemoveLabel()
-                    #get parent sketch node
-                    planeIndex=self.model.index(i,0,QModelIndex())
-                    self.model.removeRow(index,planeIndex)
+                    # get parent sketch node
+                    planeIndex = self.model.index(i, 0, QModelIndex())
+                    self.model.removeRow(index, planeIndex)
                 else:
                     index += 1
         # inform model to update

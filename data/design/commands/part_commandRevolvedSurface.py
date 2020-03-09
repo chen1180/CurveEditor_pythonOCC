@@ -39,7 +39,7 @@ class Part_CommandRevolvedSurface(Part_Command):
                     if type(datum) == AIS_Line:
                         self.myContext.Remove(self.myRubberSurface, True)
                         self.myAxis = datum.Line().Position()
-                        self.mySurface = Surface_Revolved(self.myContext, self.curCoordinateSystem)
+                        self.mySurface = Surface_Revolved(self.myContext)
                         self.mySurface.SetCurves(self.myCurve)
                         self.mySurface.SetRevolveAxis(self.myAxis)
                         self.mySurface.Compute()

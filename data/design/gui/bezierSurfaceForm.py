@@ -46,7 +46,7 @@ class BezierSurfaceForm(QWidget):
             self.ui.listWidget.takeItem(row)
             self.myCurves.pop(row)
 
-    def CheckCurveType(self):
+    def CheckType(self):
         if self.myCurves:
             for curve in self.myCurves:
                 if curve.GetTypeOfMethod() is not Sketch_ObjectTypeOfMethod.BezierCurve_Method:
@@ -57,7 +57,7 @@ class BezierSurfaceForm(QWidget):
         if self.myGeomSurface:
             self.myGeomSurface.RemoveDisplay()
             del self.myGeomSurface
-        if self.CheckCurveType():
+        if self.CheckType():
             self.myGeomSurface = Surface_Bezier(self.myContext)
             self.myGeomSurface.SetCurves([curve.GetGeometry() for curve in self.myCurves])
             self.myGeomSurface.SetStyle(self.ui.comboBox.currentIndex())

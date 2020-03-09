@@ -83,5 +83,12 @@ class PartController(QObject):
         self.part.OnCancel()
 
     def DeleteSelectedObject(self):
-        # self.part.DeleteSelectedObject()
-        pass
+        root: Node = self.model.getNode(QModelIndex())
+        for i, surfaceNode in enumerate(root.children()):
+            if isinstance(surfaceNode, SketchObjectNode):
+                myCurObject: Sketch_Geometry = surfaceNode.getSketchObject()
+                if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
+                    myCurObject.RemoveDisplay()
+                    self.model.removeRow(i, QModelIndex())
+        # inform model to update
+        self.model.layoutChanged.emit()
