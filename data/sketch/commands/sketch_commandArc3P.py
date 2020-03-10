@@ -33,7 +33,6 @@ class Sketch_CommandArc3P(Sketch_Command):
         self.myArc3PAction = Arc3PAction.Nothing
         self.tempGeom_Circle = Geom_Circle(self.curCoordinateSystem.Ax2(), SKETCH_RADIUS)
         self.myRubberCircle = AIS_Circle(self.tempGeom_Circle)
-        self.myRubberCircle.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
         self.temp2d_Circ = gp_Circ2d()
         self.temp_Circ = gp_Circ(self.curCoordinateSystem.Ax2(), SKETCH_RADIUS)
         self.temp2dAdaptor_Curve = Geom2dAdaptor_Curve()

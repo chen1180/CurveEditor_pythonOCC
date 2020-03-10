@@ -5,6 +5,7 @@ from OCC.Core.GeomAPI import GeomAPI_IntCS
 from OCC.Core.V3d import V3d_View
 from OCC.Core.Geom import Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect
+from OCC.Core.Graphic3d import Graphic3d_Vertex
 from data.node import *
 
 
@@ -12,6 +13,7 @@ class Sketch(object):
     def __init__(self, theDisplay, sg: Sketch_QTGUI = None):
         self.myCoordinateSystem = gp_Ax3(gp.XOY())
         self.myContext: AIS_InteractiveContext = theDisplay.Context
+        self.myDisplay=theDisplay
         self.myView: V3d_View = theDisplay.View
         self.myGUI = sg
         self.myGUI.SetAx3(self.myCoordinateSystem)
@@ -124,7 +126,8 @@ class Sketch(object):
 
         self.myCurrentLine.SetDirection(self.myCurrentDir)
         self.myCurrentLine.SetLocation(self.myTempPnt)
-
+        # pnt=self.myCurrentPlane.Pln().Location ()
+        # print(pnt.X(),pnt.Y(),pnt.Z())
         self.myIntCS.Perform(self.myCurrentLine, self.myCurrentPlane)  # perfrom intersection calculation
         if self.myIntCS.NbPoints() >= 1:
             self.myTempPnt = self.myIntCS.Point(1)
@@ -145,6 +148,12 @@ class Sketch(object):
         theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
+
+        #grid echo
+        v3dX, v3dY, v3dZ = self.myView.ConvertToGrid( theX, theY)
+        self.myDisplay.Viewer.ShowGridEcho(self.myView, Graphic3d_Vertex(v3dX, v3dY, v3dZ))
+        self.myDisplay.Viewer.SetGridEcho(True)
+
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d, buttons, modifier):

@@ -103,7 +103,6 @@ class Part(object):
 
     def OnCancel(self):
         self.SelectCurCommand()
-        self.myGUI.Hide()
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Part_ObjectTypeOfMethod.Nothing_Method
 

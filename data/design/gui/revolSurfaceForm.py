@@ -88,9 +88,13 @@ class RevolSurfaceForm(QWidget):
     def ApplyChange(self):
         if self.myGeomSurface:
             root = self.myModel.getNode(QModelIndex())
-            self.revolveSurfaceNode = RevolvedSurfaceNode(self.myGeomSurface.GetName(), root)
-            self.revolveSurfaceNode.setSketchObject(self.myGeomSurface)
+            revolveSurfaceNode = RevolvedSurfaceNode(self.myGeomSurface.GetName(), root)
+            revolveSurfaceNode.setSketchObject(self.myGeomSurface)
             self.myModel.layoutChanged.emit()
+        self.Finish()
+    def Finish(self):
+        self.myGeomSurface=None
+        self.parent.Hide()
 
 
 # -----------------------------Debugging-----------------------------------#

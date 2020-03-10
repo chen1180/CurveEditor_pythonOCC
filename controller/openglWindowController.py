@@ -134,6 +134,7 @@ class OpenGLEditor(GLWidget):
         else:
             zoom_factor = 0.5
         self._display.ZoomFactor(zoom_factor)
+        # print(self.camera.Distance(),self.camera.Scale())
         for callback in self._mouseScroll_callback:
             callback()
 

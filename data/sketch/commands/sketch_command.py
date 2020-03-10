@@ -7,7 +7,7 @@ from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp, gp_Pnt, gp_Circ, gp_C
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject, AIS_Shape, AIS_Circle
 from OCC.Core.Aspect import *
 from OCC.Core.Prs3d import Prs3d_LineAspect
-from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_LIGHTPINK1, Quantity_Color
+from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_BLUE1, Quantity_Color
 from OCC.Core.Geom2d import Geom2d_Geometry
 from OCC.Core.TCollection import TCollection_ExtendedString
 from data.node import *
@@ -41,7 +41,7 @@ class Sketch_Command(object):
         self.myFirstPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
         self.mySecondPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
         self.myRubberLine = AIS_Line(self.myFirstPoint, self.mySecondPoint)
-        self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
+        self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_BLUE1))
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext

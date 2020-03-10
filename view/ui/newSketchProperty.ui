@@ -54,12 +54,15 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="uiOffset">
+      <widget class="QSpinBox" name="uiOffset">
        <property name="minimum">
-        <double>-100.000000000000000</double>
+        <number>-1000</number>
        </property>
        <property name="maximum">
-        <double>100.000000000000000</double>
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>100</number>
        </property>
       </widget>
      </item>

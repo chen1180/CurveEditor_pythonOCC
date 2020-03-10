@@ -18,7 +18,6 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
         self.radius = 0.0
         self.tempGeom_Circle = Geom_Circle(self.curCoordinateSystem.Ax2(), SKETCH_RADIUS)
         self.myRubberCircle = AIS_Circle(self.tempGeom_Circle)
-        self.myRubberCircle.SetColor(Quantity_Color(Quantity_NOC_LIGHTPINK1))
         self.myCircleAx2d = gp_Ax2d()
 
     def Action(self):

@@ -131,10 +131,10 @@ class SketchController(QObject):
         name = "Sketch "
         count = str(self.rootNode.childCount())
         name += count
-        # if self.currentSketchNode is None:
-        #     self.setActionEnabled(True)
         self.currentSketchNode = SketchNode(name)
-        coordinate_system: gp_Ax3 = self._display.Viewer.PrivilegedPlane()
+        coordinate_system: gp_Ax3 = self.new_sketch.getCoordinate()
+        pnt = coordinate_system.Location()
+        print(pnt.X(), pnt.Y(), pnt.Z())
         # Display normal axis of the plane
         # print(coordinate_system.Axis())
         # normal_axis=coordinate_system.Axis()
@@ -160,13 +160,14 @@ class SketchController(QObject):
     def displayGrid(self, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
         self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
         self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
+        # print(self._display.Viewer.RectangularGridGraphicValues())
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
 
     def selectSketchNode(self, node: SketchNode):
         assert isinstance(self._display.Viewer, V3d_Viewer)
         assert isinstance(self._display.View, V3d_View)
         self._display.Viewer.SetPrivilegedPlane(node.sketch_plane)
-        self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
+        # self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
         self.sketch.SetRootNode(node)
         self.sketch.SetCoordinateSystem(node.sketch_plane)
 

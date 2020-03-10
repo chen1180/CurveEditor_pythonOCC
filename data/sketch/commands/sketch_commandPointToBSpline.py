@@ -56,23 +56,19 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
+            # calculate first point
             self.myFirstgp_Pnt2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.myFirstgp_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
             self.myFirstPoint.SetPnt(self.myFirstgp_Pnt)
             self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
-
+            # store first points
             self.Poles2d[0] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.Poles[0] = gp_Pnt(self.myFirstgp_Pnt.X(), self.myFirstgp_Pnt.Y(), self.myFirstgp_Pnt.Z())
+            # calculate interpolated bspline from stored points
             self.InterpolatePoints()
             self.interpolateBspline = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
             self.interpolateBspline.AddPoles(self.curPnt2d)
 
-            # myGeom2d_Point = Geom2d_CartesianPoint(self.curPnt2d)
-            # myAIS_Point = AIS_Point(self.myFirstPoint)
-            #
-            # self.myContext.Display(myAIS_Point, True)
-            # self.AddObject(myGeom2d_Point, myAIS_Point, Sketch_GeometryType.PointSketchObject)
-            #
             self.myContext.Display(self.myRubberLine, True)
             self.myBSplineCurveAction = BSplineCurveAction.Input_2Point
             self.IndexCounter = 2
@@ -135,9 +131,9 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
             self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
             self.myContext.Redisplay(self.myRubberLine, True)
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
-            self.myGeom2d_BSplineCurve.SetPole(self.IndexCounter - 1, self.curPnt2d)
+            self.myGeom2d_BSplineCurve.SetPole(self.IndexCounter-1 , self.curPnt2d)
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-            self.myGeom_BSplineCurve.SetPole(self.IndexCounter - 1, self.mySecondPoint.Pnt())
+            self.myGeom_BSplineCurve.SetPole(self.IndexCounter-1, self.mySecondPoint.Pnt())
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
             if ME.IsDone():
                 self.curEdge = ME.Edge()
@@ -154,6 +150,10 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
             self.myContext.Remove(self.myRubberLine, True)
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
+            # remove the last pole
+            del self.Poles2d[-1]
+            del self.Poles[-1]
+            self.InterpolatePoints()
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
             if ME.IsDone():
                 self.curEdge = ME.Edge()
@@ -166,7 +166,6 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
 
     def closeBSpline(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)
-        self.interpolateBspline.AddPoles(self.curPnt2d)
         self.interpolateBspline_node = BsplineNode(self.interpolateBspline.GetName(), self.rootNode)
         self.interpolateBspline.ComputeInterpolation()
         self.interpolateBspline_node.setSketchObject(self.interpolateBspline)

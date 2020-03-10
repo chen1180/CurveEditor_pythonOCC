@@ -323,7 +323,8 @@ class SweepSurfaceEditor(SurfaceEditor):
 
 
 from OCC.Core.gp import gp_Pnt, gp_Pln, gp_Dir, gp_Ax3, gp
-
+from OCC.Core.Geom import *
+from OCC.Core.AIS import *
 
 class Sketch_NewSketchEditor(QWidget):
     def __init__(self, parent=None, display=None):
@@ -340,19 +341,27 @@ class Sketch_NewSketchEditor(QWidget):
 
     def constructGrid(self):
         self.dir = gp_Dir()
+        offset=self.ui.uiOffset.value()
         if self.ui.uiXYPlane.isChecked():
             self.dir = gp_Dir(0.0, 0.0, 1.0)
+            pnt=gp_Pnt(0.0,0.0,offset)
             self._display.View_Top()
         if self.ui.uiXZPlane.isChecked():
             self.dir = gp_Dir(0.0, 1.0, 0.0)
+            pnt = gp_Pnt(0.0, offset, 0.0)
             self._display.View_Front()
         if self.ui.uiYZPlane.isChecked():
             self.dir = gp_Dir(1.0, 0.0, 0.0)
+            pnt = gp_Pnt(offset, 0.0, 0.0)
             self._display.View_Right()
-        self._plane = gp_Pln(gp_Pnt(0.0, 0.0, 0.0), self.dir)
-        ax3 = gp_Ax3(self._plane.Location(), self._plane.Axis().Direction())
-        self._display.Viewer.SetPrivilegedPlane(ax3)
+        self._plane = gp_Pln(pnt, self.dir)
+        plane = Geom_Plane( self._plane)
+        ais_plane=AIS_Plane(plane,True)
+        ais_plane.SetSize(1000)
+        self._display.Context.Display(ais_plane,True)
+        self._coordinate = gp_Ax3(self._plane.Location(), self._plane.Axis().Direction())
+        # self._display.Viewer.SetPrivilegedPlane( self._coordinate)
         self.close()
 
-    def plane(self):
-        return self._plane
+    def getCoordinate(self):
+        return self._coordinate

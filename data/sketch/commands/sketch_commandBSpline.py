@@ -50,7 +50,7 @@ class Sketch_CommandBSpline(Sketch_Command):
     def Action(self):
         self.myBSplineCurveAction = BSplineCurveAction.Input_1Point
 
-    def find_new_bspline(self):
+    def CreateBspline(self):
         curgp_Array1CurvePoles2d = point_list_to_TColgp_Array1OfPnt2d(self.Poles2d)
         curgp_Array1CurveMulti = int_list_to_TColStd_Array1OfInteger(self.Multi)
         curgp_Array1CurveKnots = float_list_to_TColStd_Array1OfReal(self.Knots)
@@ -73,7 +73,7 @@ class Sketch_CommandBSpline(Sketch_Command):
 
             self.Poles2d[0] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.Poles[0] = gp_Pnt(self.myFirstgp_Pnt.X(), self.myFirstgp_Pnt.Y(), self.myFirstgp_Pnt.Z())
-            self.find_new_bspline()
+            self.CreateBspline()
 
             self.bspline = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
             self.bspline.AddPoles(self.curPnt2d)
@@ -87,7 +87,7 @@ class Sketch_CommandBSpline(Sketch_Command):
             self.tempPnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
             self.Poles[1] = gp_Pnt(self.tempPnt.X(), self.tempPnt.Y(), self.tempPnt.Z())
             self.mySecondPoint.SetPnt(self.tempPnt)
-            self.find_new_bspline()
+            self.CreateBspline()
 
             ME = BRepBuilderAPI_MakeEdge(self.myFirstgp_Pnt, self.tempPnt)
             if ME.IsDone():
@@ -102,14 +102,14 @@ class Sketch_CommandBSpline(Sketch_Command):
                 self.Poles2d.append(self.curPnt2d)
                 self.Poles.append(self.tempPnt)
                 self.Multi, self.Knots = setQuasiUniformKnots(len(self.Poles), self.myDegree)
-                self.find_new_bspline()
+                self.CreateBspline()
 
                 self.myBSplineCurveAction = BSplineCurveAction.Input_OtherPoints
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
             self.Poles2d[self.IndexCounter - 1] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.tempPnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
             self.Poles[self.IndexCounter - 1] = gp_Pnt(self.tempPnt.X(), self.tempPnt.Y(), self.tempPnt.Z())
-            self.find_new_bspline()
+            self.CreateBspline()
 
             self.mySecondPoint.SetPnt(self.tempPnt)
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
@@ -125,7 +125,7 @@ class Sketch_CommandBSpline(Sketch_Command):
                     self.Poles2d.append(self.curPnt2d)
                     self.Poles.append(self.tempPnt)
                     self.Multi, self.Knots = setQuasiUniformKnots(len(self.Poles), self.myDegree)
-                    self.find_new_bspline()
+                    self.CreateBspline()
                     self.tempPnt2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
                     self.IndexCounter += 1
         return False
@@ -164,7 +164,7 @@ class Sketch_CommandBSpline(Sketch_Command):
             del self.Poles2d[-1]
             del self.Poles[-1]
             self.Multi, self.Knots = setQuasiUniformKnots(len(self.Poles), self.myDegree)
-            self.find_new_bspline()
+            self.CreateBspline()
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
             if ME.IsDone():
                 self.curEdge = ME.Edge()

@@ -140,9 +140,13 @@ class SweepSurfaceForm(QWidget):
     def ApplyChange(self):
         if self.myGeomSurface:
             root = self.myModel.getNode(QModelIndex())
-            self.sweepSurfaceNode = SweepSurfaceNode(self.myGeomSurface.GetName(), root)
-            self.sweepSurfaceNode.setSketchObject(self.myGeomSurface)
+            sweepSurfaceNode = SweepSurfaceNode(self.myGeomSurface.GetName(), root)
+            sweepSurfaceNode.setSketchObject(self.myGeomSurface)
             self.myModel.layoutChanged.emit()
+        self.Finish()
+    def Finish(self):
+        self.myGeomSurface=None
+        self.parent.Hide()
 
 
 # -----------------------------Debugging-----------------------------------#

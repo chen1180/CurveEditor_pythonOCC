@@ -100,9 +100,13 @@ class ExtrudedSurfaceForm(QWidget):
     def ApplyChange(self):
         if self.myGeomSurface:
             root = self.myModel.getNode(QModelIndex())
-            self.extrudedSurfaceNode = ExtrudedSurfaceNode(self.myGeomSurface.GetName(), root)
-            self.extrudedSurfaceNode.setSketchObject(self.myGeomSurface)
+            extrudedSurfaceNode = ExtrudedSurfaceNode(self.myGeomSurface.GetName(), root)
+            extrudedSurfaceNode.setSketchObject(self.myGeomSurface)
             self.myModel.layoutChanged.emit()
+        self.Finish()
+    def Finish(self):
+        self.myGeomSurface=None
+        self.parent.Hide()
 
 
 # -----------------------------Debugging-----------------------------------#

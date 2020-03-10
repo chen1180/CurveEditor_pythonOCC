@@ -19,6 +19,7 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myMultiplicities = []
         self.myDegree = 2
         self.myPeriodicFlag = False
+        self.TypeInterpolation = False
 
     def AddPoles(self, thePnt2d, weight=1.0):
         # set poles
@@ -65,6 +66,7 @@ class Sketch_Bspline(Sketch_Geometry):
             self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def ComputeInterpolation(self):
+        self.TypeInterpolation = True
         poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
         arrayOfPoles2d = point_list_to_TColgp_Array1OfPnt2d(poles2d_list)
         self.myGeometry2d = Geom2dAPI_PointsToBSpline(arrayOfPoles2d)
@@ -87,11 +89,10 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def DragTo(self, index, newPnt2d):
         self.myPoles[index].DragTo(newPnt2d)
-        pole2d = self.myPoles[index].GetGeometry2d().Pnt2d()
-        pole = self.myPoles[index].GetGeometry().Pnt()
-        self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
-        self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
-        self.myAIS_InteractiveObject.Redisplay(True)
+        if self.TypeInterpolation:
+            self.ComputeInterpolation()
+        else:
+            self.Recompute()
         for line in self.myAIS_Lines:
             line.Redisplay(True)
 
@@ -271,6 +272,7 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def RemoveLabel(self):
         for point in self.myPoles:
+            point.RemoveDisplay()
             point.RemoveLabel()
         for line in self.myAIS_Lines:
             self.myContext.Remove(line, True)
