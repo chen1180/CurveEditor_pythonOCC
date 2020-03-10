@@ -89,7 +89,7 @@ class Sketch_CommandBSpline(Sketch_Command):
             self.mySecondPoint.SetPnt(self.tempPnt)
             self.CreateBspline()
 
-            ME = BRepBuilderAPI_MakeEdge(self.myFirstgp_Pnt, self.tempPnt)
+            ME = BRepBuilderAPI_MakeEdge(self.myFirstgp_Pnt, self.mySecondPoint.Pnt())
             if ME.IsDone():
                 self.bspline.AddPoles(self.curPnt2d)
                 self.curEdge = ME.Edge()
@@ -156,10 +156,22 @@ class Sketch_CommandBSpline(Sketch_Command):
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
-            pass
-        elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
+            self.rootNode.removeChild(self.rootNode.childCount() - 1)
             self.myContext.Remove(self.myRubberLine, True)
+            self.bspline.RemoveLabel()
+            del self.bspline
+        elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
+            self.rootNode.removeChild(self.rootNode.childCount() - 1)
+            self.myContext.Remove(self.myRubberLine, True)
+            self.bspline.RemoveLabel()
+            del self.bspline
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
+            if len(self.Poles)<=3:
+                self.rootNode.removeChild(self.rootNode.childCount() - 1)
+                self.myContext.Remove(self.myRubberLine, True)
+                self.bspline.RemoveLabel()
+                del self.bspline
+                self.myContext.Remove(self.myRubberAIS_Shape, True)
             # remove the last pole
             del self.Poles2d[-1]
             del self.Poles[-1]
@@ -168,13 +180,12 @@ class Sketch_CommandBSpline(Sketch_Command):
             ME = BRepBuilderAPI_MakeEdge(self.myGeom_BSplineCurve)
             if ME.IsDone():
                 self.curEdge = ME.Edge()
-                self.IndexCounter -= 1
                 self.closeBSpline()
+                self.IndexCounter -= 1
         self.myBSplineCurveAction = BSplineCurveAction.Nothing
 
     def GetTypeOfMethod(self):
         return Sketch_ObjectTypeOfMethod.BSpline_Method
-
 
     def closeBSpline(self):
         self.myContext.Remove(self.myRubberAIS_Shape, True)

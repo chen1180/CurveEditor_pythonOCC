@@ -146,9 +146,15 @@ class Sketch_CommandPointToBSpline(Sketch_Command):
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
-            pass
-        elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
+            self.rootNode.removeChild(self.rootNode.childCount() - 1)
             self.myContext.Remove(self.myRubberLine, True)
+            self.interpolateBspline.RemoveLabel()
+            del self.interpolateBspline
+        elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
+            self.rootNode.removeChild(self.rootNode.childCount() - 1)
+            self.myContext.Remove(self.myRubberLine, True)
+            self.interpolateBspline.RemoveLabel()
+            del self.interpolateBspline
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
             # remove the last pole
             del self.Poles2d[-1]

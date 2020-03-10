@@ -92,7 +92,12 @@ class Sketch_Bspline(Sketch_Geometry):
         if self.TypeInterpolation:
             self.ComputeInterpolation()
         else:
-            self.Recompute()
+            self.myPoles[index].DragTo(newPnt2d)
+            pole2d = self.myPoles[index].GetGeometry2d().Pnt2d()
+            pole = self.myPoles[index].GetGeometry().Pnt()
+            self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
+            self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
+            self.myAIS_InteractiveObject.Redisplay(True)
         for line in self.myAIS_Lines:
             line.Redisplay(True)
 
