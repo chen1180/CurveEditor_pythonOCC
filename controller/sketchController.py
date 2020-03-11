@@ -89,18 +89,22 @@ class SketchController(QObject):
                                           statusTip="No Snap mode",
                                           triggered=self.snapNothing)
         snap_action.append(self.action_snapNothing)
+        self.action_snapToGrid = QAction(QIcon(""), "Snap to Grid", self,
+                                         statusTip="Snap to the nearest point on the grid",
+                                         triggered=self.snapGrid)
+        snap_action.append(self.action_snapToGrid)
 
-        self.action_snapEnd = QAction(QIcon(""), "Snap to Point", self,
-                                      statusTip="Snap to the end points",
+        self.action_snapEnd = QAction(QIcon(""), "Snap to EndPoint", self,
+                                      statusTip="Snap to the end points of a curve",
                                       triggered=self.snapEnd)
         snap_action.append(self.action_snapEnd)
 
-        self.action_snapCenter = QAction(QIcon(""), "Snap Center", self,
+        self.action_snapCenter = QAction(QIcon(""), "Snap to Center", self,
                                          statusTip="Snap to the center of circle or arc",
                                          triggered=self.snapCenter)
         snap_action.append(self.action_snapCenter)
-        self.action_snapNearest = QAction(QIcon(""), "Snap Nearest", self,
-                                          statusTip="Snap to the nearest points on the geometry",
+        self.action_snapNearest = QAction(QIcon(""), "Snap to Nearest", self,
+                                          statusTip="Snap to the nearest point on a curve",
                                           triggered=self.snapNearest)
         snap_action.append(self.action_snapNearest)
         self.actions.append(snap_action)
@@ -113,23 +117,30 @@ class SketchController(QObject):
         self.rootNode: Node = root
 
     def snapEnd(self):
+        self.sketch.SnapToGridPoint =False
         self.sketch.SetSnap(Sketcher_SnapType.SnapEnd)
 
     def snapNearest(self):
+        self.sketch.SnapToGridPoint = False
         self.sketch.SetSnap(Sketcher_SnapType.SnapNearest)
 
     def snapCenter(self):
+        self.sketch.SnapToGridPoint = False
         self.sketch.SetSnap(Sketcher_SnapType.SnapCenter)
 
     def snapNothing(self):
+        self.sketch.SnapToGridPoint = False
         self.sketch.SetSnap(Sketcher_SnapType.SnapNothing)
+
+    def snapGrid(self):
+        self.sketch.SnapToGridPoint = True
 
     def createNewSketch(self):
         self.new_sketch = Sketch_NewSketchEditor(None, self._display)
         self.new_sketch.ui.uiOk.accepted.connect(self.createSketchNode)
 
     def createSketchNode(self):
-        name = "Plane "
+        name = "Sketch "
         count = str(self.rootNode.childCount())
         name += count
         self.currentSketchNode = SketchNode(name)

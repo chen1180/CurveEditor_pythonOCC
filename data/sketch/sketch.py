@@ -13,7 +13,7 @@ class Sketch(object):
     def __init__(self, theDisplay, sg: Sketch_QTGUI = None):
         self.myCoordinateSystem = gp_Ax3(gp.XOY())
         self.myContext: AIS_InteractiveContext = theDisplay.Context
-        self.myDisplay=theDisplay
+        self.myDisplay = theDisplay
         self.myView: V3d_View = theDisplay.View
         self.myGUI = sg
         self.myGUI.SetAx3(self.myCoordinateSystem)
@@ -34,7 +34,8 @@ class Sketch(object):
 
         self.myData = []
         self.myNode: SketchObjectNode = None
-        self.myModel=None
+        self.myModel = None
+        self.SnapToGridPoint = False
         self.myCommands = []
 
         self.myAnalyserSnap = Sketch_AnalyserSnap(self.myContext, self.myData, self.myCoordinateSystem)
@@ -68,11 +69,13 @@ class Sketch(object):
         for idx in range(len(self.myCommands)):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             self.CurCommand.SetRootNode(self.myNode)
-    def SetModel(self,theModel):
-        self.myModel=theModel
+
+    def SetModel(self, theModel):
+        self.myModel = theModel
         for idx in range(len(self.myCommands)):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             self.CurCommand.SetModel(self.myModel)
+
     def GetData(self):
         return self.myData
 
@@ -148,12 +151,11 @@ class Sketch(object):
         theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
-
-        #grid echo
-        v3dX, v3dY, v3dZ = self.myView.ConvertToGrid( theX, theY)
-        self.myDisplay.Viewer.ShowGridEcho(self.myView, Graphic3d_Vertex(v3dX, v3dY, v3dZ))
-        self.myDisplay.Viewer.SetGridEcho(True)
-
+        if self.SnapToGridPoint:
+            # grid echo
+            v3dX, v3dY, v3dZ = self.myView.ConvertToGrid( theX, theY)
+            self.myDisplay.Viewer.ShowGridEcho(self.myView, Graphic3d_Vertex(v3dX, v3dY, v3dZ))
+            self.myDisplay.Viewer.SetGridEcho(True)
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             if self.CurCommand.MouseInputEvent(self.myCurrentPnt2d, buttons, modifier):
@@ -163,6 +165,11 @@ class Sketch(object):
         theX, theY, buttons, modifier = kargs
         aView: V3d_View = self.myView
         v3dX, v3dY, v3dZ, projVx, projVy, projVz = aView.ConvertWithProj(theX, theY)
+        if self.SnapToGridPoint:
+            # grid echo
+            v3dX, v3dY, v3dZ = self.myView.ConvertToGrid(theX, theY)
+            self.myDisplay.Viewer.ShowGridEcho(self.myView, Graphic3d_Vertex(v3dX, v3dY, v3dZ))
+            self.myDisplay.Viewer.SetGridEcho(True)
         if self.ProjectPointOnPlane(v3dX, v3dY, v3dZ, projVx, projVy, projVz):
             self.SelectCurCommand()
             self.CurCommand.MouseMoveEvent(self.myCurrentPnt2d, buttons, modifier)
@@ -259,6 +266,6 @@ class Sketch(object):
             self.CurCommand: Sketch_Command = self.myCommands[idx]
             if self.CurCommand.GetTypeOfMethod() == self.myCurrentMethod:
                 # Acitivate selection automaticlly
-                #This is a bug!! Remove the following line will lead to critical error when enable sketch command.
+                # This is a bug!! Remove the following line will lead to critical error when enable sketch command.
                 self.myContext.SetAutoActivateSelection(False)
                 break

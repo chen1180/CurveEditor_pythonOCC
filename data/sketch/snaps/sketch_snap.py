@@ -3,12 +3,13 @@ from OCC.Core.gp import gp_Ax3, gp, gp_Pnt2d, gp_Pnt
 from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.TColStd import TColStd_HSequenceOfTransient
 from OCC.Core.ElCLib import elclib
-from OCC.Core.Geom2dAPI import *
-from OCC.Core.Quantity import Quantity_NOC_CYAN1, Quantity_Color
 from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_Curve
 from OCC.Core.AIS import AIS_InteractiveContext, AIS_InteractiveObject, AIS_Point
+from OCC.Core.Geom2dAPI import *
+from OCC.Core.Quantity import *
+from OCC.Core.Prs3d import *
+from OCC.Core.Aspect import *
 from data.sketch.sketch_type import *
-from data.sketch.sketch_object import Sketch_Object
 
 MINIMUMSNAP = 25
 MINANGLE = 3.14 / 64
@@ -32,7 +33,10 @@ class Sketch_Snap(object):
         self.firstDisplay = True
         self.myGeom_Point = Geom_CartesianPoint(gp.Origin())
         self.myAIS_Point = AIS_Point(self.myGeom_Point)
-        self.myAIS_Point.SetColor(Quantity_Color(Quantity_NOC_CYAN1))
+        self.myAIS_Point.SetColor(Quantity_Color(Quantity_NOC_YELLOW))
+        self.myAIS_Point.SetWidth(5.0)
+        self.myAIS_Point.SetMarker(Aspect_TOM_O_POINT)
+
 
         self.minimumSnapDistance = MINIMUMSNAP
         self.minDistance = 0

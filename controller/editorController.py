@@ -326,6 +326,7 @@ from OCC.Core.gp import gp_Pnt, gp_Pln, gp_Dir, gp_Ax3, gp
 from OCC.Core.Geom import *
 from OCC.Core.AIS import *
 
+
 class Sketch_NewSketchEditor(QWidget):
     def __init__(self, parent=None, display=None):
         super(Sketch_NewSketchEditor, self).__init__(parent)
@@ -341,10 +342,10 @@ class Sketch_NewSketchEditor(QWidget):
 
     def constructGrid(self):
         self.dir = gp_Dir()
-        offset=self.ui.uiOffset.value()
+        offset = self.ui.uiOffset.value()
         if self.ui.uiXYPlane.isChecked():
             self.dir = gp_Dir(0.0, 0.0, 1.0)
-            pnt=gp_Pnt(0.0,0.0,offset)
+            pnt = gp_Pnt(0.0, 0.0, offset)
             self._display.View_Top()
         if self.ui.uiXZPlane.isChecked():
             self.dir = gp_Dir(0.0, 1.0, 0.0)
@@ -355,8 +356,9 @@ class Sketch_NewSketchEditor(QWidget):
             pnt = gp_Pnt(offset, 0.0, 0.0)
             self._display.View_Right()
         self._coordinate = gp_Ax3(pnt, self._plane.Axis().Direction())
-        self._display.Viewer.SetPrivilegedPlane( self._coordinate)
+        self._display.Viewer.SetPrivilegedPlane(self._coordinate)
         self.close()
 
     def getCoordinate(self):
         return self._coordinate
+
