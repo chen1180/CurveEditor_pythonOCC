@@ -1,5 +1,5 @@
 from view import mainWindow, customToolButton
-from controller import editorController, openglWindowController, sketchController, partController,viewController
+from controller import editorController, openglWindowController, sketchController, partController, viewController
 import resources.icon.icon
 from data.model import *
 
@@ -27,8 +27,8 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow = openglWindowController.OpenGLEditor(self)
         self.setCentralWidget(self._glWindow)
 
-        #view manager
-        self.viewController=viewController.ViewController(self._glWindow._display,self)
+        # view manager
+        self.viewController = viewController.ViewController(self._glWindow._display, self)
         # sketch manager
         self.sketchController = sketchController.SketchController(self._glWindow._display, self)
         self.sketchController.setModel(self._model)
@@ -48,6 +48,7 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.partController.OnCancel)
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.partController.DeleteSelectedObject)
         # setup tool bar
+        self.createMenuBars()
         self.createToolBars()
 
         # setup sceneGraph editor
@@ -108,7 +109,7 @@ class Window(QtWidgets.QMainWindow):
         self._propEditor.setModel(self._model)
         # select latest row
         self._uiTreeView.setCurrentIndex(self._model.index(position, 0, QtCore.QModelIndex()))
-        self.sketchController.currentSketchIndex=self._uiTreeView.currentIndex()
+        self.sketchController.currentSketchIndex = self._uiTreeView.currentIndex()
         self._uiTreeView.updateEditorData()
         self._uiTreeView.expandAll()
 
@@ -120,7 +121,6 @@ class Window(QtWidgets.QMainWindow):
             self._uiTreeView.setCurrentIndex(index.child(index.column() - 1, 0))
             self._uiTreeView.updateEditorData()
             self._uiTreeView.expandAll()
-
 
     def createToolBars(self):
         # Curve tool bar
@@ -155,7 +155,9 @@ class Window(QtWidgets.QMainWindow):
         self._toolTabWidget.addTab(self._viewToolBar, "View")
         self._toolTabWidget.addTab(self._sketchToolBar, "Sketch")
         self._toolTabWidget.addTab(self._designToolBar, "Design")
-        self.setMenuWidget(self._toolTabWidget)
+        self._ui.toolBar.addWidget(self._toolTabWidget)
+        # set dockwidget as menubar
+        # self.setMenuWidget(self._toolTabWidget)
 
     def createToolButton(self, action, parent):
         button = QtWidgets.QToolButton(self)
@@ -164,8 +166,8 @@ class Window(QtWidgets.QMainWindow):
         # button.setStyleSheet("QToolButton {color: #333; border: 2px solid #555; border-radius: 11px; padding: 5px; background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #888); min-width: 80px;}"
         #     "QToolButton:hover {background: qradialgradient(cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4, radius: 1.35, stop: 0 #fff, stop: 1 #bbb);}"
         #     "QToolButton:pressed { background: qradialgradient(cx: 0.4, cy: -0.1, fx: 0.4, fy: -0.1, radius: 1.35, stop: 0 #fff, stop: 1 #ddd);}")
-        button.setMinimumSize(100,50)
-        button.setIconSize(QtCore.QSize(50,30))
+        button.setMinimumSize(100, 50)
+        button.setIconSize(QtCore.QSize(50, 30))
         button.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         button.setAutoRaise(True)
         parent.addWidget(button)
@@ -189,3 +191,13 @@ class Window(QtWidgets.QMainWindow):
         button.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         button.setAutoRaise(True)
         parent.addWidget(button)
+
+    def createMenuBars(self):
+        menu = self._ui.menuBar.addMenu("&File")
+
+        def export_to_PNG():
+            self._glWindow.view.Dump('./capture_png.png')
+
+        menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
+                                         statusTip="Export current view as picture",
+                                         triggered=export_to_PNG))

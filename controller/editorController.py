@@ -355,7 +355,7 @@ class Sketch_NewSketchEditor(QWidget):
             self.dir = gp_Dir(1.0, 0.0, 0.0)
             pnt = gp_Pnt(offset, 0.0, 0.0)
             self._display.View_Right()
-        self._coordinate = gp_Ax3(pnt, self._plane.Axis().Direction())
+        self._coordinate = gp_Ax3(pnt, self.dir)
         self._display.Viewer.SetPrivilegedPlane(self._coordinate)
         self.close()
 

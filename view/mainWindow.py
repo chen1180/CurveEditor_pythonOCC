@@ -23,13 +23,6 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.menubar.setFont(font)
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -39,6 +32,13 @@ class Ui_MainWindow(object):
         self.statusbar.setAutoFillBackground(True)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.menuBar = QtWidgets.QMenuBar(MainWindow)
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menuBar.setObjectName("menuBar")
+        MainWindow.setMenuBar(self.menuBar)
+        self.toolBar = QtWidgets.QToolBar(MainWindow)
+        self.toolBar.setObjectName("toolBar")
+        MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -46,3 +46,4 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))

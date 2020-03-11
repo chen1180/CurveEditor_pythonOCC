@@ -51,7 +51,7 @@ class ExtrudedSurfaceForm(QWidget):
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
                     self.ui.uiProfileLineEdit.setText(myCurObject.GetName())
                     self.myProfile = myCurObject
-                    self.myNormalAxis = planeNode.getSketchPlane().Axis()
+                    self.myNormalAxis = planeNode.getSketchPlane().GetCoordinate().Axis()
 
     def SelectDirection(self):
         self.parent.Hide()
