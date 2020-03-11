@@ -21,5 +21,9 @@
         <file>wireframe.png</file>
         <file>shading.png</file>
         <file>viewIso.png</file>
+        <file>orthorgraphic.png</file>
+        <file>perspective.png</file>
+        <file>fitContent.png</file>
+        <file>move.png</file>
     </qresource>
 </RCC>

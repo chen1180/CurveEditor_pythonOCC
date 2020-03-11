@@ -1,4 +1,4 @@
-from OCC.Core.Aspect import Aspect_GDM_Lines, Aspect_GT_Rectangular
+from OCC.Core.Aspect import *
 from OCC.Core.Graphic3d import *
 from OCC.Core.V3d import *
 from OCC.Core.V3d import V3d_Viewer
@@ -12,6 +12,7 @@ from data.node import *
 from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
 from data.sketch.sketch import Sketch
 from data.sketch.sketch_type import *
+from OCC.Core.Quantity import *
 
 
 class SketchController(QObject):
@@ -128,7 +129,7 @@ class SketchController(QObject):
         self.new_sketch.ui.uiOk.accepted.connect(self.createSketchNode)
 
     def createSketchNode(self):
-        name = "Sketch "
+        name = "Plane "
         count = str(self.rootNode.childCount())
         name += count
         self.currentSketchNode = SketchNode(name)
@@ -141,8 +142,10 @@ class SketchController(QObject):
         # normal_geom_axis=Geom_Line(normal_axis)
         # ais_axis=AIS_Line(normal_geom_axis)
         # self._display.Context.Display(ais_axis,True)
+        sketch_plane = Sketch_Plane(self._display.Context, coordinate_system)
+        sketch_plane.Compute()
         self.createDynamicGrid()
-        self.currentSketchNode.setSketchPlane(coordinate_system)
+        self.currentSketchNode.setSketchPlane(sketch_plane)
         self.sketchPlaneUpdated.emit(self.currentSketchNode)
 
         self.selectSketchNode(self.currentSketchNode)
@@ -154,22 +157,18 @@ class SketchController(QObject):
         self.camera: Graphic3d_Camera = self.view.Camera()
         canvas_size = max(self.view.Size())
         grid_interval = self.camera.Distance() // self.view.Scale() / 5
-        self.displayGrid(0.0, 0.0, grid_interval, grid_interval, 0.0, canvas_size,
-                         canvas_size, self.new_sketch.ui.uiOffset.value())
-
-    def displayGrid(self, xOrigin, yOrigin, xStep, yStep, rotation, xSize, ySize, offset):
-        self._display.Viewer.SetRectangularGridValues(xOrigin, yOrigin, xStep, yStep, rotation)
-        self._display.Viewer.SetRectangularGridGraphicValues(xSize, ySize, offset)
-        # print(self._display.Viewer.RectangularGridGraphicValues())
         self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
+        self._display.Viewer.SetRectangularGridGraphicValues(canvas_size, canvas_size,
+                                                             self.new_sketch.ui.uiOffset.value())
+        self._display.Viewer.SetRectangularGridValues(0.0, 0.0, grid_interval, grid_interval, 0.0)
 
     def selectSketchNode(self, node: SketchNode):
         assert isinstance(self._display.Viewer, V3d_Viewer)
         assert isinstance(self._display.View, V3d_View)
-        self._display.Viewer.SetPrivilegedPlane(node.sketch_plane)
+        self._display.Viewer.SetPrivilegedPlane(node.getSketchPlane().GetCoordinate())
         # self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
         self.sketch.SetRootNode(node)
-        self.sketch.SetCoordinateSystem(node.sketch_plane)
+        self.sketch.SetCoordinateSystem(node.getSketchPlane().GetCoordinate())
 
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)

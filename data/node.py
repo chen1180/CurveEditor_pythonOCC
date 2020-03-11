@@ -1,4 +1,3 @@
-
 class Node(object):
 
     def __init__(self, name, parent=None):
@@ -92,12 +91,14 @@ class Node(object):
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
-        self.sketch_plane: gp_Ax3 = None
+        self.sketch_plane: Sketch_Plane = None
 
     def setSketchPlane(self, thePlane):
         self.sketch_plane = thePlane
+
     def getSketchPlane(self):
         return self.sketch_plane
+
     def typeInfo(self):
         return "Plane"
 

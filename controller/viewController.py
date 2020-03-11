@@ -13,22 +13,27 @@ class ViewController(QObject):
         self.createActions()
 
     def createActions(self):
-        def setView(a0):
-            if a0 == True:
-                self._display.SetPerspectiveProjection()
-            else:
-                self._display.SetOrthographicProjection()
-            self._display.Repaint()
 
-        self._action_transform = QAction(QIcon(""), "Transform", self,
+        self._action_transform = QAction(QIcon(":/move.png"), "Transform", self,
                                          statusTip="Transform a object",
                                          triggered=self._display.View.SetFront)
         self.actions.append(self._action_transform)
-        self._action_fitAll = QAction(QIcon(""), "Fit all shape on screen", self,
+        self._action_fitAll = QAction(QIcon(":/fitContent.png"), "Fit all", self,
                                       statusTip="Fit all shapes on screen",
                                       triggered=self._display.FitAll)
         self.actions.append(self._action_fitAll)
-        self._action_setView = QAction(QIcon(""), "Projective/Orthor", self,
+        def setView(a0):
+            if a0 == True:
+                self._display.SetPerspectiveProjection()
+                self._action_setView.setText("Perspective")
+            else:
+                self._display.SetOrthographicProjection()
+                self._action_setView.setText("Ortho")
+            self._display.Repaint()
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/orthorgraphic.png"), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap(":/perspective.png"), QIcon.Normal, QIcon.On)
+        self._action_setView = QAction(icon, "Ortho", self,
                                        statusTip="set view type",
                                        triggered=setView)
         self._action_setView.setCheckable(True)

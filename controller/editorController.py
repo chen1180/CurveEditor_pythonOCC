@@ -354,13 +354,8 @@ class Sketch_NewSketchEditor(QWidget):
             self.dir = gp_Dir(1.0, 0.0, 0.0)
             pnt = gp_Pnt(offset, 0.0, 0.0)
             self._display.View_Right()
-        self._plane = gp_Pln(pnt, self.dir)
-        plane = Geom_Plane( self._plane)
-        ais_plane=AIS_Plane(plane,True)
-        ais_plane.SetSize(1000)
-        self._display.Context.Display(ais_plane,True)
-        self._coordinate = gp_Ax3(self._plane.Location(), self._plane.Axis().Direction())
-        # self._display.Viewer.SetPrivilegedPlane( self._coordinate)
+        self._coordinate = gp_Ax3(pnt, self._plane.Axis().Direction())
+        self._display.Viewer.SetPrivilegedPlane( self._coordinate)
         self.close()
 
     def getCoordinate(self):
