@@ -1,12 +1,11 @@
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 import sys
-from PyQt5.QtWidgets import QDialog, QApplication, QPushButton, QVBoxLayout
-
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
-
 import random
-import numpy as np
 
 # -*- coding: utf-8 -*-
 """Python/Numpy implementation of Bspline basis functions via Cox - de Boor algorithm."""
@@ -162,8 +161,8 @@ class Bspline:
         N = np.array([self(i) for i in x]).T
         self.x = x
         self.y = N
-        for i,n in enumerate(N):
-            tmp, = plt.plot(x, n, picker=True,label="Knots {}".format(i))
+        for i, n in enumerate(N):
+            tmp, = plt.plot(x, n, picker=True, label="Knots {}".format(i))
             self.plt.append(tmp)
         plt.legend(loc="upper right")
 
@@ -300,22 +299,53 @@ Example:
         return np.squeeze(A)
 
 
-class DraggableScatter():
-    epsilon = 5
+class BasisFunctionWindow(QDialog):
+    epsilon = 20
+    PlotUpdated = pyqtSignal(object, int)
 
-    def __init__(self, scatter):
+    def __init__(self, parent=None):
+        super(BasisFunctionWindow, self).__init__(parent)
 
-        self.scatter = scatter
+        # a figure instance to plot on
+        self.figure = plt.figure()
+        self.setWindowTitle("Basis function plot")
+
+        # this is the Canvas Widget that displays the `figure`
+        # it takes the `figure` instance as a parameter to __init__
+        self.canvas = FigureCanvas(self.figure)
+
+        # this is the Navigation widget
+        # it takes the Canvas widget and a parent
+        self.toolbar = NavigationToolbar(self.canvas, self)
+
+        # Just some button connected to `plot` method
+        self.plotButton = QPushButton('Plot')
+        self.plotButton.clicked.connect(self.plot)
+        self.resetButton=QPushButton('Reset')
+        self.resetButton.clicked.connect(self.resetPlot)
+
+        # set the layout
+        layout = QVBoxLayout()
+        layout.addWidget(self.toolbar)
+        layout.addWidget(self.canvas)
+        layout.addWidget(self.plotButton)
+        layout.addWidget(self.resetButton)
+
+        self.setLayout(layout)
         self._ind = None
-        self.ax = scatter.axes
-        self.canvas = self.ax.figure.canvas
         self.canvas.mpl_connect('button_press_event', self.button_press_callback)
         self.canvas.mpl_connect('button_release_event', self.button_release_callback)
         self.canvas.mpl_connect('motion_notify_event', self.motion_notify_callback)
-        self.degree=3
-        self.basis = Bspline(knot_vector, self.degree)
-        self.basis.plot(plt)
-        plt.show()
+        self.knots_vector = []
+        self.degree = None
+        self.original_knots = []
+        self.original_degree = None
+
+    def setBasisFunction(self, knots, degree):
+        self.knots_vector = knots
+        self.degree = degree
+        self.original_degree = degree
+        self.original_knots = knots
 
     def get_ind_under_point(self, event):
         xy = np.asarray(self.scatter.get_offsets())
@@ -350,40 +380,54 @@ class DraggableScatter():
         if event.button != 1:
             return
         x, y = event.xdata, event.ydata
-        y = 1
+        if x < 0.0:
+            x = 0.0
+        y=1.0
         xy = np.asarray(self.scatter.get_offsets())
         xy[self._ind] = np.array([x, y])
-
         self.scatter.set_offsets(xy)
+        self.knots_vector = sorted([scatter[0] for scatter in self.scatter.get_offsets()])
+        self.updatePlot()
         self.canvas.draw_idle()
-        knot_vector = sorted([scatter[0] for scatter in self.scatter.get_offsets()])
-        basis = Bspline(knot_vector, self.degree)
-        x,N=basis.GetBasis()
-        for idx, line in enumerate(self.basis.plt):
+
+    def updatePlot(self):
+        basis = Bspline(self.knots_vector, self.degree)
+        x, N = basis.GetBasis()
+        for idx, line in enumerate(self.curves):
             line.set_data(x, N[idx])
-            plt.draw()
+        self.PlotUpdated.emit(self.knots_vector, self.degree)
 
+    def plot(self):
+        ''' plot some random stuff '''
 
-def onclick(event):
-    print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-          ('double' if event.dblclick else 'single', event.button,
-           event.x, event.y, event.xdata, event.ydata))
+        # instead of ax.hold(False)
+        self.figure.clear()
 
+        # create an axis
+        self.ax = self.figure.add_subplot(111)
 
-def onpick(event):
-    artist = event.artist
-    xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
-    # x, y = artist.get_xdata(), artist.get_ydata()
-    ind = event.ind
-    print('onpick line:', artist)
-    # artist.set_ydata([0.5]*1000)
-    # fig.canvas.draw()
-    # fig.canvas.flush_events()
+        # discards the old graph
+        # ax.hold(False) # deprecated, see above
 
+        # plot data
+        self.scatter = self.ax.scatter(self.knots_vector, [1] * len(self.knots_vector), picker=True,marker='x')
+        basis = Bspline(self.knots_vector, self.degree)
+        x, N = basis.GetBasis()
+        self.curves = []
+        for i, n in enumerate(N):
+            plt, = self.ax.plot(x, n, label="Knots {}".format(i))
+            self.curves.append(plt)
+        # refresh canvas
+        self.canvas.draw()
+    def resetPlot(self):
+        self.degree=self.original_degree
+        self.knots_vector=self.original_knots
+        self.plot()
+        self.PlotUpdated.emit(self.knots_vector, self.degree)
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
 
-knot_vector = [0.   ,0.  , 0.  , 0. ,  0.25 ,0.5 , 0.75 ,1.   ,1.,   1. ,  1.  ]
-fig, ax = plt.subplots()
-scatter = ax.scatter(knot_vector, [1] * len(knot_vector), picker=True)
-cid = fig.canvas.mpl_connect('button_press_event', onclick)
-fig.canvas.mpl_connect('pick_event', onpick)
-DraggableScatter(scatter)
+    main = BasisFunctionWindow()
+    main.show()
+
+    sys.exit(app.exec_())

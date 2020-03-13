@@ -1,13 +1,5 @@
-import sys
-from PyQt5.QtWidgets import QDialog, QApplication, QPushButton, QVBoxLayout
-
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-import matplotlib.pyplot as plt
-
-import random
 import numpy as np
-
+import scipy.interpolate as si
 # -*- coding: utf-8 -*-
 """Python/Numpy implementation of Bspline basis functions via Cox - de Boor algorithm."""
 
@@ -84,16 +76,6 @@ class Bspline:
         # Dummy calls to the functions for memory storage
         self.__call__(0.0)
         self.d(0.0)
-        self.x = None
-        self.y = None
-        self.plt = []
-
-    def GetBasis(self):
-        x_min = np.min(self.knot_vector)
-        x_max = np.max(self.knot_vector)
-        x = np.linspace(x_min, x_max, num=100)
-        N = np.array([self(i) for i in x]).T
-        return x, N
 
     def __basis0(self, xi):
         """Order zero basis (for internal use)."""
@@ -144,28 +126,39 @@ class Bspline:
         """Convenience function to compute first derivative of basis functions. 'Memoized' for speed."""
         return self.__basis(xi, self.p, compute_derivatives=True)
 
-    def plot(self, plt):
+    def plot(self):
         """Plot basis functions over full range of knots.
         Convenience function. Requires matplotlib.
         """
 
-        # try:
-        #     import matplotlib.pyplot as plt
-        # except ImportError:
-        #     from sys import stderr
-        #     print("ERROR: matplotlib.pyplot not found, matplotlib must be installed to use this function", file=stderr)
-        #     raise
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            from sys import stderr
+            print("ERROR: matplotlib.pyplot not found, matplotlib must be installed to use this function", file=stderr)
+            raise
 
         x_min = np.min(self.knot_vector)
         x_max = np.max(self.knot_vector)
-        x = np.linspace(x_min, x_max, num=100)
+
+        x = np.linspace(x_min, x_max, num=1000)
+
         N = np.array([self(i) for i in x]).T
-        self.x = x
-        self.y = N
-        for i,n in enumerate(N):
-            tmp, = plt.plot(x, n, picker=True,label="Knots {}".format(i))
-            self.plt.append(tmp)
-        plt.legend(loc="upper right")
+        # control_points=[[0,0],[2,2],[3,5]]
+        # result_x=[]
+        # result_y=[]
+        # for i in range(len(N[0])):
+        #     p_x=0
+        #     p_y=0
+        #     for n in range(len(control_points)):
+        #         p_x+=control_points[n][0]*N[n][i]
+        #         p_y+=control_points[n][1]*N[n][i]
+        #     result_x.append(p_x)
+        #     result_y.append(p_y)
+        for n in N:
+            plt.plot(x, n)
+
+        return plt.show()
 
     def dplot(self):
         """Plot first derivatives of basis functions over full range of knots.
@@ -298,92 +291,66 @@ Example:
             A[i, :] = f(taui)
 
         return np.squeeze(A)
+def bspline(cv, n=100, degree=3, periodic=False):
+    """ Calculate n samples on a bspline
+
+        cv :      Array ov control vertices
+        n  :      Number of samples to return
+        degree:   Curve degree
+        periodic: True - Curve is closed
+                  False - Curve is open
+    """
+
+    # If periodic, extend the point array by count+degree+1
+    cv = np.asarray(cv)
+    count = len(cv)
+
+    if periodic:
+        factor, fraction = divmod(count+degree+1, count)
+        cv = np.concatenate((cv,) * factor + (cv[:fraction],))
+        count = len(cv)
+        degree = np.clip(degree,1,degree)
+
+    # If opened, prevent degree from exceeding count-1
+    else:
+        degree = np.clip(degree,1,count-1)
 
 
-class DraggableScatter():
-    epsilon = 5
+    # Calculate knot vector
+    kv = None
+    if periodic:
+        kv = np.arange(0-degree,count+degree+degree-1)
+    else:
+        kv = np.clip(np.arange(count+degree+1)-degree,0,count-degree)
 
-    def __init__(self, scatter):
+    # Calculate query range
+    u = np.linspace(periodic,(count-degree),n)
+    # Calculate result
+    return (np.array(si.splev(u, (kv,cv.T,degree))).T,kv)
+import matplotlib.pyplot as plt
+colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
 
-        self.scatter = scatter
-        self._ind = None
-        self.ax = scatter.axes
-        self.canvas = self.ax.figure.canvas
-        self.canvas.mpl_connect('button_press_event', self.button_press_callback)
-        self.canvas.mpl_connect('button_release_event', self.button_release_callback)
-        self.canvas.mpl_connect('motion_notify_event', self.motion_notify_callback)
-        self.degree=3
-        self.basis = Bspline(knot_vector, self.degree)
-        self.basis.plot(plt)
-        plt.show()
+cv = np.array([[ 50.,  25.],
+   [ 59.,  12.],
+   [ 50.,  10.],
+   [ 57.,   2.],
+   [ 40.,   4.],
+   [ 40.,   14.]])
 
-    def get_ind_under_point(self, event):
-        xy = np.asarray(self.scatter.get_offsets())
-        xyt = self.ax.transData.transform(xy)
-        xt, yt = xyt[:, 0], xyt[:, 1]
+plt.plot(cv[:,0],cv[:,1], 'o-', label='Control Points')
+d=2
+p,knots = bspline(cv,n=100,degree=d,periodic=False)
+x,y = p.T
+plt.plot(x,y,'k-',label='Degree %s'%d,color=colors[d%len(colors)])
 
-        d = np.sqrt((xt - event.x) ** 2 + (yt - event.y) ** 2)
-        ind = d.argmin()
+plt.minorticks_on()
+plt.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.xlim(35, 70)
+plt.ylim(0, 30)
+plt.gca().set_aspect('equal', adjustable='box')
+plt.show()
 
-        if d[ind] >= self.epsilon:
-            ind = None
-
-        return ind
-
-    def button_press_callback(self, event):
-        if event.inaxes is None:
-            return
-        if event.button != 1:
-            return
-        self._ind = self.get_ind_under_point(event)
-
-    def button_release_callback(self, event):
-        if event.button != 1:
-            return
-        self._ind = None
-
-    def motion_notify_callback(self, event):
-        if self._ind is None:
-            return
-        if event.inaxes is None:
-            return
-        if event.button != 1:
-            return
-        x, y = event.xdata, event.ydata
-        y = 1
-        xy = np.asarray(self.scatter.get_offsets())
-        xy[self._ind] = np.array([x, y])
-
-        self.scatter.set_offsets(xy)
-        self.canvas.draw_idle()
-        knot_vector = sorted([scatter[0] for scatter in self.scatter.get_offsets()])
-        basis = Bspline(knot_vector, self.degree)
-        x,N=basis.GetBasis()
-        for idx, line in enumerate(self.basis.plt):
-            line.set_data(x, N[idx])
-            plt.draw()
-
-
-def onclick(event):
-    print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-          ('double' if event.dblclick else 'single', event.button,
-           event.x, event.y, event.xdata, event.ydata))
-
-
-def onpick(event):
-    artist = event.artist
-    xmouse, ymouse = event.mouseevent.xdata, event.mouseevent.ydata
-    # x, y = artist.get_xdata(), artist.get_ydata()
-    ind = event.ind
-    print('onpick line:', artist)
-    # artist.set_ydata([0.5]*1000)
-    # fig.canvas.draw()
-    # fig.canvas.flush_events()
-
-
-knot_vector = [0.   ,0.  , 0.  , 0. ,  0.25 ,0.5 , 0.75 ,1.   ,1.,   1. ,  1.  ]
-fig, ax = plt.subplots()
-scatter = ax.scatter(knot_vector, [1] * len(knot_vector), picker=True)
-cid = fig.canvas.mpl_connect('button_press_event', onclick)
-fig.canvas.mpl_connect('pick_event', onpick)
-DraggableScatter(scatter)
+basis = Bspline(knots, d)
+basis.plot()

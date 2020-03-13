@@ -25,7 +25,7 @@ class Sketch_Property(QWidget):
         self.isPointWindow = False
         self.ui = Ui_SketchProperty()
         self.ui.setupUi(self)
-        self.setWindowModality(Qt.ApplicationModal)
+        # self.setWindowModality(Qt.ApplicationModal)
 
         if not name:
             self.setObjectName("Sketch_Property")

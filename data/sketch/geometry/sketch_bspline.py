@@ -55,7 +55,6 @@ class Sketch_Bspline(Sketch_Geometry):
         poles_list = [pole.GetGeometry().Pnt() for pole in self.myPoles]
         arrayOfPoles = point_list_to_TColgp_Array1OfPnt(poles_list)
         self.myGeometry = Geom_BSplineCurve(arrayOfPoles, arrayOfWeights, arrayOfKnots, arrayOfMulties, self.myDegree)
-
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
         if self.myAIS_InteractiveObject:
             self.myAIS_InteractiveObject.SetShape(edge.Edge())
@@ -77,7 +76,6 @@ class Sketch_Bspline(Sketch_Geometry):
         self.myGeometry = GeomAPI_PointsToBSpline(arrayOfPoles)
         if self.myGeometry.IsDone():
             self.myGeometry = self.myGeometry.Curve()
-
         edge = BRepBuilderAPI_MakeEdge(self.myGeometry)
         if self.myAIS_InteractiveObject:
             self.myAIS_InteractiveObject.SetShape(edge.Edge())
@@ -196,6 +194,7 @@ class Sketch_Bspline(Sketch_Geometry):
     def GetKnots(self):
         return self.myKnots
 
+
     def SetMulties(self, theMulties):
         self.myMultiplicities = theMulties
 
@@ -210,6 +209,9 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def SetDegree(self, theDegree):
         self.myDegree = theDegree
+
+    def GetDegree(self):
+        return self.myDegree
 
     def SetKnotsType(self, theType: int):
         # Non uniform type

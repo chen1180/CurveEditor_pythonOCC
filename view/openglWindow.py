@@ -4,13 +4,6 @@ from OCC.Display.backend import load_any_qt_backend, get_qt_modules
 load_any_qt_backend()
 QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 from OCC.Display.qtDisplay import qtViewer3d
-from OCC.Core.AIS import *
-from OCC.Core.Graphic3d import *
-from OCC.Core.gp import *
-from OCC.Core.Quantity import Quantity_Color,Quantity_NOC_SKYBLUE,Quantity_NOC_GRAY
-from OCC.Core.Geom import Geom_Axis2Placement,Geom_Plane,Geom_Line,Geom_CartesianPoint
-from OCC.Core.Quantity import *
-from OCC.Core.Prs3d import *
 class GLWidget(qtViewer3d):
     def __init__(self, parent=None):
         super(GLWidget, self).__init__(parent)
