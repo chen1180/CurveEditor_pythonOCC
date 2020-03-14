@@ -197,7 +197,7 @@ class Sketch(object):
         self.SelectCurCommand()
         self.myAnalyserSnap.Cancel()
         if (
-                self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Line2P_Method and self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Arc3P_Method):
+                self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Line2P_Method and self.myCurrentMethod == Sketch_ObjectTypeOfMethod.ArcCenter2P_Method):
             self.PolylineFirstPointExist = self.CurCommand.GetPolylineFirstPnt(self.PolylineFirstPoint)
         self.CurCommand.CancelEvent()
         self.myCurrentMethod = Sketch_ObjectTypeOfMethod.Nothing_Method

@@ -13,8 +13,7 @@ class ArcCenter2PAction(Enum):
     Nothing = 0
     Input_CenterArc = 1
     Input_1ArcPoint = 2
-    Input_MidPoint = 3
-    Input_2ArcPoint = 4
+    Input_2ArcPoint = 3
 
 
 class Sketch_CommandArcCenter2P(Sketch_Command):
@@ -64,27 +63,22 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
             # update text
             self.myAIS_Label.SetPosition(self.tempGeom_Circle.Location())
             self.myContext.Display(self.myAIS_Label, True)
-
-            # nurbs = self.CircleToNurbsCircle(self.myFirstgp_Pnt2d, self.radius)
-            # nurbs.Compute()
-            # self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
-            # self.bspline_node.setSketchObject(nurbs)
-            # self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
-            self.myArcCenter2PAction = ArcCenter2PAction.Input_MidPoint
+            self.myArcCenter2PAction = ArcCenter2PAction.Input_2ArcPoint
         elif self.myArcCenter2PAction == ArcCenter2PAction.Input_2ArcPoint:
             self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
             if self.ProjectOnCircle(self.curPnt2d):
                 third_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
                 self.myRubberCircle.SetCircle(self.tempGeom_Circle)
-                p1 = 0.0
+                p1 = elclib.Parameter(self.tempGeom_Circle.Circ(), self.mySecondPoint.Pnt())
                 p2 = elclib.Parameter(self.tempGeom_Circle.Circ(), third_Pnt)
                 self.myRubberCircle.SetFirstParam(min(p1, p2))
                 self.myRubberCircle.SetLastParam(max(p1, p2))
-                self.myContext.Redisplay(self.myRubberCircle, True)
+
                 # Remove text
                 self.myContext.Remove(self.myAIS_Label, True)
+                self.myContext.Remove(self.myRubberCircle, True)
 
-                nurbs = self.ArcToNurbsArc(p1, p2)
+                nurbs = self.ArcToNurbsArc(min(p1, p2), max(p1, p2))
                 self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
                 self.bspline_node.setSketchObject(nurbs)
                 self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
@@ -106,20 +100,12 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
             self.tempGeom_Circle.SetRadius(self.radius)
             self.myContext.Redisplay(self.myRubberCircle, True)
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-        elif self.myArcCenter2PAction == ArcCenter2PAction.Input_MidPoint:
-            self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
-            if self.ProjectOnCircle(thePnt2d):
-                if not self.curPnt2d.IsEqual(self.myFirstgp_Pnt2d, 0):
-                    self.myMidgp_Pnt2d = self.curPnt2d
-                    self.myFirstPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-                    self.myArcCenter2PAction = ArcCenter2PAction.Input_2ArcPoint
-
         elif self.myArcCenter2PAction == ArcCenter2PAction.Input_2ArcPoint:
             self.curPnt2d = self.myAnalyserSnap.MouseMove(thePnt2d)
             if self.ProjectOnCircle(self.curPnt2d):
                 third_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
                 self.myRubberCircle.SetCircle(self.tempGeom_Circle)
-                p1 = 0.0
+                p1 = elclib.Parameter(self.tempGeom_Circle.Circ(), self.mySecondPoint.Pnt())
                 p2 = elclib.Parameter(self.tempGeom_Circle.Circ(), third_Pnt)
                 self.myRubberCircle.SetFirstParam(min(p1, p2))
                 self.myRubberCircle.SetLastParam(max(p1, p2))
@@ -137,7 +123,8 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
         elif self.myArcCenter2PAction == ArcCenter2PAction.Input_1ArcPoint:
             self.myContext.Remove(self.myRubberCircle, True)
         elif self.myArcCenter2PAction == ArcCenter2PAction.Input_2ArcPoint:
-            pass
+            self.myContext.Remove(self.myRubberCircle, True)
+            self.myContext.Remove(self.myAIS_Label, True)
         self.myArcCenter2PAction = ArcCenter2PAction.Nothing
 
     def GetTypeOfMethod(self):
