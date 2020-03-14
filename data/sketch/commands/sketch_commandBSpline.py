@@ -69,7 +69,7 @@ class Sketch_CommandBSpline(Sketch_Command):
             self.myFirstgp_Pnt2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.myFirstgp_Pnt = elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d)
             self.myFirstPoint.SetPnt(self.myFirstgp_Pnt)
-            self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
+            # self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
 
             self.Poles2d[0] = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.Poles[0] = gp_Pnt(self.myFirstgp_Pnt.X(), self.myFirstgp_Pnt.Y(), self.myFirstgp_Pnt.Z())
@@ -78,7 +78,7 @@ class Sketch_CommandBSpline(Sketch_Command):
             self.bspline = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
             self.bspline.AddPoles(self.curPnt2d)
 
-            self.myContext.Display(self.myRubberLine, True)
+            # self.myContext.Display(self.myRubberLine, True)
             self.myBSplineCurveAction = BSplineCurveAction.Input_2Point
             self.IndexCounter = 2
 
@@ -94,7 +94,7 @@ class Sketch_CommandBSpline(Sketch_Command):
                 self.bspline.AddPoles(self.curPnt2d)
                 self.curEdge = ME.Edge()
                 self.myRubberAIS_Shape.Set(self.curEdge)
-                self.myContext.Remove(self.myRubberLine, True)
+                # self.myContext.Remove(self.myRubberLine, True)
                 self.myContext.Display(self.myRubberAIS_Shape, True)
 
                 self.IndexCounter += 1
@@ -137,9 +137,10 @@ class Sketch_CommandBSpline(Sketch_Command):
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
-            self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-            self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
-            self.myContext.Redisplay(self.myRubberLine, True)
+            # self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
+            # self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
+            # self.myContext.Redisplay(self.myRubberLine, True)
+            pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
             self.myGeom2d_BSplineCurve.SetPole(self.IndexCounter, self.curPnt2d)
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
@@ -157,18 +158,18 @@ class Sketch_CommandBSpline(Sketch_Command):
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
             self.rootNode.removeChild(self.rootNode.childCount() - 1)
-            self.myContext.Remove(self.myRubberLine, True)
+            # self.myContext.Remove(self.myRubberLine, True)
             self.bspline.RemoveLabel()
             del self.bspline
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
             self.rootNode.removeChild(self.rootNode.childCount() - 1)
-            self.myContext.Remove(self.myRubberLine, True)
+            # self.myContext.Remove(self.myRubberLine, True)
             self.bspline.RemoveLabel()
             del self.bspline
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_OtherPoints:
             if len(self.Poles)<=3:
                 self.rootNode.removeChild(self.rootNode.childCount() - 1)
-                self.myContext.Remove(self.myRubberLine, True)
+                # self.myContext.Remove(self.myRubberLine, True)
                 self.bspline.RemoveLabel()
                 del self.bspline
                 self.myContext.Remove(self.myRubberAIS_Shape, True)

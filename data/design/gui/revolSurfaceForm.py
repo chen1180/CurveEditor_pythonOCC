@@ -43,12 +43,12 @@ class RevolSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiProfile.setText(myCurObject.GetName())
+                    self.ui.uiProfile.CreateLabel(myCurObject.GetName())
                     self.myProfile = myCurObject
 
     def SelectAxis(self):
         self.parent.Hide()
-        self.ui.uiChangeAxis.setText("Selecting")
+        self.ui.uiChangeAxis.CreateLabel("Selecting")
         self.selectAxis = True
 
     def SetAxis(self):
@@ -58,7 +58,7 @@ class RevolSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiAxis.setText(myCurObject.GetName())
+                    self.ui.uiAxis.CreateLabel(myCurObject.GetName())
                     self.myAxis = myCurObject
 
     def CheckType(self):

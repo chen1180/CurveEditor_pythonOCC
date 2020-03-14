@@ -16,8 +16,8 @@ class PartController(QObject):
         self._display = display
         self._statusBar: QStatusBar = parent.statusBar()
         self.partGUI = part_qtgui.Part_QTGUI(parent)
-        self.part = Part(self._display, self._statusBar,self.partGUI)
-        self.parent=parent
+        self.part = Part(self._display, self._statusBar, self.partGUI)
+        self.parent = parent
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
         self.actions = []
@@ -83,10 +83,12 @@ class PartController(QObject):
 
     def DeleteSelectedObject(self):
         root: Node = self.model.getNode(QModelIndex())
-        index=0
+        index = 0
         while index < root.childCount():
             child = root.child(index)
-            if isinstance(child,BezierSurfaceNode) or isinstance(child,SweepSurfaceNode) or isinstance(child,ExtrudedSurfaceNode) or isinstance(child,RevolvedSurfaceNode):
+            if isinstance(child, BezierSurfaceNode) or isinstance(child, SweepSurfaceNode) or isinstance(child,
+                                                                                                         ExtrudedSurfaceNode) or isinstance(
+                    child, RevolvedSurfaceNode):
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
                     myCurObject.RemoveDisplay()

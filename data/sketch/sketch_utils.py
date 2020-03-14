@@ -6,8 +6,7 @@ from OCC.Core.ElCLib import elclib
 def Pnt2dToPnt(pnt2d, theAxis):
     return elclib.To3d(theAxis.Ax2(), pnt2d)
 
-
-def TColgp_Array1OfPnt2d_to_point_list(li: TColgp_Array1OfPnt2d):
+def TColgp_Array1OfPnt2d_to_point_list(li):
     pts = []
     for i in range(li.Length()):
         point = li.Value(i + 1)

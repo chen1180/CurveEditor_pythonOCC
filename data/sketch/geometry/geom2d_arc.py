@@ -6,7 +6,6 @@ from OCC.Core._Geom2d import Geom2d_Line_swigregister
 
 M_PI = 3.14
 
-
 class Geom2d_Arc(Geom2d_Circle):
     def __init__(self, C: gp_Circ2d):
         super(Geom2d_Arc, self).__init__(C)

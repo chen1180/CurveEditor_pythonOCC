@@ -43,12 +43,13 @@ class Sketch(object):
         self.addCommand(Sketch_CommandPoint())
         self.addCommand(Sketch_CommandLine2P())
         self.addCommand(Sketch_CommandBezierCurve())
-        self.addCommand(Sketch_CommandArc3P())
+        self.addCommand(Sketch_CommandArcCenter2P())
         self.addCommand(Sketch_CommandCircleCenterRadius())
         self.addCommand(Sketch_CommandBSpline())
         self.addCommand(Sketch_CommandPointToBSpline())
         self.addCommand(Sketch_CommandMoveObject())
-        self.addCommand(Sketch_CommandNurbCircle())
+        self.addCommand(Sketch_CommandNurbCircleSquare())
+        self.addCommand(Sketch_CommandNurbCircleTriangle())
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext
@@ -115,7 +116,7 @@ class Sketch(object):
         self.SelectCurCommand()
         self.CurCommand.Action()
         if (
-                self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Line2P_Method or self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Arc3P_Method) and self.PolylineFirstPointExist:
+                self.myCurrentMethod == Sketch_ObjectTypeOfMethod.Line2P_Method or self.myCurrentMethod == Sketch_ObjectTypeOfMethod.ArcCenter2P_Method) and self.PolylineFirstPointExist:
             self.CurCommand.SetPolylineFirstPnt(self.PolylineFirstPoint)
         else:
             self.PolylineFirstPointExist = False

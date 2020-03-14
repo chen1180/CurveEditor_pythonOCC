@@ -62,18 +62,27 @@ class SketchController(QObject):
                                              statusTip="Add a cubic Bezier curve",
                                              triggered=self.sketchBezier)
         self.actions.append(self.action_addBezierCurve)
+        bspline_action = []
         self.action_addBSpline = QAction(QIcon(":/bspline_curve.png"), "BSplines", self,
                                          statusTip="Add a B Spline curve",
                                          triggered=self.sketchBSpline)
-        self.actions.append(self.action_addBSpline)
-        self.action_addNurbsCircle = QAction(QIcon(":/nurbs.png"), "Nurbs Circle", self,
-                                             statusTip="Add a 9 control points nurbs circle",
-                                             triggered=self.sketchNurbCircle)
-        self.actions.append(self.action_addNurbsCircle)
+        bspline_action.append(self.action_addBSpline)
         self.action_pointsToBSpline = QAction(QIcon(":/spline.png"), "Interpolate", self,
                                               statusTip="Interpolate points with BSpline",
                                               triggered=self.sketchPointsToBSpline)
-        self.actions.append(self.action_pointsToBSpline)
+        bspline_action.append(self.action_pointsToBSpline)
+        self.actions.append(bspline_action)
+        nurbCircle_action=[]
+        self.action_addNurbsCircle_Square = QAction(QIcon(":/nurbs.png"), "Nurbs Circle 1", self,
+                                             statusTip="Add a 9 control points nurbs circle",
+                                             triggered=self.sketchNurbCircleSquare)
+        nurbCircle_action.append(self.action_addNurbsCircle_Square)
+        self.action_addNurbsCircle_Triangle= QAction(QIcon(":/nurbs.png"), "Nurbs Circle 2", self,
+                                                    statusTip="Add a 7 control points nurbs circle",
+                                                    triggered=self.sketchNurbCircleTriangle)
+        nurbCircle_action.append(self.action_addNurbsCircle_Triangle)
+        self.actions.append(nurbCircle_action)
+
         self.action_addArc = QAction(QIcon(":/arc.png"), "Add Arc", self,
                                      statusTip="Add an arc",
                                      triggered=self.sketchArc3P)
@@ -117,7 +126,7 @@ class SketchController(QObject):
         self.rootNode: Node = root
 
     def snapEnd(self):
-        self.sketch.SnapToGridPoint =False
+        self.sketch.SnapToGridPoint = False
         self.sketch.SetSnap(Sketcher_SnapType.SnapEnd)
 
     def snapNearest(self):
@@ -148,7 +157,6 @@ class SketchController(QObject):
         pnt = coordinate_system.Location()
         print(pnt.X(), pnt.Y(), pnt.Z())
         # Display normal axis of the plane
-        # print(coordinate_system.Axis())
         # normal_axis=coordinate_system.Axis()
         # normal_geom_axis=Geom_Line(normal_axis)
         # ais_axis=AIS_Line(normal_geom_axis)
@@ -158,7 +166,6 @@ class SketchController(QObject):
         self.createDynamicGrid()
         self.currentSketchNode.setSketchPlane(sketch_plane)
         self.sketchPlaneUpdated.emit(self.currentSketchNode)
-
         self.selectSketchNode(self.currentSketchNode)
 
     def createDynamicGrid(self):
@@ -191,7 +198,7 @@ class SketchController(QObject):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BezierCurve_Method)
 
     def sketchArc3P(self):
-        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Arc3P_Method)
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.ArcCenter2P_Method)
 
     def sketchCircleCenterRadius(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.CircleCenterRadius_Method)
@@ -199,8 +206,11 @@ class SketchController(QObject):
     def sketchBSpline(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.BSpline_Method)
 
-    def sketchNurbCircle(self):
-        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.NurbsCircle_Method)
+    def sketchNurbCircleSquare(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.NurbsCircleSquare_Method)
+
+    def sketchNurbCircleTriangle(self):
+        self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.NurbsCircleTriangle_Method)
 
     def sketchPointsToBSpline(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.PointsToBSpline_Method)
@@ -225,6 +235,15 @@ class SketchController(QObject):
 
     def OnCancel(self):
         self.sketch.OnCancel()
+
+    def HideSketchNodeChildren(self, node):
+        index = 0
+        while index < node.childCount():
+            child = node.child(index)
+            myCurObject: Sketch_Geometry = child.getSketchObject()
+            myCurObject.RemoveDisplay()
+            myCurObject.RemoveLabel()
+            index += 1
 
     def DeleteSelectedObject(self):
         root: Node = self.currentSketchNode.parent()

@@ -31,6 +31,8 @@ class Window(QtWidgets.QMainWindow):
         self._uiTreeView = QtWidgets.QTreeView()
         self._uiTreeView.setModel(self._model)
         self._uiTreeView.setSortingEnabled(True)
+        self._uiTreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._uiTreeView.customContextMenuRequested.connect(self.openMenu)
 
         # view manager
         self.viewController = viewController.ViewController(self._glWindow._display, self)
@@ -202,3 +204,44 @@ class Window(QtWidgets.QMainWindow):
         #                                  statusTip="Export current view as picture",
         #                                  triggered=export_to_PNG))
         pass
+
+    def deleteTreeItem(self, index):
+        indexes = self._uiTreeView.selectedIndexes()
+        self.sketchController.DeleteSelectedObject()
+
+    def deleteAllTreeItem(self):
+        if self._model.hasChildren():
+            root: Node = self._model._rootNode
+            index = 0
+            while index < root.childCount():
+                planeNode = root.child(index)
+                if isinstance(planeNode, SketchNode):
+                    self.sketchController.HideSketchNodeChildren(planeNode)
+                else:
+                    planeNode.getSketchObject().RemoveDisplay()
+                index += 1
+            self._model.removeRows(0, self._model.rowCount(QtCore.QModelIndex()))
+
+    def openMenu(self, position):
+        indexes = self._uiTreeView.selectedIndexes()
+        level = 0
+        if len(indexes) > 0:
+            level = 0
+            index = indexes[0]
+            while index.parent().isValid():
+                index = index.parent()
+                level += 1
+        menu = QtWidgets.QMenu()
+        menu.addAction(QtWidgets.QAction(QtGui.QIcon(), "Delete this", self,
+                                         statusTip="Delete selected node",
+                                         triggered=self.deleteTreeItem))
+        if level == 0:
+            menu.addAction(self.tr("Edit person"))
+            menu.addAction(QtWidgets.QAction(QtGui.QIcon(), "Empty Scene", self,
+                                             statusTip="Delete all objects in the scene",
+                                             triggered=self.deleteAllTreeItem))
+        elif level == 1:
+            menu.addAction(self.tr("Edit object/container"))
+        elif level == 2:
+            menu.addAction(self.tr("Edit object"))
+        menu.exec_(self._uiTreeView.viewport().mapToGlobal(position))

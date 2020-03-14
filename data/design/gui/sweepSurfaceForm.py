@@ -83,7 +83,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiPathLineEdit.setText(myCurObject.GetName())
+                    self.ui.uiPathLineEdit.CreateLabel(myCurObject.GetName())
                     self.myPath = myCurObject
 
     def SetConstantSection(self):
@@ -93,7 +93,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiConstantSectionLineEdit.setText(myCurObject.GetName())
+                    self.ui.uiConstantSectionLineEdit.CreateLabel(myCurObject.GetName())
                     self.myConstantSection = myCurObject
 
     def SetFirstSection(self):
@@ -103,7 +103,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiFirstSectionLineEdit.setText(myCurObject.GetName())
+                    self.ui.uiFirstSectionLineEdit.CreateLabel(myCurObject.GetName())
                     self.myFirstSection = myCurObject
 
     def SetLastSection(self):
@@ -113,7 +113,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiLastSectionLineEdit.setText(myCurObject.GetName())
+                    self.ui.uiLastSectionLineEdit.CreateLabel(myCurObject.GetName())
                     self.myLastSection = myCurObject
 
     def CheckType(self):

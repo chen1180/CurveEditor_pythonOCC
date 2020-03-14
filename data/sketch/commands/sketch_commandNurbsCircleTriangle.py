@@ -11,24 +11,21 @@ class CircleCenterRadiusAction(Enum):
     Input_RadiusPoint = 2
 
 
-class Sketch_CommandCircleCenterRadius(Sketch_Command):
-    """
-    @attention: This command is not used in the program.
-    """
-
+class Sketch_CommandNurbCircleTriangle(Sketch_Command):
     def __init__(self):
-        super(Sketch_CommandCircleCenterRadius, self).__init__("CircleCR.")
+        super(Sketch_CommandNurbCircleTriangle, self).__init__("NURBS Circle.")
         self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
         self.radius = 0.0
         self.tempGeom_Circle = Geom_Circle(self.curCoordinateSystem.Ax2(), SKETCH_RADIUS)
         self.myRubberCircle = AIS_Circle(self.tempGeom_Circle)
+        self.myRubberCircle.SetColor(Quantity_Color(Quantity_NOC_BLUE1))
         self.myCircleAx2d = gp_Ax2d()
 
     def Action(self):
         self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_CenterPoint
         self.tempGeom_Circle.SetAxis(self.curCoordinateSystem.Axis())
-        self.myCircleAx2d.SetDirection(
-            gp_Dir2d(self.curCoordinateSystem.XDirection().X(), self.curCoordinateSystem.XDirection().Y()))
+        # if self.curCoordinateSystem.XDirection():
+        #     self.myCircleAx2d.SetDirection(gp_Dir2d(self.curCoordinateSystem.XDirection().X(), self.curCoordinateSystem.XDirection().Y()))
 
     def MouseInputEvent(self, thePnt2d: gp_Pnt2d, buttons, modifier):
         if self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Nothing:
@@ -44,24 +41,22 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
             self.myRubberCircle.SetCircle(self.tempGeom_Circle)
             self.myContext.Display(self.myRubberCircle, True)
 
-            self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
-            self.myContext.Display(self.myRubberLine, True)
+            # self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
+            # self.myContext.Display(self.myRubberLine, True)
 
             self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_RadiusPoint
         elif self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Input_RadiusPoint:
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                     TangentType.Circle_CenterPnt, True)
             self.radius = self.myFirstgp_Pnt2d.Distance(self.curPnt2d)
-            myGeom2d_Circle = Geom2d_Circle(self.myCircleAx2d, self.radius)
-
-            Geom_Circle1 = Geom_Circle(elclib.To3d(self.curCoordinateSystem.Ax2(), myGeom2d_Circle.Circ2d()))
-            myAIS_Circle = AIS_Circle(Geom_Circle1)
-            self.AddObject(myGeom2d_Circle, myAIS_Circle, Sketch_GeometryType.CircleSketchObject)
-
             self.myContext.Remove(self.myRubberCircle, True)
-            self.myContext.Remove(self.myRubberLine, True)
-            self.myContext.Display(myAIS_Circle, True)
-            self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_CenterPoint
+
+            nurbs = self.ToNurbs_Triangle()
+            nurbs.Compute()
+            self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
+            self.bspline_node.setSketchObject(nurbs)
+            self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
+            self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
 
         return False
 
@@ -74,12 +69,13 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
             self.curPnt2d = self.myAnalyserSnap.MouseMoveException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                    TangentType.Circle_CenterPnt, True)
             self.radius = self.myFirstgp_Pnt2d.Distance(self.curPnt2d)
+            if self.radius == 0.0:
+                self.radius = 1.0
             self.tempGeom_Circle.SetRadius(self.radius)
             self.myContext.Redisplay(self.myRubberCircle, True)
-
             self.mySecondPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.curPnt2d))
-            self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
-            self.myContext.Redisplay(self.myRubberLine, True)
+            # self.myRubberLine.SetPoints(self.myFirstPoint, self.mySecondPoint)
+            # self.myContext.Redisplay(self.myRubberLine, True)
 
     def CancelEvent(self):
         if self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Nothing:
@@ -88,8 +84,28 @@ class Sketch_CommandCircleCenterRadius(Sketch_Command):
             pass
         elif self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Input_RadiusPoint:
             self.myContext.Remove(self.myRubberCircle, True)
-            self.myContext.Remove(self.myRubberLine, True)
         self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
 
     def GetTypeOfMethod(self):
-        return Sketch_ObjectTypeOfMethod.CircleCenterRadius_Method
+        return Sketch_ObjectTypeOfMethod.NurbsCircleTriangle_Method
+
+    def ToNurbs_Triangle(self):
+        nurbsCircle = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
+        convert: Geom_BSplineCurve = geomconvert_CurveToBSplineCurve(self.tempGeom_Circle)
+        poles = TColgp_Array1OfPnt2d_to_point_list(convert.Poles())
+        weights = convert.Weights()
+        knots = convert.Knots()
+        multiplicity = convert.Multiplicities()
+
+        for pole in poles:
+            x, y = pole.X(), pole.Y()
+            nurbsCircle.AddPoles(gp_Pnt2d(x, y))
+        nurbsCircle.AddPoles(gp_Pnt2d(poles[0].X(), poles[0].Y()))
+
+        nurbsCircle.SetWeights([1.0, 0.5000000000000001, 1.0, 0.5000000000000001, 1.0, 0.5000000000000001, 1.0])
+        nurbsCircle.SetKnots(TColStd_Array1OfNumber_to_list(knots))
+        nurbsCircle.SetMultiplicities([3, 2, 2, 3])
+        nurbsCircle.SetDegree(convert.Degree())
+
+        nurbsCircle.Compute()
+        return nurbsCircle

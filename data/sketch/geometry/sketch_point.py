@@ -22,10 +22,10 @@ class Sketch_Point(Sketch_Geometry):
 
         # Text label
         coordinate = "({},{})".format(round(thePnt2d.X(), 1), round(thePnt2d.Y(), 1))
-        self.myAIS_Coordinate = self.setText(coordinate, Quantity_NOC_GREEN)
-        self.myAIS_Name = self.setText(self.myName, Quantity_NOC_BLUE1, offset=gp_Vec(-20, -20, -20))
+        self.myAIS_Coordinate = self.CreateLabel(coordinate, Quantity_NOC_GREEN)
+        self.myAIS_Name = self.CreateLabel(self.myName, Quantity_NOC_BLUE1, offset=gp_Vec(-20, -20, -20))
 
-    def setText(self, text: str, color, offset=gp_Vec(20, 20, 20)):
+    def CreateLabel(self, text: str, color, offset=gp_Vec(20, 20, 20)):
         # Text label
         myAIS_Text = AIS_TextLabel()
         myAIS_Text.SetText(

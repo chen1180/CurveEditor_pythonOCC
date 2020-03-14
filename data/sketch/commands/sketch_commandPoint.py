@@ -28,7 +28,7 @@ class Sketch_CommandPoint(Sketch_Command):
             sketch_point.Compute(self.curPnt2d)
             node = PointNode(sketch_point.GetName(), self.rootNode)
             node.setSketchObject(sketch_point)
-            self.AddObject(sketch_point.GetGeometry(), sketch_point.GetAIS_Object(),
+            self.AddObject(sketch_point.GetGeometry2d(), sketch_point.GetAIS_Object(),
                            Sketch_GeometryType.PointSketchObject)
 
         return False

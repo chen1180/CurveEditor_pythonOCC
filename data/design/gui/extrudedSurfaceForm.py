@@ -49,13 +49,13 @@ class ExtrudedSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiProfileLineEdit.setText(myCurObject.GetName())
+                    self.ui.uiProfileLineEdit.CreateLabel(myCurObject.GetName())
                     self.myProfile = myCurObject
                     self.myNormalAxis = planeNode.getSketchPlane().GetCoordinate().Axis()
 
     def SelectDirection(self):
         self.parent.Hide()
-        self.ui.uiSelectEdgeButton.setText("Selecting")
+        self.ui.uiSelectEdgeButton.CreateLabel("Selecting")
         self.selectDirection = True
 
     def SetDirections(self):
@@ -65,7 +65,7 @@ class ExtrudedSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiEdgeLineEdit.setText(myCurObject.GetName())
+                    self.ui.uiEdgeLineEdit.CreateLabel(myCurObject.GetName())
                     self.myDirection = myCurObject
 
     def CheckType(self):

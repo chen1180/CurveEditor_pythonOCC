@@ -19,19 +19,14 @@ class Sketch_ObjectTypeOfMethod:
     Point_Method = 1
     Line2P_Method = 2
     CircleCenterRadius_Method = 3
-    Circle3P_Method = 4
-    Circle2PTan_Method = 5
-    CircleP2Tan_Method = 6
-    Circle3Tan_Method = 7
-    Arc3P_Method = 8
 
-    ArcCenter2P_Method = 9
-    BezierCurve_Method = 10
-    Trim_Method = 11
-    BSpline_Method = 12
-    PointsToBSpline_Method = 13
-    NurbsCircle_Method = 14
-
+    ArcCenter2P_Method = 4
+    BezierCurve_Method = 5
+    Trim_Method = 6
+    BSpline_Method = 7
+    PointsToBSpline_Method = 8
+    NurbsCircleSquare_Method = 9
+    NurbsCircleTriangle_Method=10
     Move_Method = 20
 
 

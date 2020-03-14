@@ -1,15 +1,15 @@
 from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
 from data.sketch.sketch_type import *
 from data.sketch.sketch_object import Sketch_Object
-from OCC.Core.Geom import Geom_CartesianPoint
-from OCC.Core.gp import gp_Origin2d, gp_Ax3, gp_Pnt2d, gp, gp_Pnt, gp_Circ, gp_Circ2d, gp_Lin2d, gp_Ax2d, gp_Dir2d, \
-    gp_Dir, gp_Vec
-from OCC.Core.AIS import AIS_InteractiveContext, AIS_Line, AIS_InteractiveObject, AIS_Shape, AIS_Circle
+from OCC.Core.Geom import *
+from OCC.Core.gp import *
+from OCC.Core.AIS import *
 from OCC.Core.Aspect import *
-from OCC.Core.Prs3d import Prs3d_LineAspect
-from OCC.Core.Quantity import Quantity_NOC_YELLOW, Quantity_NOC_BLUE1, Quantity_Color
-from OCC.Core.Geom2d import Geom2d_Geometry
-from OCC.Core.TCollection import TCollection_ExtendedString
+from OCC.Core.Prs3d import *
+from OCC.Core.Quantity import *
+from OCC.Core.Geom2d import *
+from OCC.Core.TCollection import *
+from OCC.Core.GeomConvert import *
 from data.node import *
 from data.sketch.sketch_utils import *
 from PyQt5.QtCore import Qt
@@ -20,6 +20,7 @@ SKETCH_RADIUS = 10.0
 
 class Sketch_Command(object):
     def __init__(self, name):
+
         self.data = []
         self.rootNode: Node = None
         self.myModel: SceneGraphModel = None
@@ -40,8 +41,8 @@ class Sketch_Command(object):
 
         self.myFirstPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
         self.mySecondPoint: Geom_CartesianPoint = Geom_CartesianPoint(gp.Origin())
-        self.myRubberLine = AIS_Line(self.myFirstPoint, self.mySecondPoint)
-        self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_BLUE1))
+        # self.myRubberLine = AIS_Line(self.myFirstPoint, self.mySecondPoint)
+        # self.myRubberLine.SetColor(Quantity_Color(Quantity_NOC_BLUE1))
 
     def SetContext(self, theContext: AIS_InteractiveContext):
         self.myContext = theContext

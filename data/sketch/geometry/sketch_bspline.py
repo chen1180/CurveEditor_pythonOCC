@@ -49,8 +49,7 @@ class Sketch_Bspline(Sketch_Geometry):
 
         poles2d_list = [pole.GetGeometry2d().Pnt2d() for pole in self.myPoles]
         arrayOfPoles2d = point_list_to_TColgp_Array1OfPnt2d(poles2d_list)
-        self.myGeometry2d = Geom2d_BSplineCurve(arrayOfPoles2d, arrayOfWeights, arrayOfKnots, arrayOfMulties,
-                                                self.myDegree)
+        self.myGeometry2d = Geom2d_BSplineCurve(arrayOfPoles2d, arrayOfWeights, arrayOfKnots, arrayOfMulties,self.myDegree)
 
         poles_list = [pole.GetGeometry().Pnt() for pole in self.myPoles]
         arrayOfPoles = point_list_to_TColgp_Array1OfPnt(poles_list)
@@ -206,7 +205,8 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def GetPoles(self):
         return self.myPoles
-
+    def SetPoles(self,thePoles):
+        self.myPoles=list(thePoles)
     def SetDegree(self, theDegree):
         self.myDegree = theDegree
 

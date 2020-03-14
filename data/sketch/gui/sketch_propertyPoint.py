@@ -9,7 +9,7 @@ class Sketch_PropertyPoint(Sketch_Property):
         super(Sketch_PropertyPoint, self).__init__(parent, name, fl)
         if not name:
             self.setObjectName("Property Points")
-        self.ui.TextLabelPoint1.setText("Point")
+        self.ui.TextLabelPoint1.setText("Point. ")
         self.isPointWindow = True
         # UI
         self.ui.TextLabelWidth.close()
