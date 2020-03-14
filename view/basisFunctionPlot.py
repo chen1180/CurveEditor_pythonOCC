@@ -5,7 +5,6 @@ import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
-import random
 
 # -*- coding: utf-8 -*-
 """Python/Numpy implementation of Bspline basis functions via Cox - de Boor algorithm."""
@@ -382,6 +381,8 @@ class BasisFunctionWindow(QDialog):
         x, y = event.xdata, event.ydata
         if x < 0.0:
             x = 0.0
+        if x>max(self.knots_vector):
+            x=max(self.knots_vector)
         y=1.0
         xy = np.asarray(self.scatter.get_offsets())
         xy[self._ind] = np.array([x, y])

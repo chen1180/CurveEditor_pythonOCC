@@ -35,9 +35,11 @@ class Surface_Revolved(Surface_Geometry):
         axis = self.myRevolveAxis.GetGeometry().Position()
         edge = BRepBuilderAPI_MakeEdge(profile)
         shape = BRepPrimAPI_MakeRevol(edge.Edge(), axis, math.radians(self.myAngle)).Shape()
+
         self.myAIS_InteractiveObject = AIS_Shape(shape)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
-
+        self.SetCenter(shape)
+        self.InitClippingPlane()
     def SetCurves(self, theCurves):
         self.myCurve = theCurves
 

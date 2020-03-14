@@ -28,7 +28,10 @@ class Node(object):
 
     def child(self, row):
         if self._children:
-            return self._children[row]
+            if row > len(self._children) - 1:
+                return None
+            else:
+                return self._children[row]
         return None
 
     def children(self):

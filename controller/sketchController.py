@@ -154,7 +154,7 @@ class SketchController(QObject):
         # ais_axis=AIS_Line(normal_geom_axis)
         # self._display.Context.Display(ais_axis,True)
         sketch_plane = Sketch_Plane(self._display.Context, coordinate_system)
-        sketch_plane.Compute()
+        # sketch_plane.Compute()
         self.createDynamicGrid()
         self.currentSketchNode.setSketchPlane(sketch_plane)
         self.sketchPlaneUpdated.emit(self.currentSketchNode)

@@ -208,44 +208,42 @@ class SurfaceEditor(QWidget):
         self._dataMapper.setRootIndex(parent)
         self._dataMapper.setCurrentModelIndex(current)
 
-    def setClippingPlane(self):
-        # clip plane number one, by default xOy
-        clip_plane_1 = Graphic3d_ClipPlane()
-        # set hatch on
-        clip_plane_1.SetCapping(True)
-        clip_plane_1.SetCappingHatch(True)
-        # off by default, user will have to enable it
-        clip_plane_1.SetOn(True)
-        # set clip plane color
-        aMat = clip_plane_1.CappingMaterial()
-        aColor = Quantity_Color(0.5, 0.6, 0.7, Quantity_TOC_RGB)
-        aMat.SetAmbientColor(aColor)
-        aMat.SetDiffuseColor(aColor)
-        clip_plane_1.SetCappingMaterial(aMat)
-        self.clippingPlane = clip_plane_1
+    # def setClippingPlane(self):
+    #     # clip plane number one, by default xOy
+    #     clip_plane_1 = Graphic3d_ClipPlane(gp_Pln(self.myCenter,gp_Dir(1., 0., 0.)))
+    #     # set hatch on
+    #     clip_plane_1.SetCapping(True)
+    #     clip_plane_1.SetCappingHatch(True)
+    #     # off by default, user will have to enable it
+    #     clip_plane_1.SetOn(True)
+    #     # set clip plane color
+    #     aMat = clip_plane_1.CappingMaterial()
+    #     aColor = Quantity_Color(0.5, 0.6, 0.7, Quantity_TOC_RGB)
+    #     aMat.SetAmbientColor(aColor)
+    #     aMat.SetDiffuseColor(aColor)
+    #     clip_plane_1.SetCappingMaterial(aMat)
+    #     self.clippingPlane = clip_plane_1
+    #     self.myGeometry = Geom_Plane(self.clippingPlane.ToPlane())
+    #     self.myGeometry.SetLocation(self.myCenter)
+    #     self.myAIS_Plane = AIS_Plane(self.myGeometry)
+    #     # self._surface.myContext.Display(self.myAIS_Plane, True)
 
     def clippingOn(self, checked):
-        if checked:
-            self._surface.GetAIS_Object().AddClipPlane(self.clippingPlane)
-            self.clippingPlane.SetOn(True)
-        else:
-            self._surface.GetAIS_Object().RemoveClipPlane(self.clippingPlane)
-            self.clippingPlane.SetOn(False)
-        self._surface.myContext.UpdateCurrentViewer()
+        self._surface.OnClippingPlane(checked)
 
     def changeClippingPlane(self):
-        equation = Graphic3d_Vec4d(0., 0., 1., 0.0)
-        checkedButton = self.ui.buttonGroup.checkedButton().text()
-        if checkedButton == "X":
-            equation = Graphic3d_Vec4d(1., 0., 0., 0.)
-        elif checkedButton == "Y":
-            equation = Graphic3d_Vec4d(0., 1., 0., 0.)
-        self.clippingPlane.SetEquation(equation)
-        self._surface.myContext.UpdateCurrentViewer()
+        dir = gp_Dir(0., 0., 1.)
+        checkedButton = self.ui.buttonGroup.checkedButton()
+        if checkedButton == self.ui.xRadioButton:
+            dir = gp_Dir(1., 0., 0.)
+        elif checkedButton == self.ui.yRadioButton:
+            dir = gp_Dir(0., 1., 0.)
+        elif checkedButton == self.ui.zRadioButton:
+            dir = gp_Dir(0., 0., 1.)
+        self._surface.UpdateClippingPlane(dir)
 
     def animateClipping(self):
         if self.ui.checkBox.isChecked():
-            plane_definition = self.clippingPlane.ToPlane()  # it's a gp_Pln
             h = 1.0
             direction = gp_Vec(0., 0., h)
             checkedButton = self.ui.buttonGroup.checkedButton().text()
@@ -254,16 +252,11 @@ class SurfaceEditor(QWidget):
             elif checkedButton == "Y":
                 direction = gp_Vec(0., h, 0.)
             for i in range(100):
-                plane_definition.Translate(direction)
-                self.clippingPlane.SetEquation(plane_definition)
-                self._surface.myContext.UpdateCurrentViewer()
+                self._surface.TranslateClippingPlane(direction)
 
     def resetClipping(self):
         if self.ui.checkBox.isChecked():
-            self._surface.GetAIS_Object().RemoveClipPlane(self.clippingPlane)
-            self.setClippingPlane()
-            self._surface.GetAIS_Object().AddClipPlane(self.clippingPlane)
-            self._surface.myContext.UpdateCurrentViewer()
+            self.changeClippingPlane()
 
 
 class RuledSurfaceEditor(SurfaceEditor):
@@ -276,8 +269,7 @@ class RuledSurfaceEditor(SurfaceEditor):
         node = self._model.getNode(current)
         if type(node) == ExtrudedSurfaceNode:
             self._surface: Surface_LinearExtrusion = node.getSketchObject()
-            self.setClippingPlane()
-            self.changeClippingPlane()
+
 
 
 class BezierSurfaceEditor(SurfaceEditor):
@@ -290,7 +282,6 @@ class BezierSurfaceEditor(SurfaceEditor):
         node = self._model.getNode(current)
         if type(node) == BezierSurfaceNode:
             self._surface = node.getSketchObject()
-            self.setClippingPlane()
             self.changeClippingPlane()
 
 
@@ -304,7 +295,6 @@ class RevolutedSurfaceEditor(SurfaceEditor):
         node = self._model.getNode(current)
         if type(node) == RevolvedSurfaceNode:
             self._surface = node.getSketchObject()
-            self.setClippingPlane()
             self.changeClippingPlane()
 
 
@@ -318,7 +308,6 @@ class SweepSurfaceEditor(SurfaceEditor):
         node = self._model.getNode(current)
         if type(node) == SweepSurfaceNode:
             self._surface = node.getSketchObject()
-            self.setClippingPlane()
             self.changeClippingPlane()
 
 
@@ -361,4 +350,3 @@ class Sketch_NewSketchEditor(QWidget):
 
     def getCoordinate(self):
         return self._coordinate
-

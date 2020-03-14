@@ -27,6 +27,11 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow = openglWindowController.OpenGLEditor(self)
         self.setCentralWidget(self._glWindow)
 
+        # setup sceneGraph editor
+        self._uiTreeView = QtWidgets.QTreeView()
+        self._uiTreeView.setModel(self._model)
+        self._uiTreeView.setSortingEnabled(True)
+
         # view manager
         self.viewController = viewController.ViewController(self._glWindow._display, self)
         # sketch manager
@@ -50,11 +55,6 @@ class Window(QtWidgets.QMainWindow):
         # setup tool bar
         self.createMenuBars()
         self.createToolBars()
-
-        # setup sceneGraph editor
-        self._uiTreeView = QtWidgets.QTreeView()
-        self._uiTreeView.setModel(self._model)
-        self._uiTreeView.setSortingEnabled(True)
 
         # create sceneGraph dock widget
         self._sceneGraphDock = QtWidgets.QDockWidget("Scene", self)
@@ -193,11 +193,12 @@ class Window(QtWidgets.QMainWindow):
         parent.addWidget(button)
 
     def createMenuBars(self):
-        menu = self._ui.menuBar.addMenu("&File")
-
-        def export_to_PNG():
-            self._glWindow.view.Dump('./capture_png.png')
-
-        menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
-                                         statusTip="Export current view as picture",
-                                         triggered=export_to_PNG))
+        # menu = self._ui.menuBar.addMenu("&File")
+        #
+        # def export_to_PNG():
+        #     self._glWindow.view.Dump('./capture_png.png')
+        #
+        # menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
+        #                                  statusTip="Export current view as picture",
+        #                                  triggered=export_to_PNG))
+        pass

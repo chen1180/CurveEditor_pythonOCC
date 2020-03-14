@@ -36,8 +36,12 @@ class Surface_Sweep(Surface_Geometry):
         face = BRepBuilderAPI_MakeFace()
         face.Init(self.myGeometry, True, 1.0e-6)
         face.Build()
-        self.myAIS_InteractiveObject = AIS_Shape(face.Shape())
+        face=face.Shape()
+        self.myAIS_InteractiveObject = AIS_Shape(face)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
+
+        self.SetCenter(face)
+        self.InitClippingPlane()
 
     def SetSections(self, theSection):
         self.mySections = theSection

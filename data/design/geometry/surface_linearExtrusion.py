@@ -12,6 +12,7 @@ from OCC.Core.Geom import Geom_SurfaceOfLinearExtrusion
 from .surface_geometry import Surface_Geometry
 
 
+
 class Surface_LinearExtrusion(Surface_Geometry):
     IndexCounter = 0
 
@@ -32,9 +33,11 @@ class Surface_LinearExtrusion(Surface_Geometry):
         # face.Build()
         profile = BRepBuilderAPI_MakeEdge(self.myCurve).Edge()
         prism = BRepPrimAPI_MakePrism(profile, self.myVec * self.myLength).Shape()
+
         self.myAIS_InteractiveObject = AIS_Shape(prism)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
-
+        self.SetCenter(prism)
+        self.InitClippingPlane()
     def SetCurves(self, theCurves):
         self.myCurve = theCurves
 
@@ -43,3 +46,5 @@ class Surface_LinearExtrusion(Surface_Geometry):
 
     def SetLength(self, theLength):
         self.myLength = theLength
+
+
