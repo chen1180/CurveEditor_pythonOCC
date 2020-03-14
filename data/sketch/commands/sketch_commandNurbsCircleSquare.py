@@ -52,7 +52,6 @@ class Sketch_CommandNurbCircleSquare(Sketch_Command):
             self.myContext.Remove(self.myRubberCircle, True)
 
             nurbs = self.ToNurbs_Square(self.myFirstgp_Pnt2d, self.radius)
-            nurbs.Compute()
             self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
             self.bspline_node.setSketchObject(nurbs)
             self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)

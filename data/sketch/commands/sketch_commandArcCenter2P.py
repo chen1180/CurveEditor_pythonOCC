@@ -3,6 +3,8 @@ from OCC.Core.ElCLib import elclib
 from enum import Enum
 from OCC.Core.Geom2dAPI import *
 from OCC.Core.GeomAPI import *
+from OCC.Core.GC import *
+from OCC.Core.gce import *
 
 M_PI = 3.14
 
@@ -26,7 +28,7 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
         self.myCircleAx2d = gp_Ax2d()
         self.ProjectOnCurve = Geom2dAPI_ProjectPointOnCurve()
         coordinate = "Degree: {}".format(0)
-        self.myAIS_Label = self.createLabel(coordinate, Quantity_NOC_GREEN, offset=gp_Vec(0, 0, 0))
+        self.myAIS_Label = self.CreateLabel(coordinate, Quantity_NOC_GREEN, offset=gp_Vec(0, 0, 0))
 
     def Action(self):
         self.myArcCenter2PAction = ArcCenter2PAction.Input_CenterArc
@@ -59,7 +61,7 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
                 geomapi_To2d(self.tempGeom_Circle, gp_Pln(self.curCoordinateSystem)))
 
             self.myContext.Redisplay(self.myRubberCircle, True)
-            #update text
+            # update text
             self.myAIS_Label.SetPosition(self.tempGeom_Circle.Location())
             self.myContext.Display(self.myAIS_Label, True)
 
@@ -81,8 +83,13 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
                 self.myContext.Redisplay(self.myRubberCircle, True)
                 # Remove text
                 self.myContext.Remove(self.myAIS_Label, True)
+
+                nurbs = self.ArcToNurbsArc(p1, p2)
+                self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
+                self.bspline_node.setSketchObject(nurbs)
+                self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
+
             self.myArcCenter2PAction = ArcCenter2PAction.Nothing
-            self.ArcToNurbs()
         return False
 
     def MouseMoveEvent(self, thePnt2d: gp_Pnt2d, buttons, modifiers):
@@ -117,11 +124,10 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
                 self.myRubberCircle.SetFirstParam(min(p1, p2))
                 self.myRubberCircle.SetLastParam(max(p1, p2))
                 self.myContext.Redisplay(self.myRubberCircle, True)
-                #update text
-
-                degree="Degree: {}".format(round(p2*180/M_PI))
+                # update text
+                degree = "Degree: {}".format(round(p2 * 180 / M_PI))
                 self.myAIS_Label.SetText(TCollection_ExtendedString(degree))
-                self.myContext.Redisplay(self.myAIS_Label,True)
+                self.myContext.Redisplay(self.myAIS_Label, True)
 
     def CancelEvent(self):
         if self.myArcCenter2PAction == ArcCenter2PAction.Nothing:
@@ -137,6 +143,28 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
     def GetTypeOfMethod(self):
         return Sketch_ObjectTypeOfMethod.ArcCenter2P_Method
 
+    def ArcToNurbsArc(self, p1, p2):
+        temp_curve = GC_MakeArcOfCircle(self.tempGeom_Circle.Circ(), p1, p2, False)
+        if temp_curve.Status() == gce_Done:
+            nurbsArc = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
+
+            convert: Geom_BSplineCurve = geomconvert_CurveToBSplineCurve(temp_curve.Value())
+            poles = TColgp_Array1OfPnt2d_to_point_list(convert.Poles())
+            weights = TColStd_Array1OfNumber_to_list(convert.Weights())
+            knots = TColStd_Array1OfNumber_to_list(convert.Knots())
+            multiplicity = TColStd_Array1OfNumber_to_list(convert.Multiplicities())
+
+            for pole in poles:
+                x, y = pole.X(), pole.Y()
+                nurbsArc.AddPoles(gp_Pnt2d(x, y))
+            nurbsArc.SetWeights(weights)
+            nurbsArc.SetKnots(knots)
+            nurbsArc.SetMultiplicities(multiplicity)
+            nurbsArc.SetDegree(convert.Degree())
+
+            nurbsArc.Compute()
+            return nurbsArc
+
     def ProjectOnCircle(self, thePnt2d):
         self.ProjectOnCurve.Init(thePnt2d, self.tempGeom2d_Circle)
         if self.ProjectOnCurve.NbPoints() > 0:
@@ -144,7 +172,7 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
             return True
         return False
 
-    def createLabel(self, text: str, color, offset=gp_Vec(20, 20, 20)):
+    def CreateLabel(self, text: str, color, offset=gp_Vec(20, 20, 20)):
         # Text label
         myAIS_Text = AIS_TextLabel()
         myAIS_Text.SetText(
@@ -152,22 +180,3 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
         myAIS_Text.SetPosition(self.tempGeom_Circle.Location().Translated(offset))
         myAIS_Text.SetColor(Quantity_Color(color))
         return myAIS_Text
-
-    def ArcToNurbs(self):
-        nurbsCircle = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
-        convert: Geom_BSplineCurve = geomconvert_CurveToBSplineCurve(self.tempGeom_Circle)
-        poles=TColgp_Array1OfPnt2d_to_point_list(convert.Poles())
-        weights = convert.Weights()
-        knots =convert.Knots()
-        multiplicity = convert.Multiplicities()
-        for pole in poles:
-            x,y=pole.X(), pole.Y()
-            nurbsCircle.AddPoles(gp_Pnt2d(x,y))
-        nurbsCircle.AddPoles(gp_Pnt2d(poles[0].X(), poles[0].Y()))
-        nurbsCircle.SetWeights([1.0, 0.5000000000000001, 1.0, 0.5000000000000001, 1.0, 0.5000000000000001,1.0])
-        nurbsCircle.SetKnots(TColStd_Array1OfNumber_to_list(knots))
-        nurbsCircle.SetMultiplicities([3,2,2,3])
-
-        nurbsCircle.SetDegree(convert.Degree())
-        nurbsCircle.Compute()
-        return nurbsCircle

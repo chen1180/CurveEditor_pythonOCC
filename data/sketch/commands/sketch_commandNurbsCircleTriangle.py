@@ -52,7 +52,6 @@ class Sketch_CommandNurbCircleTriangle(Sketch_Command):
             self.myContext.Remove(self.myRubberCircle, True)
 
             nurbs = self.ToNurbs_Triangle()
-            nurbs.Compute()
             self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
             self.bspline_node.setSketchObject(nurbs)
             self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
