@@ -75,7 +75,7 @@ class OpenGLEditor(GLWidget):
         #
         # Improve quality by a factor 10
         #
-        factor = 1
+        factor = 10
         ais_context.SetDeviationCoefficient(dc / factor)
         ais_context.SetDeviationAngle(da / factor)
         ais_context.SetHLRDeviationCoefficient(dc_hlr / factor)

@@ -1,12 +1,11 @@
 from data.sketch.commands.sketch_command import *
 from OCC.Core.ElCLib import elclib
 from enum import Enum
-from OCC.Core.Geom2dAPI import *
-from OCC.Core.GeomAPI import *
+
 from OCC.Core.GC import *
 from OCC.Core.gce import *
 
-M_PI = 3.14
+M_PI = 3.14159
 
 
 class ArcCenter2PAction(Enum):
@@ -74,6 +73,9 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
                 self.myRubberCircle.SetFirstParam(min(p1, p2))
                 self.myRubberCircle.SetLastParam(max(p1, p2))
 
+                self.myGeomArc = Geom2d_Arc(self.tempGeom2d_Circle.Circ2d())
+                self.myGeomArc.SetFirstParam(min(p1, p2))
+                self.myGeomArc.SetLastParam(max(p1, p2))
                 # Remove text
                 self.myContext.Remove(self.myAIS_Label, True)
                 self.myContext.Remove(self.myRubberCircle, True)
@@ -81,7 +83,7 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
                 nurbs = self.ArcToNurbsArc(min(p1, p2), max(p1, p2))
                 self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
                 self.bspline_node.setSketchObject(nurbs)
-                self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
+                self.AddObject(self.myGeomArc, nurbs.GetAIS_Object(), Sketch_GeometryType.ArcSketchObject)
 
             self.myArcCenter2PAction = ArcCenter2PAction.Nothing
         return False

@@ -105,8 +105,11 @@ class Sketch_Bspline(Sketch_Geometry):
             self.myGeometry2d.SetPole(index + 1, pole2d, self.myWeights[index])
             self.myGeometry.SetPole(index + 1, poles_list[index], self.myWeights[index])
         for index, knots in enumerate(self.myKnots):
-            self.myGeometry2d.SetKnot(index + 1, knots, self.myMultiplicities[index])
-            self.myGeometry.SetKnot(index + 1, knots, self.myMultiplicities[index])
+            try:
+                self.myGeometry2d.SetKnot(index + 1, knots, self.myMultiplicities[index])
+                self.myGeometry.SetKnot(index + 1, knots, self.myMultiplicities[index])
+            except Exception as e:
+                break
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def IncreaseDegree(self, theDegree):
@@ -226,7 +229,7 @@ class Sketch_Bspline(Sketch_Geometry):
         # PiecewiseBezier: if the first and last knots have multiplicity Degree + 1 and if interior knots have multiplicity Degree A piecewise Bezier with only two knots is a BezierCurve. else the curve is non uniform.
         elif theType == 3:
             if len(self.myPoles) < 5:
-                raise ValueError
+                raise ValueError("Number of Poles must be greater than 5!")
             else:
                 self.myMultiplicities, self.myKnots = setPiecewiseBezierKnots(len(self.myPoles), self.myDegree)
         self.Compute()

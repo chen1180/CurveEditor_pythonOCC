@@ -2,6 +2,9 @@ from data.sketch.gui.sketch_property import *
 from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BezierCurve
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_BezierCurve
 from OCC.Core.ElCLib import *
+from view.basisFunctionPlot import BezierBasisFunctionWindow
+import time
+import numpy as np
 
 
 class Sketch_PropertyBezierCurve(Sketch_Property):
@@ -12,6 +15,9 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.geometry_dict = {}
         self.ui_initialized = False
         self.mySObject: Sketch_BezierCurve = None
+        self.canvas = BezierBasisFunctionWindow(self)
+        self.ui.PushButtonPlot.clicked.connect(self.plotBasisFunction)
+        self.ui.PushButtonAnimate.clicked.connect(self.animateCurveConstruction)
         # ui
         self.ui.TextLabelPoint1.close()
         self.ui.LineEditPoint1.close()
@@ -65,7 +71,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
     def setupUI(self):
         self.tree = QTreeWidget()
         self.tree.setColumnCount(3)
-        self.tree.setHeaderLabels(['Key', 'Value','Action'])
+        self.tree.setHeaderLabels(['Key', 'Value', 'Action'])
         self.ui.GroupBoxGPLayout.addWidget(self.tree, 1, 0, 1, 3)
         self.degree = QTreeWidgetItem(self.tree, ["degree", str(self.geometry_dict["degree"])])
         self.button = QPushButton()
@@ -122,3 +128,85 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.closed.setText(1, str(closed_flag))
         self.rational.setText(1, str(rational_flag))
         self.continuity.setText(1, str(continuity))
+
+    def plotBasisFunction(self):
+        self.canvas.setBasisFunction(self.geometry_dict["nbPoles"])
+        self.canvas.plot()
+        self.canvas.show()
+
+    def lerp(self, pnt2d_1, pn2d_2, t):
+        s = 1 - t
+        return gp_Pnt2d(pnt2d_1.X() * s + pn2d_2.X() * t, pnt2d_1.Y() * s + pn2d_2.Y() * t)
+
+    def B(self, coorArr, i, j, t):
+        if j == 0:
+            return coorArr[i]
+        return self.B(coorArr, i, j - 1, t) * (1 - t) + self.B(coorArr, i + 1, j - 1, t) * t
+
+    def animateCurveConstruction(self):
+        poles = self.geometry_dict["poles"]
+        x_poles = [i.X() for i in poles]
+        y_poles = [i.Y() for i in poles]
+        degree = len(poles) - 1
+        points_list = []
+        for i in range(1, degree + 1):
+            points = []
+            for idx in range(len(poles) - i):
+                x, y = self.B(x_poles, idx, i, 0), self.B(y_poles, idx, i, 0)
+                point = Sketch_Point(self.myContext, self.myCoordinateSystem)
+                point.Compute(gp_Pnt2d(x, y))
+                point.SetColor(Quantity_Color(1, i / degree, i / degree, 0))
+                points.append(point)
+            points_list.append(points)
+        line_list = []
+        for _ in points_list:
+            if len(_) >= 2:
+                lines = []
+                for idx in range(len(_) - 1):
+                    line = Sketch_Line(self.myContext, self.myCoordinateSystem)
+                    line.AddPoints(_[idx].GetGeometry2d().Pnt2d())
+                    line.AddPoints(_[idx + 1].GetGeometry2d().Pnt2d())
+                    line.Compute()
+                    line.showVieportAuxilirayLine=False
+                    line.DisplayAuxiliryLine()
+                    lines.append(line)
+                line_list.append(lines)
+        # aCubeTrsf = gp_Trsf2d()
+        # tA = time.time()
+        # for t in np.linspace(0, 1, 10):
+        #     for i in range(len(points_list)):
+        #         computed_point = []
+        #         for idx in range(len(points_list[i])):
+        #             new_point = gp_Pnt2d(self.B(x_poles, idx, i + 1, t), self.B(y_poles, idx, i + 1, t))
+        #             points_list[i][idx].DragTo(new_point)
+        #             computed_point.append(new_point)
+        #         if i < len(points_list) - 1:
+        #             for j in range(len(computed_point) - 1):
+        #                 line_list[i][j].DragTo(0, computed_point[j])
+        #                 line_list[i][j].DragTo(1, computed_point[j + 1])
+        #         self.myContext.UpdateCurrentViewer()
+
+        start_pnt = gp_Trsf()
+        start_pnt.SetTranslation(points_list[0][0].GetGeometry().Pnt(),points_list[0][0].GetGeometry().Pnt())
+        end_pnt = gp_Trsf()
+        end_pnt.SetTranslation(points_list[0][0].GetGeometry().Pnt(),points_list[0][1].GetGeometry().Pnt())
+        animation = AIS_Animation(TCollection_AsciiString("obj1"))
+        animation_obj = AIS_AnimationObject(TCollection_AsciiString("obj1"), self.myContext, points_list[0][0].GetAIS_Object(), start_pnt,
+                                            end_pnt)
+        animation_obj.SetOwnDuration(3)
+        animation_obj.SetStartPts(0)
+        animation.Add(animation_obj)
+
+        duration = animation.Duration()
+        animation.StartTimer(0, 1.0, True)
+        while not animation.IsStopped():
+            animation.UpdateTimer()
+            self.myContext.UpdateCurrentViewer()
+
+        # # remove display
+        # for _ in points_list:
+        #     for __ in _:
+        #         __.RemoveDisplay()
+        # for _ in line_list:
+        #     for __ in _:
+        #         __.RemoveDisplay()

@@ -49,12 +49,14 @@ class Sketch_CommandNurbCircleTriangle(Sketch_Command):
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                     TangentType.Circle_CenterPnt, True)
             self.radius = self.myFirstgp_Pnt2d.Distance(self.curPnt2d)
+            self.tempGeom2d_Circle = Geom2d_Circle.DownCast(
+                geomapi_To2d(self.tempGeom_Circle, gp_Pln(self.curCoordinateSystem)))
             self.myContext.Remove(self.myRubberCircle, True)
 
             nurbs = self.ToNurbs_Triangle()
             self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
             self.bspline_node.setSketchObject(nurbs)
-            self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
+            self.AddObject(self.tempGeom2d_Circle, nurbs.GetAIS_Object(), Sketch_GeometryType.CircleSketchObject)
             self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
 
         return False

@@ -1,6 +1,3 @@
-from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
-from data.sketch.sketch_type import *
-from data.sketch.sketch_object import Sketch_Object
 from OCC.Core.Geom import *
 from OCC.Core.gp import *
 from OCC.Core.AIS import *
@@ -10,10 +7,16 @@ from OCC.Core.Quantity import *
 from OCC.Core.Geom2d import *
 from OCC.Core.TCollection import *
 from OCC.Core.GeomConvert import *
+from PyQt5.QtCore import Qt
+from OCC.Core.Geom2dAPI import *
+from OCC.Core.GeomAPI import *
+
+from data.model import SceneGraphModel
 from data.node import *
 from data.sketch.sketch_utils import *
-from PyQt5.QtCore import Qt
-from data.model import SceneGraphModel
+from data.sketch.snaps.sketch_analyserSnap import Sketch_AnalyserSnap
+from data.sketch.sketch_type import *
+from data.sketch.sketch_object import Sketch_Object
 
 SKETCH_RADIUS = 10.0
 

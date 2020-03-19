@@ -2,7 +2,7 @@ from data.sketch.gui.sketch_property import *
 from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BSplineCurve
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_BezierCurve
 from OCC.Core.ElCLib import *
-from view.basisFunctionPlot import BasisFunctionWindow
+from view.basisFunctionPlot import BsplineBasisFunctionWindow
 from itertools import groupby
 class Sketch_PropertyBspline(Sketch_Property):
     def __init__(self, parent, name, fl):
@@ -13,9 +13,10 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.knots_distribution_dict = {0: "NonUniform ", 1: "Uniform", 2: "QuasiUniform ", 3: "PiecewiseBezier"}
         self.ui_initialized = False
         self.mySObject: Sketch_Bspline = None
-        self.canvas = BasisFunctionWindow()
+        self.canvas = BsplineBasisFunctionWindow(self)
+        self.canvas.setModal(Qt.NonModal)
         self.canvas.PlotUpdated.connect(self.UpdateBasisFunction)
-
+        self.ui.PushButtonPlot.clicked.connect(self.plotBasisFunction)
         # ui
         self.ui.TextLabelPoint1.close()
         self.ui.LineEditPoint1.close()
@@ -121,10 +122,10 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.tree.setItemWidget(self.knots_distribution, 2, self.comboBox_knots_distribution)
 
         self.knots_sequence = QTreeWidgetItem(self.tree, ["Knots sequence", str(self.geometry_dict["knots_sequence"])])
-        self.button_plotKnots = QPushButton()
-        self.button_plotKnots.setText("Plot")
-        self.button_plotKnots.clicked.connect(self.plotBasisFunction)
-        self.tree.setItemWidget(self.knots_sequence, 2, self.button_plotKnots)
+        # self.button_plotKnots = QPushButton()
+        # self.button_plotKnots.setText("Plot")
+        # self.button_plotKnots.clicked.connect(self.plotBasisFunction)
+        # self.tree.setItemWidget(self.knots_sequence, 2, self.button_plotKnots)
 
         self.poles = QTreeWidgetItem(self.tree, ["poles", str(self.geometry_dict["nbPoles"])])
         # self.poles.setData(0, Qt.UserRole, self.geometry_dict["poles"])
@@ -196,6 +197,7 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.updateUI()
     def plotBasisFunction(self):
         self.canvas.setBasisFunction(self.geometry_dict["knots_sequence"],self.geometry_dict["degree"])
+        self.canvas.plot()
         self.canvas.show()
 
     def updateUI(self):
@@ -214,10 +216,13 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.knots_distribution.setText(1, knots_distribution)
         self.continuity.setText(1, str(continuity))
         self.knots_sequence.setText(1, str(knots_sequence))
+
     def UpdateBasisFunction(self,knots,degree):
         knots_no_duplicates=sorted(list(set(knots)))
         multiplicities=[knots.count(x) for x in knots_no_duplicates]
+
         self.mySObject.SetKnots(knots_no_duplicates)
         self.mySObject.SetMultiplicities(multiplicities)
         self.mySObject.SetDegree(degree)
-        self.mySObject.Compute()
+        print(knots_no_duplicates,multiplicities,degree,self.mySObject.GetWeights())
+        self.mySObject.Recompute()

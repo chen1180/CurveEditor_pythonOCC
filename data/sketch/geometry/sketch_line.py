@@ -121,3 +121,4 @@ class Sketch_Line(Sketch_Geometry):
 
     def SetColor(self, theColor):
         self.myLineColor = theColor
+        self.myLineAspect.SetColor(theColor)

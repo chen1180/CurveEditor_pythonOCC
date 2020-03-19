@@ -7,6 +7,7 @@ from OCC.Core.Quantity import *
 from OCC.Core.gp import *
 from OCC.Core.AIS import *
 from OCC.Core.BRepBuilderAPI import *
+from OCC.Core.TCollection import *
 from data.sketch.sketch_object import Sketch_Object
 from view.sketchProperty import Ui_SketchProperty
 from data.sketch.sketch_utils import *
@@ -25,7 +26,8 @@ class Sketch_Property(QWidget):
         self.isPointWindow = False
         self.ui = Ui_SketchProperty()
         self.ui.setupUi(self)
-        # self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModal)
+
 
         if not name:
             self.setObjectName("Sketch_Property")

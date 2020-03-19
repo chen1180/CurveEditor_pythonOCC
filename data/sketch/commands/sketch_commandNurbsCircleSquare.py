@@ -41,20 +41,19 @@ class Sketch_CommandNurbCircleSquare(Sketch_Command):
             self.myRubberCircle.SetCircle(self.tempGeom_Circle)
             self.myContext.Display(self.myRubberCircle, True)
 
-            # self.myRubberLine.SetPoints(self.myFirstPoint, self.myFirstPoint)
-            # self.myContext.Display(self.myRubberLine, True)
-
             self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Input_RadiusPoint
         elif self.myCircleCenterRadiusAction == CircleCenterRadiusAction.Input_RadiusPoint:
             self.curPnt2d = self.myAnalyserSnap.MouseInputException(self.myFirstgp_Pnt2d, thePnt2d,
                                                                     TangentType.Circle_CenterPnt, True)
             self.radius = self.myFirstgp_Pnt2d.Distance(self.curPnt2d)
+            self.tempGeom2d_Circle = Geom2d_Circle.DownCast(
+                geomapi_To2d(self.tempGeom_Circle, gp_Pln(self.curCoordinateSystem)))
             self.myContext.Remove(self.myRubberCircle, True)
 
             nurbs = self.ToNurbs_Square(self.myFirstgp_Pnt2d, self.radius)
             self.bspline_node = BsplineNode(nurbs.GetName(), self.rootNode)
             self.bspline_node.setSketchObject(nurbs)
-            self.AddObject(nurbs.GetGeometry2d(), nurbs.GetAIS_Object(), Sketch_GeometryType.CurveSketchObject)
+            self.AddObject(self.tempGeom2d_Circle, nurbs.GetAIS_Object(), Sketch_GeometryType.CircleSketchObject)
             self.myCircleCenterRadiusAction = CircleCenterRadiusAction.Nothing
 
         return False
@@ -116,25 +115,6 @@ class Sketch_CommandNurbCircleSquare(Sketch_Command):
         nurbsCircle.SetKnots(knots)
         nurbsCircle.SetMultiplicities(multiplicity)
         nurbsCircle.SetDegree(2)
-        return nurbsCircle
-
-    def ToNurbs_Triangle(self):
-        nurbsCircle = Sketch_Bspline(self.myContext, self.curCoordinateSystem)
-        convert: Geom_BSplineCurve = geomconvert_CurveToBSplineCurve(self.tempGeom_Circle)
-        poles = TColgp_Array1OfPnt2d_to_point_list(convert.Poles())
-        weights = convert.Weights()
-        knots = convert.Knots()
-        multiplicity = convert.Multiplicities()
-
-        for pole in poles:
-            x, y = pole.X(), pole.Y()
-            nurbsCircle.AddPoles(gp_Pnt2d(x, y))
-        nurbsCircle.AddPoles(gp_Pnt2d(poles[0].X(), poles[0].Y()))
-
-        nurbsCircle.SetWeights([1.0, 0.5000000000000001, 1.0, 0.5000000000000001, 1.0, 0.5000000000000001, 1.0])
-        nurbsCircle.SetKnots(TColStd_Array1OfNumber_to_list(knots))
-        nurbsCircle.SetMultiplicities([3, 2, 2, 3])
-        nurbsCircle.SetDegree(convert.Degree())
-
         nurbsCircle.Compute()
         return nurbsCircle
+

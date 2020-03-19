@@ -7,12 +7,15 @@ from data.model import *
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
+
         self._ui = mainWindow.Ui_MainWindow()
         self._ui.setupUi(self)
+
 
         # setup data
         self._rootNode = Node("Scene")
         self._model = SceneGraphModel(self._rootNode)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         # """VIEW <------> PROXY MODEL <------> DATA MODEL"""
         # self._proxyModel = QtCore.QSortFilterProxyModel()
         # self._proxyModel.setSourceModel(self._model)
@@ -195,14 +198,14 @@ class Window(QtWidgets.QMainWindow):
         parent.addWidget(button)
 
     def createMenuBars(self):
-        # menu = self._ui.menuBar.addMenu("&File")
-        #
-        # def export_to_PNG():
-        #     self._glWindow.view.Dump('./capture_png.png')
-        #
-        # menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
-        #                                  statusTip="Export current view as picture",
-        #                                  triggered=export_to_PNG))
+        menu = self._ui.menuBar.addMenu("&File")
+
+        def export_to_PNG():
+            self._glWindow.view.Dump('./capture_png.png')
+
+        menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
+                                         statusTip="Export current view as picture",
+                                         triggered=export_to_PNG))
         pass
 
     def deleteTreeItem(self, index):

@@ -298,12 +298,42 @@ Example:
         return np.squeeze(A)
 
 
-class BasisFunctionWindow(QDialog):
+import math
+
+
+class Bezier:
+    def binomial(self, i, n):
+        """Binomial coefficient"""
+        return math.factorial(n) / float(
+            math.factorial(i) * math.factorial(n - i))
+
+    def bernstein(self, t, i, n):
+        """Bernstein polynom"""
+        return self.binomial(i, n) * (t ** i) * ((1 - t) ** (n - i))
+
+    def bezier(self, t, points):
+        """Calculate coordinate of a point in the bezier curve"""
+        n = len(points) - 1
+        x = y = 0
+        for i, pos in enumerate(points):
+            bern = self.bernstein(t, i, n)
+            x += pos[0] * bern
+            y += pos[1] * bern
+        return x, y
+
+    def bezier_curve_range(self, n, points):
+        """Range of points in a curve bezier"""
+        for i in range(n):
+            t = i / float(n - 1)
+            yield self.bezier(t, points)
+
+
+class BsplineBasisFunctionWindow(QDialog):
     epsilon = 20
     PlotUpdated = pyqtSignal(object, int)
 
     def __init__(self, parent=None):
-        super(BasisFunctionWindow, self).__init__(parent)
+        super(BsplineBasisFunctionWindow, self).__init__(parent)
 
         # a figure instance to plot on
         self.figure = plt.figure()
@@ -320,15 +350,21 @@ class BasisFunctionWindow(QDialog):
         # Just some button connected to `plot` method
         self.plotButton = QPushButton('Plot')
         self.plotButton.clicked.connect(self.plot)
-        self.resetButton=QPushButton('Reset')
+        self.resetButton = QPushButton('Reset')
         self.resetButton.clicked.connect(self.resetPlot)
 
+        degreeLabel = QLabel("Degree")
+        self.degreeLineEdit = QLineEdit()
+        degreeLabel.setBuddy(self.degreeLineEdit)
+
         # set the layout
-        layout = QVBoxLayout()
-        layout.addWidget(self.toolbar)
-        layout.addWidget(self.canvas)
-        layout.addWidget(self.plotButton)
-        layout.addWidget(self.resetButton)
+        layout = QGridLayout()
+        layout.addWidget(degreeLabel, 0, 0, 1, 2)
+        layout.addWidget(self.degreeLineEdit, 0, 1, 1, 2)
+        layout.addWidget(self.toolbar, 1, 0, 1, 4)
+        layout.addWidget(self.canvas, 2, 0, 1, 4)
+        layout.addWidget(self.plotButton, 3, 0, 1, 4)
+        layout.addWidget(self.resetButton, 4, 0, 1, 4)
 
         self.setLayout(layout)
         self._ind = None
@@ -342,6 +378,8 @@ class BasisFunctionWindow(QDialog):
 
     def setBasisFunction(self, knots, degree):
         self.knots_vector = knots
+        self.max_knot = max(self.knots_vector)
+        self.min_knot = min(self.knots_vector)
         self.degree = degree
         self.original_degree = degree
         self.original_knots = knots
@@ -379,11 +417,11 @@ class BasisFunctionWindow(QDialog):
         if event.button != 1:
             return
         x, y = event.xdata, event.ydata
-        if x < 0.0:
-            x = 0.0
-        if x>max(self.knots_vector):
-            x=max(self.knots_vector)
-        y=1.0
+        if x < self.min_knot:
+            x = self.min_knot
+        if x > self.max_knot:
+            x = self.max_knot
+        y = 1.0
         xy = np.asarray(self.scatter.get_offsets())
         xy[self._ind] = np.array([x, y])
         self.scatter.set_offsets(xy)
@@ -411,7 +449,7 @@ class BasisFunctionWindow(QDialog):
         # ax.hold(False) # deprecated, see above
 
         # plot data
-        self.scatter = self.ax.scatter(self.knots_vector, [1] * len(self.knots_vector), picker=True,marker='x')
+        self.scatter = self.ax.scatter(self.knots_vector, [1] * len(self.knots_vector), picker=True, marker='x')
         basis = Bspline(self.knots_vector, self.degree)
         x, N = basis.GetBasis()
         self.curves = []
@@ -420,15 +458,76 @@ class BasisFunctionWindow(QDialog):
             self.curves.append(plt)
         # refresh canvas
         self.canvas.draw()
+
     def resetPlot(self):
-        self.degree=self.original_degree
-        self.knots_vector=self.original_knots
+        self.degree = self.original_degree
+        self.knots_vector = self.original_knots
         self.plot()
         self.PlotUpdated.emit(self.knots_vector, self.degree)
+class BezierBasisFunctionWindow(QDialog):
+
+    def __init__(self, parent=None):
+        super(BezierBasisFunctionWindow, self).__init__(parent)
+
+        # a figure instance to plot on
+        self.figure = plt.figure()
+        self.setWindowTitle("Bezier Basis function plot")
+
+        # this is the Canvas Widget that displays the `figure`
+        # it takes the `figure` instance as a parameter to __init__
+        self.canvas = FigureCanvas(self.figure)
+
+        # this is the Navigation widget
+        # it takes the Canvas widget and a parent
+        self.toolbar = NavigationToolbar(self.canvas, self)
+        self.bezier = Bezier()
+
+        # Just some button connected to `plot` method
+        self.plotButton = QPushButton('Plot')
+        self.plotButton.clicked.connect(self.plot)
+
+
+
+        # set the layout
+        layout = QGridLayout()
+        layout.addWidget(self.toolbar, 1, 0, 1, 4)
+        layout.addWidget(self.canvas, 2, 0, 1, 4)
+        layout.addWidget(self.plotButton, 3, 0, 1, 4)
+        self.setLayout(layout)
+
+        self.knots_vector = []
+        self.degree = None
+
+    def setBasisFunction(self, numPoints):
+        self.numPoints = numPoints
+
+
+    def plot(self):
+        # instead of ax.hold(False)
+        self.figure.clear()
+
+        # create an axis
+        self.ax = self.figure.add_subplot(111)
+
+        # discards the old graph
+        # ax.hold(False) # deprecated, see above
+
+        # plot data
+        x = np.linspace(0, 1, 100)
+        for j in range(self.numPoints):
+            y = [self.bezier.bernstein(i, j, self.numPoints-1) for i in x]
+            self.ax.plot(x, y)
+        # refresh canvas
+        self.canvas.draw()
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    main = BasisFunctionWindow()
+    main = BezierBasisFunctionWindow()
+    main.setBasisFunction( 5)
+
+    main.plot()
     main.show()
 
     sys.exit(app.exec_())

@@ -83,7 +83,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiPathLineEdit.CreateLabel(myCurObject.GetName())
+                    self.ui.uiPathLineEdit.setText(myCurObject.GetName())
                     self.myPath = myCurObject
 
     def SetConstantSection(self):

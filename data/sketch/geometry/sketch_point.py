@@ -23,15 +23,16 @@ class Sketch_Point(Sketch_Geometry):
         # Text label
         coordinate = "({},{})".format(round(thePnt2d.X(), 1), round(thePnt2d.Y(), 1))
         self.myAIS_Coordinate = self.CreateLabel(coordinate, Quantity_NOC_GREEN)
-        self.myAIS_Name = self.CreateLabel(self.myName, Quantity_NOC_BLUE1, offset=gp_Vec(-20, -20, -20))
+        self.myAIS_Name = self.CreateLabel(self.myName, Quantity_NOC_BLUE1, offset=gp_Vec(-50, -50, -50))
 
-    def CreateLabel(self, text: str, color, offset=gp_Vec(20, 20, 20)):
+    def CreateLabel(self, text: str, color, offset=gp_Vec(50, 50, 50)):
         # Text label
         myAIS_Text = AIS_TextLabel()
         myAIS_Text.SetText(
             TCollection_ExtendedString(text))
         myAIS_Text.SetPosition(self.myGeometry.Pnt().Translated(offset))
         myAIS_Text.SetColor(Quantity_Color(color))
+        myAIS_Text.SetHeight(30)
         self.myContext.Deactivate(myAIS_Text)
         return myAIS_Text
 
@@ -45,8 +46,8 @@ class Sketch_Point(Sketch_Geometry):
         # update text label
         coordinate = "({},{})".format(round(newPnt2d.X(), 1), round(newPnt2d.Y(), 1))
         self.myAIS_Coordinate.SetText(TCollection_ExtendedString(coordinate))
-        self.myAIS_Coordinate.SetPosition(self.myGeometry.Pnt().Translated(gp_Vec(20, 20, 20)))
-        self.myAIS_Name.SetPosition(self.myGeometry.Pnt().Translated(gp_Vec(-20, -20, -20)))
+        self.myAIS_Coordinate.SetPosition(self.myGeometry.Pnt().Translated(gp_Vec(50, 50, 50)))
+        self.myAIS_Name.SetPosition(self.myGeometry.Pnt().Translated(gp_Vec(-50, -50, -50)))
         self.myAIS_Coordinate.Redisplay(True)
         self.myAIS_Name.Redisplay(True)
 
@@ -83,6 +84,7 @@ class Sketch_Point(Sketch_Geometry):
 
     def SetColor(self, theColor):
         self.myPointColor = theColor
+        self.myPointAspect.SetColor(theColor)
 
     def GetWidth(self):
         return self.myPointWidth
