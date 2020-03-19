@@ -10,7 +10,7 @@ class Sketch_Line(Sketch_Geometry):
         super(Sketch_Line, self).__init__("Line", theContext, theAxis)
         self.myGeometry: Geom_Line = None
         self.myGeometry2d: Geom2d_Edge = None
-        self.myAIS_InteractiveObject: AIS_Shape = None
+        self.myAIS_InteractiveObject: AIS_Line = None
         Sketch_Line.IndexCounter += 1
         self.myName = "Line" + str(self.IndexCounter)
         self.myPoles = []

@@ -78,6 +78,7 @@ class Sketch_Point(Sketch_Geometry):
 
     def SetStyle(self, theStyle):
         self.myPointStyle = theStyle
+        self.myPointAspect.SetTypeOfMarker(theStyle)
 
     def GetColor(self):
         return self.myPointColor

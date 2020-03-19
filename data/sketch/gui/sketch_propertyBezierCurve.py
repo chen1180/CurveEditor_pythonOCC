@@ -3,8 +3,8 @@ from OCC.Core.Geom2d import Geom2d_CartesianPoint, Geom2d_BezierCurve
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_BezierCurve
 from OCC.Core.ElCLib import *
 from view.basisFunctionPlot import BezierBasisFunctionWindow
-import time
-import numpy as np
+from functools import lru_cache
+import math
 
 
 class Sketch_PropertyBezierCurve(Sketch_Property):
@@ -18,6 +18,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.canvas = BezierBasisFunctionWindow(self)
         self.ui.PushButtonPlot.clicked.connect(self.plotBasisFunction)
         self.ui.PushButtonAnimate.clicked.connect(self.animateCurveConstruction)
+        self.animatedGeometry=[]
         # ui
         self.ui.TextLabelPoint1.close()
         self.ui.LineEditPoint1.close()
@@ -138,38 +139,50 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         s = 1 - t
         return gp_Pnt2d(pnt2d_1.X() * s + pn2d_2.X() * t, pnt2d_1.Y() * s + pn2d_2.Y() * t)
 
-    def B(self, coorArr, i, j, t):
+    @lru_cache(1000)
+    def DeCastlejau(self, coorArr, i, j, t):
         if j == 0:
             return coorArr[i]
-        return self.B(coorArr, i, j - 1, t) * (1 - t) + self.B(coorArr, i + 1, j - 1, t) * t
+        return self.DeCastlejau(coorArr, i, j - 1, t) * (1 - t) + self.DeCastlejau(coorArr, i + 1, j - 1, t) * t
+
+    def binomial(self, i, n):
+        """Binomial coefficient"""
+        return math.factorial(n) / float(
+            math.factorial(i) * math.factorial(n - i))
+
+    def bernstein(self, t, i, n):
+        """Bernstein polynom"""
+        return self.binomial(i, n) * (t ** i) * ((1 - t) ** (n - i))
 
     def animateCurveConstruction(self):
+        # remove the last animation shape first
+        if self.animatedGeometry:
+            for _ in self.animatedGeometry:
+                _.RemoveDisplay()
         poles = self.geometry_dict["poles"]
-        x_poles = [i.X() for i in poles]
-        y_poles = [i.Y() for i in poles]
+        x_poles = tuple([i.X() for i in poles])
+        y_poles = tuple([i.Y() for i in poles])
         degree = len(poles) - 1
         points_list = []
         for i in range(1, degree + 1):
-            points = []
-            for idx in range(len(poles) - i):
-                x, y = self.B(x_poles, idx, i, 0), self.B(y_poles, idx, i, 0)
-                point = Sketch_Point(self.myContext, self.myCoordinateSystem)
-                point.Compute(gp_Pnt2d(x, y))
-                point.SetColor(Quantity_Color(1, i / degree, i / degree, 0))
-                points.append(point)
-            points_list.append(points)
+            points_list.append(poles[0:(len(poles) - i)])
+        bezier_point = Sketch_Point(self.myContext, self.myCoordinateSystem)
+        bezier_point.Compute(poles[0])
+        bezier_point.SetStyle(Aspect_TOM_O_PLUS)
+        bezier_point.SetColor(Quantity_Color(Quantity_NOC_RED1))
+        self.animatedGeometry.append(bezier_point)
         line_list = []
         for _ in points_list:
             if len(_) >= 2:
                 lines = []
                 for idx in range(len(_) - 1):
                     line = Sketch_Line(self.myContext, self.myCoordinateSystem)
-                    line.AddPoints(_[idx].GetGeometry2d().Pnt2d())
-                    line.AddPoints(_[idx + 1].GetGeometry2d().Pnt2d())
+                    line.AddPoints(_[idx])
+                    line.AddPoints(_[idx + 1])
                     line.Compute()
-                    line.showVieportAuxilirayLine=False
-                    line.DisplayAuxiliryLine()
+                    line.SetColor(Quantity_Color(1, i / degree, 1, 0))
                     lines.append(line)
+                    self.animatedGeometry.append(line)
                 line_list.append(lines)
         # aCubeTrsf = gp_Trsf2d()
         # tA = time.time()
@@ -186,27 +199,43 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         #                 line_list[i][j].DragTo(1, computed_point[j + 1])
         #         self.myContext.UpdateCurrentViewer()
 
-        start_pnt = gp_Trsf()
-        start_pnt.SetTranslation(points_list[0][0].GetGeometry().Pnt(),points_list[0][0].GetGeometry().Pnt())
-        end_pnt = gp_Trsf()
-        end_pnt.SetTranslation(points_list[0][0].GetGeometry().Pnt(),points_list[0][1].GetGeometry().Pnt())
-        animation = AIS_Animation(TCollection_AsciiString("obj1"))
-        animation_obj = AIS_AnimationObject(TCollection_AsciiString("obj1"), self.myContext, points_list[0][0].GetAIS_Object(), start_pnt,
-                                            end_pnt)
-        animation_obj.SetOwnDuration(3)
-        animation_obj.SetStartPts(0)
-        animation.Add(animation_obj)
+        # start_pnt = gp_Trsf()
+        # start_pnt.SetTranslation(points_list[0][0].GetGeometry().Pnt(),points_list[0][0].GetGeometry().Pnt())
+        # end_pnt = gp_Trsf()
+        # end_pnt.SetTranslation(points_list[0][0].GetGeometry().Pnt(),points_list[0][1].GetGeometry().Pnt())
 
-        duration = animation.Duration()
+        # animation_obj = AIS_AnimationObject(TCollection_AsciiString("obj1"), self.myContext, points_list[0][0].GetAIS_Object(), start_pnt,
+        #                                     end_pnt)
+        # animation_obj.SetOwnDuration(3)
+        # animation_obj.SetStartPts(0)
+        # animation.Add(animation_obj)
+        animation = AIS_Animation(TCollection_AsciiString("obj1"))
+        animation.SetOwnDuration(4.0)
         animation.StartTimer(0, 1.0, True)
+        duration = animation.Duration()
         while not animation.IsStopped():
+            t = animation.ElapsedTime() / duration
+            if t > 1.0:
+                t = 1.0
+            for i in range(len(points_list)):
+                if i < len(points_list) - 1:
+                    for idx in range(len(points_list[i]) - 1):
+                        new_point1 = gp_Pnt2d(self.DeCastlejau(x_poles, idx, i + 1, t),
+                                              self.DeCastlejau(y_poles, idx, i + 1, t))
+                        new_point2 = gp_Pnt2d(self.DeCastlejau(x_poles, idx + 1, i + 1, t),
+                                              self.DeCastlejau(y_poles, idx + 1, i + 1, t))
+                        line_list[i][idx].DragTo(0, new_point1)
+                        line_list[i][idx].DragTo(1, new_point2)
+            currentPnt2d = self.mySObject.GetGeometry2d().Value(t)
+            bezier_point.DragTo(currentPnt2d)
             animation.UpdateTimer()
             self.myContext.UpdateCurrentViewer()
+            if t >= self.ui.doubleSpinBoxAnimationValue.value():
+                break
 
-        # # remove display
-        # for _ in points_list:
-        #     for __ in _:
-        #         __.RemoveDisplay()
-        # for _ in line_list:
-        #     for __ in _:
-        #         __.RemoveDisplay()
+    def closeEvent(self, QCloseEvent):
+        super(Sketch_PropertyBezierCurve, self).closeEvent(QCloseEvent)
+        # remove the last animation shape first
+        if self.animatedGeometry:
+            for _ in self.animatedGeometry:
+                _.RemoveDisplay()

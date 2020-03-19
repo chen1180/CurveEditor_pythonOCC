@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>270</width>
-    <height>325</height>
+    <height>348</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -72,20 +72,50 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Basis Function</string>
+      <string>Plot/Animation</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0" colspan="2">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QDoubleSpinBox" name="doubleSpinBoxAnimationValue">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="PushButtonAnimate">
+        <property name="text">
+         <string>Animation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
        <widget class="QPushButton" name="PushButtonPlot">
         <property name="text">
          <string>Plot</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="PushButtonAnimate">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Animate</string>
+         <string>Basis Function</string>
         </property>
        </widget>
       </item>
@@ -98,28 +128,47 @@
       <string>Attributes</string>
      </property>
      <layout class="QGridLayout" name="GroupBoxAttributesLayout">
-      <item row="1" column="1">
-       <widget class="QComboBox" name="ComboBoxStyle">
+      <item row="0" column="0">
+       <widget class="QLabel" name="TextLabelColor">
+        <property name="text">
+         <string>Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="ComboBoxColor">
         <item>
          <property name="text">
-          <string>SOLID</string>
+          <string>BLACK</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>DASH</string>
+          <string>BROWN</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>DOT</string>
+          <string>RED</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>DOTDASH</string>
+          <string>ORANGE</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>YELLOW</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="TextLabelStyle">
+        <property name="text">
+         <string>Style</string>
+        </property>
        </widget>
       </item>
       <item row="2" column="1">
@@ -171,53 +220,34 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="TextLabelColor">
-        <property name="text">
-         <string>Color</string>
-        </property>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="ComboBoxStyle">
+        <item>
+         <property name="text">
+          <string>SOLID</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DASH</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DOT</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DOTDASH</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="TextLabelWidth">
         <property name="text">
          <string>Width</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="ComboBoxColor">
-        <item>
-         <property name="text">
-          <string>BLACK</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>BROWN</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RED</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ORANGE</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>YELLOW</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="TextLabelStyle">
-        <property name="text">
-         <string>Style</string>
         </property>
        </widget>
       </item>
