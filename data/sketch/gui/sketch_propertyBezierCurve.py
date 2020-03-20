@@ -18,7 +18,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.canvas = BezierBasisFunctionWindow(self)
         self.ui.PushButtonPlot.clicked.connect(self.plotBasisFunction)
         self.ui.PushButtonAnimate.clicked.connect(self.animateCurveConstruction)
-        self.animatedGeometry=[]
+
         # ui
         self.ui.TextLabelPoint1.close()
         self.ui.LineEditPoint1.close()
@@ -135,16 +135,6 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.canvas.plot()
         self.canvas.show()
 
-    def lerp(self, pnt2d_1, pn2d_2, t):
-        s = 1 - t
-        return gp_Pnt2d(pnt2d_1.X() * s + pn2d_2.X() * t, pnt2d_1.Y() * s + pn2d_2.Y() * t)
-
-    @lru_cache(1000)
-    def DeCastlejau(self, coorArr, i, j, t):
-        if j == 0:
-            return coorArr[i]
-        return self.DeCastlejau(coorArr, i, j - 1, t) * (1 - t) + self.DeCastlejau(coorArr, i + 1, j - 1, t) * t
-
     def binomial(self, i, n):
         """Binomial coefficient"""
         return math.factorial(n) / float(
@@ -156,10 +146,44 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
 
     def animateCurveConstruction(self):
         # remove the last animation shape first
-        if self.animatedGeometry:
-            for _ in self.animatedGeometry:
+        # if self.animatedGeometry:
+        #     for _ in self.animatedGeometry:
+        #         _.RemoveDisplay()
+        self.animation = AnimationThread(self)  # This is the thread object
+        self.animation.finished.connect(self.clearUp)
+        self.animation.start()
+
+    def clearUp(self):
+        # remove the last animation shape first
+        if self.animation.animatedGeometry:
+            for _ in  self.animation.animatedGeometry:
                 _.RemoveDisplay()
-        poles = self.geometry_dict["poles"]
+
+    def closeEvent(self, QCloseEvent):
+        super(Sketch_PropertyBezierCurve, self).closeEvent(QCloseEvent)
+
+
+
+class AnimationThread(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, property_widget: Sketch_PropertyBezierCurve):
+        super(AnimationThread, self).__init__()
+        self.myContext = property_widget.myContext
+        self.myCoordinateSystem = property_widget.myCoordinateSystem
+        self.mySObject = property_widget.mySObject
+        self.myPoles = property_widget.geometry_dict["poles"]
+        self.myAnimationValue = property_widget.ui.doubleSpinBoxAnimationValue.value()
+        self.animatedGeometry = []
+
+    @lru_cache(1000)
+    def DeCastlejau(self, coorArr, i, j, t):
+        if j == 0:
+            return coorArr[i]
+        return self.DeCastlejau(coorArr, i, j - 1, t) * (1 - t) + self.DeCastlejau(coorArr, i + 1, j - 1, t) * t
+
+    def run(self):
+        poles = self.myPoles
         x_poles = tuple([i.X() for i in poles])
         y_poles = tuple([i.Y() for i in poles])
         degree = len(poles) - 1
@@ -230,12 +254,6 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             bezier_point.DragTo(currentPnt2d)
             animation.UpdateTimer()
             self.myContext.UpdateCurrentViewer()
-            if t >= self.ui.doubleSpinBoxAnimationValue.value():
+            if t >= self.myAnimationValue:
                 break
-
-    def closeEvent(self, QCloseEvent):
-        super(Sketch_PropertyBezierCurve, self).closeEvent(QCloseEvent)
-        # remove the last animation shape first
-        if self.animatedGeometry:
-            for _ in self.animatedGeometry:
-                _.RemoveDisplay()
+        self.finished.emit()
