@@ -24,9 +24,11 @@ class Part_CommandRevolvedSurface(Part_Command):
         if self.myGUI.form_createRevolSurface.selectProfile==True:
             self.myGUI.form_createRevolSurface.SetProfile()
             self.myGUI.form_createRevolSurface.selectProfile=False
+            self.myRevolvedSurfaceAction==RevolvedSurfaceAction.Input_Axis
         if self.myGUI.form_createRevolSurface.selectAxis==True:
             self.myGUI.form_createRevolSurface.SetAxis()
             self.myGUI.form_createRevolSurface.selectAxis=False
+            self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve
         # if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
         #     pass
         # elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
@@ -41,18 +43,18 @@ class Part_CommandRevolvedSurface(Part_Command):
         if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
             pass
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
-            self.myStatusBar.showMessage("Select a shape for revolve operation! (Bezier curve or Bspline)", 1000)
+            self.myStatusBar.showMessage("Select a shape (Bezier curve or Bspline)! Press Ecs to cancel!", 1000)
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
-            self.myStatusBar.showMessage("Select an axis!", 1000)
+            self.myStatusBar.showMessage("Select an axis! Press Ecs to cancel!", 1000)
 
     def CancelEvent(self):
         if self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Nothing:
             pass
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Curve:
-            pass
+            self.myGUI.Show()
         elif self.myRevolvedSurfaceAction == RevolvedSurfaceAction.Input_Axis:
-            pass
-        self.myRevolvedSurfaceAction = RevolvedSurfaceAction.Nothing
+            self.myGUI.Show()
+
 
     def GetTypeOfMethod(self):
         return Part_ObjectTypeOfMethod.RevolvedSurface_Method

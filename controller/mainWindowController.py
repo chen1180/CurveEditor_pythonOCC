@@ -11,7 +11,6 @@ class Window(QtWidgets.QMainWindow):
         self._ui = mainWindow.Ui_MainWindow()
         self._ui.setupUi(self)
 
-
         # setup data
         self._rootNode = Node("Scene")
         self._model = SceneGraphModel(self._rootNode)
@@ -211,6 +210,7 @@ class Window(QtWidgets.QMainWindow):
     def deleteTreeItem(self, index):
         indexes = self._uiTreeView.selectedIndexes()
         self.sketchController.DeleteSelectedObject()
+
     def deleteAllTreeItem(self):
         if self._model.hasChildren():
             root: Node = self._model._rootNode
@@ -223,7 +223,10 @@ class Window(QtWidgets.QMainWindow):
                     planeNode.getSketchObject().RemoveDisplay()
                 index += 1
             self._model.removeRows(0, self._model.rowCount(QtCore.QModelIndex()))
-
+        #clear current node
+        self.sketchController.currentSketchNode=None
+        self._glWindow._display.Viewer.DeactivateGrid()
+        print(self._rootNode)
     def openMenu(self, position):
         indexes = self._uiTreeView.selectedIndexes()
         level = 0
@@ -238,7 +241,6 @@ class Window(QtWidgets.QMainWindow):
                                          statusTip="Delete selected node",
                                          triggered=self.deleteTreeItem))
         if level == 0:
-            menu.addAction(self.tr("Edit person"))
             menu.addAction(QtWidgets.QAction(QtGui.QIcon(), "Empty Scene", self,
                                              statusTip="Delete all objects in the scene",
                                              triggered=self.deleteAllTreeItem))

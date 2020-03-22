@@ -35,3 +35,5 @@ class Geom2d_Edge(Geom2d_Line):
 
     def EndParameter(self):
         return elclib.Parameter(self.Lin2d(), self.EndPnt)
+    def GetLength(self):
+        return self.StartPnt.Distance(self.EndPnt)

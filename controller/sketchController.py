@@ -154,15 +154,7 @@ class SketchController(QObject):
         name += count
         self.currentSketchNode = SketchNode(name)
         coordinate_system: gp_Ax3 = self.new_sketch.getCoordinate()
-        pnt = coordinate_system.Location()
-        print(pnt.X(), pnt.Y(), pnt.Z())
-        # Display normal axis of the plane
-        # normal_axis=coordinate_system.Axis()
-        # normal_geom_axis=Geom_Line(normal_axis)
-        # ais_axis=AIS_Line(normal_geom_axis)
-        # self._display.Context.Display(ais_axis,True)
         sketch_plane = Sketch_Plane(self._display.Context, coordinate_system)
-        # sketch_plane.Compute()
         self.createDynamicGrid()
         self.currentSketchNode.setSketchPlane(sketch_plane)
         self.sketchPlaneUpdated.emit(self.currentSketchNode)

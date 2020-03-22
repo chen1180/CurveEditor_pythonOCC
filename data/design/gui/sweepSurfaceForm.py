@@ -38,7 +38,7 @@ class SweepSurfaceForm(QWidget):
         self.myConstantSection = None
         self.myFirstSection = None
         self.myLastSection = None
-        self.myGeomSurface=None
+        self.myGeomSurface = None
 
     def EnableRadiusWidgets(self, checked):
         self.ui.uiRadiusLabel.setEnabled(checked)
@@ -93,7 +93,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiConstantSectionLineEdit.CreateLabel(myCurObject.GetName())
+                    self.ui.uiConstantSectionLineEdit.setText(myCurObject.GetName())
                     self.myConstantSection = myCurObject
 
     def SetFirstSection(self):
@@ -103,7 +103,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiFirstSectionLineEdit.CreateLabel(myCurObject.GetName())
+                    self.ui.uiFirstSectionLineEdit.setText(myCurObject.GetName())
                     self.myFirstSection = myCurObject
 
     def SetLastSection(self):
@@ -113,7 +113,7 @@ class SweepSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiLastSectionLineEdit.CreateLabel(myCurObject.GetName())
+                    self.ui.uiLastSectionLineEdit.setText(myCurObject.GetName())
                     self.myLastSection = myCurObject
 
     def CheckType(self):
@@ -134,7 +134,7 @@ class SweepSurfaceForm(QWidget):
                 self.myGeomSurface.SetSections([self.myConstantSection.GetGeometry()])
             elif self.ui.uiEvolvingSectionRadioButton.isChecked():
                 self.myGeomSurface.SetConstructionMethod(2)
-                self.myGeomSurface.SetSections([self.myFirstSection.GetGeometry(),self.myLastSection.GetGeometry()])
+                self.myGeomSurface.SetSections([self.myFirstSection.GetGeometry(), self.myLastSection.GetGeometry()])
             self.myGeomSurface.Compute()
 
     def ApplyChange(self):
@@ -144,8 +144,9 @@ class SweepSurfaceForm(QWidget):
             sweepSurfaceNode.setSketchObject(self.myGeomSurface)
             self.myModel.layoutChanged.emit()
         self.Finish()
+
     def Finish(self):
-        self.myGeomSurface=None
+        self.myGeomSurface = None
         self.parent.Hide()
 
 

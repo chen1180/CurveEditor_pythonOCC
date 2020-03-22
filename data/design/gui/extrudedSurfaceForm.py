@@ -27,6 +27,7 @@ class ExtrudedSurfaceForm(QWidget):
         self.myGeomSurface = None
         self.selectProfile = False
         self.selectDirection = False
+        self.operationInterupt = False
 
     def EnableEdgeWidgets(self, checked):
         self.ui.uiEdgeLineEdit.setEnabled(checked)
@@ -49,13 +50,12 @@ class ExtrudedSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiProfileLineEdit.CreateLabel(myCurObject.GetName())
+                    self.ui.uiProfileLineEdit.setText(myCurObject.GetName())
                     self.myProfile = myCurObject
                     self.myNormalAxis = planeNode.getSketchPlane().GetCoordinate().Axis()
 
     def SelectDirection(self):
         self.parent.Hide()
-        self.ui.uiSelectEdgeButton.CreateLabel("Selecting")
         self.selectDirection = True
 
     def SetDirections(self):
@@ -65,7 +65,7 @@ class ExtrudedSurfaceForm(QWidget):
             for child in planeNode.children():
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
-                    self.ui.uiEdgeLineEdit.CreateLabel(myCurObject.GetName())
+                    self.ui.uiEdgeLineEdit.setText(myCurObject.GetName())
                     self.myDirection = myCurObject
 
     def CheckType(self):
@@ -88,13 +88,16 @@ class ExtrudedSurfaceForm(QWidget):
             del self.myGeomSurface
         if self.CheckType():
             self.myGeomSurface = Surface_LinearExtrusion(self.myContext)
+            length = self.ui.uiLength.value()
             if self.ui.uiAlongNormal.isChecked():
                 axis = gp_Vec(self.myNormalAxis.Direction())
             if self.ui.uiAlongEdge.isChecked():
-                axis=gp_Vec(self.myDirection.GetGeometry().Position().Direction())
+                axis = gp_Vec(self.myDirection.GetGeometry().Position().Direction())
+                length = self.myDirection.GetGeometry2d().GetLength()
+
             self.myGeomSurface.SetCurves(self.myProfile.GetGeometry())
             self.myGeomSurface.SetDirection(axis)
-            self.myGeomSurface.SetLength(self.ui.uiLength.value())
+            self.myGeomSurface.SetLength(length)
             self.myGeomSurface.Compute()
 
     def ApplyChange(self):
@@ -104,8 +107,9 @@ class ExtrudedSurfaceForm(QWidget):
             extrudedSurfaceNode.setSketchObject(self.myGeomSurface)
             self.myModel.layoutChanged.emit()
         self.Finish()
+
     def Finish(self):
-        self.myGeomSurface=None
+        self.myGeomSurface = None
         self.parent.Hide()
 
 

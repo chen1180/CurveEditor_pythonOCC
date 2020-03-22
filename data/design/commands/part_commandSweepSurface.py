@@ -29,15 +29,19 @@ class Part_CommandSweepSurface(Part_Command):
         if self.myGUI.form_createSweepSurface.selectPath == True:
             self.myGUI.form_createSweepSurface.SetPath()
             self.myGUI.form_createSweepSurface.selectPath = False
+            self.mySweepSurfaceAction=SweepSurfaceAction.Input_Path
         if self.myGUI.form_createSweepSurface.selectConstantSection == True:
             self.myGUI.form_createSweepSurface.SetConstantSection()
             self.myGUI.form_createSweepSurface.selectConstantSection = False
+            self.mySweepSurfaceAction = SweepSurfaceAction.Input_Profile
         if self.myGUI.form_createSweepSurface.selectFirstSection == True:
             self.myGUI.form_createSweepSurface.SetFirstSection()
             self.myGUI.form_createSweepSurface.selectFirstSection = False
+            self.mySweepSurfaceAction = SweepSurfaceAction.Input_Profile
         if self.myGUI.form_createSweepSurface.selectLastSection == True:
             self.myGUI.form_createSweepSurface.SetLastSection()
             self.myGUI.form_createSweepSurface.selectLastSection = False
+            self.mySweepSurfaceAction = SweepSurfaceAction.Input_Profile
         # elif self.mySweepSurfaceAction == SweepSurfaceAction.Input_Profile:
         #     if myObjects.Type() == AIS_KOI_Shape:
         #         curve = self.FindGeometry(myObjects)
@@ -58,27 +62,23 @@ class Part_CommandSweepSurface(Part_Command):
         if self.mySweepSurfaceAction == SweepSurfaceAction.Nothing:
             pass
         elif self.mySweepSurfaceAction == SweepSurfaceAction.Input_Profile:
-            pass
+            if self.myGUI.form_createSweepSurface.selectConstantSection:
+                self.myStatusBar.showMessage("Select a constant profile! Press Ecs to cancel!", 1000)
+            if self.myGUI.form_createSweepSurface.selectFirstSection:
+                self.myStatusBar.showMessage("Select the start profile! Press Ecs to cancel!", 1000)
+            if self.myGUI.form_createSweepSurface.selectLastSection:
+                self.myStatusBar.showMessage("Select the end profile! Press Ecs to cancel!", 1000)
         elif self.mySweepSurfaceAction == SweepSurfaceAction.Input_Path:
-            pass
+            self.myStatusBar.showMessage("Select a path to sweep! Press Ecs to cancel!", 1000)
 
     def CancelEvent(self):
         if self.mySweepSurfaceAction == SweepSurfaceAction.Nothing:
             pass
         elif self.mySweepSurfaceAction == SweepSurfaceAction.Input_Profile:
-            pass
+            self.myGUI.Show()
         elif self.mySweepSurfaceAction == SweepSurfaceAction.Input_Path:
-            pass
-        self.mySweepSurfaceAction = SweepSurfaceAction.Nothing
+            self.myGUI.Show()
 
     def GetTypeOfMethod(self):
         return Part_ObjectTypeOfMethod.SweptSurface_Method
 
-    def CloseSurface(self):
-        self.mySurface = Surface_Sweep(self.myContext)
-        self.mySurface.SetProfile(self.myCurve)
-        self.mySurface.SetPath(self.myPath)
-        self.mySurface.Compute()
-        self.surfaceNode = SweepSurfaceNode(self.mySurface.GetName(), self.myNode)
-        self.surfaceNode.setSketchObject(self.mySurface)
-        self.myModel.layoutChanged.emit()

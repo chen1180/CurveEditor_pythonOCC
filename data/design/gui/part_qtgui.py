@@ -7,16 +7,19 @@ from .revolSurfaceForm import RevolSurfaceForm
 from .extrudedSurfaceForm import ExtrudedSurfaceForm
 from .sweepSurfaceForm import SweepSurfaceForm
 
+
 class Part_QTGUI(object):
     def __init__(self, parent: QMainWindow):
+        self.parent: QMainWindow = parent
         self.dockWidget = QDockWidget("Tool", parent)
         self.dockWidget.setAllowedAreas(Qt.LeftDockWidgetArea)
         parent.addDockWidget(Qt.LeftDockWidgetArea, self.dockWidget)
         self.form_createBezierSurface = BezierSurfaceForm(self)
         self.form_createRevolSurface = RevolSurfaceForm(self)
-        self.form_createExtrudedSurface=ExtrudedSurfaceForm(self)
-        self.form_createSweepSurface=SweepSurfaceForm(self)
-        self.forms = [self.form_createBezierSurface, self.form_createRevolSurface,self.form_createExtrudedSurface,self.form_createSweepSurface]
+        self.form_createExtrudedSurface = ExtrudedSurfaceForm(self)
+        self.form_createSweepSurface = SweepSurfaceForm(self)
+        self.forms = [self.form_createBezierSurface, self.form_createRevolSurface, self.form_createExtrudedSurface,
+                      self.form_createSweepSurface]
         self.dockWidget.hide()
 
     def SetContext(self, theContext):
@@ -39,7 +42,9 @@ class Part_QTGUI(object):
         elif theActionType == Part_ObjectTypeOfMethod.Nothing_Method:
             self.dockWidget.hide()
         self.dockWidget.show()
+
     def Show(self):
         self.dockWidget.show()
+
     def Hide(self):
         self.dockWidget.hide()
