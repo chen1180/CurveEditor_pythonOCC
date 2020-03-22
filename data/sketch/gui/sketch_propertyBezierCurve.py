@@ -145,12 +145,8 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         return self.binomial(i, n) * (t ** i) * ((1 - t) ** (n - i))
 
     def animateCurveConstruction(self):
-        # remove the last animation shape first
-        # if self.animatedGeometry:
-        #     for _ in self.animatedGeometry:
-        #         _.RemoveDisplay()
         self.animation = AnimationThread(self)  # This is the thread object
-        self.animation.finished.connect(self.clearUp)
+        # self.animation.finished.connect(self.clearUp)
         self.animation.start()
 
     def clearUp(self):
@@ -161,6 +157,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
 
     def closeEvent(self, QCloseEvent):
         super(Sketch_PropertyBezierCurve, self).closeEvent(QCloseEvent)
+        self.clearUp()
 
 
 
@@ -177,12 +174,23 @@ class AnimationThread(QThread):
         self.animatedGeometry = []
 
     @lru_cache(1000)
-    def DeCastlejau(self, coorArr, i, j, t):
+    def DeCasteljau_Recursion(self, coorArr, i, j, t):
+        """
+        This is the recursive version of DeCastlejau algorithmn. (Slower computation but easier to understand)
+        @param coorArr: The control point array (Generate array for coordinate x,y or z of the control points.)
+        @param i: The position of point in control point array
+        @param j: The degree of the Bezier curve
+        @param t: Step variable between [0,1]
+        @return: The value for point on the Bezier curve.
+        """
         if j == 0:
             return coorArr[i]
-        return self.DeCastlejau(coorArr, i, j - 1, t) * (1 - t) + self.DeCastlejau(coorArr, i + 1, j - 1, t) * t
+        return self.DeCasteljau_Recursion(coorArr, i, j - 1, t) * (1 - t) + self.DeCasteljau_Recursion(coorArr, i + 1, j - 1, t) * t
 
     def run(self):
+        if self.animatedGeometry:
+            for _ in  self.animatedGeometry:
+                _.RemoveDisplay()
         poles = self.myPoles
         x_poles = tuple([i.X() for i in poles])
         y_poles = tuple([i.Y() for i in poles])
@@ -244,10 +252,10 @@ class AnimationThread(QThread):
             for i in range(len(points_list)):
                 if i < len(points_list) - 1:
                     for idx in range(len(points_list[i]) - 1):
-                        new_point1 = gp_Pnt2d(self.DeCastlejau(x_poles, idx, i + 1, t),
-                                              self.DeCastlejau(y_poles, idx, i + 1, t))
-                        new_point2 = gp_Pnt2d(self.DeCastlejau(x_poles, idx + 1, i + 1, t),
-                                              self.DeCastlejau(y_poles, idx + 1, i + 1, t))
+                        new_point1 = gp_Pnt2d(self.DeCasteljau_Recursion(x_poles, idx, i + 1, t),
+                                              self.DeCasteljau_Recursion(y_poles, idx, i + 1, t))
+                        new_point2 = gp_Pnt2d(self.DeCasteljau_Recursion(x_poles, idx + 1, i + 1, t),
+                                              self.DeCasteljau_Recursion(y_poles, idx + 1, i + 1, t))
                         line_list[i][idx].DragTo(0, new_point1)
                         line_list[i][idx].DragTo(1, new_point2)
             currentPnt2d = self.mySObject.GetGeometry2d().Value(t)
@@ -257,3 +265,4 @@ class AnimationThread(QThread):
             if t >= self.myAnimationValue:
                 break
         self.finished.emit()
+        self.quit()

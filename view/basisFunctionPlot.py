@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 
 from functools import partial
 import numpy as np
-
+import matplotlib.cm
+import matplotlib.colors
+import matplotlib.pyplot as plt
 
 class memoize(object):
     """Cache the return value of a method.
@@ -87,11 +89,23 @@ class Bspline:
         self.plt = []
 
     def GetBasis(self):
-        x_min = np.min(self.knot_vector)
-        x_max = np.max(self.knot_vector)
-        x = np.linspace(x_min, x_max, num=100)
-        N = np.array([self(i) for i in x]).T
-        return x, N
+        nt_per_interval = 21
+
+        epsrel = 1e-10
+        epsabs = epsrel * (self.knot_vector[-1] - self.knot_vector[0])
+
+        xxs = []
+        for I in zip(self.knot_vector[:-1], self.knot_vector[1:]):
+            t_i = I[0]
+            t_ip1 = I[1] - epsabs
+            if t_ip1 - t_i > 0.:  # accept only intervals of length > 0 (to skip higher-multiplicity knots in the interior)
+                xxs.append(np.linspace(t_i, t_ip1, nt_per_interval))
+        yys=[]
+        for i,xx in enumerate(xxs):
+            yy = np.array([self(x) for x in xx])
+            yys.append(yy)
+
+        return xxs, yys
 
     def __basis0(self, xi):
         """Order zero basis (for internal use)."""
@@ -161,7 +175,7 @@ class Bspline:
         self.x = x
         self.y = N
         for i, n in enumerate(N):
-            tmp, = plt.plot(x, n, picker=True, label="Knots {}".format(i))
+            tmp, = plt.plot(x, n[i], picker=True, label="Knots {}".format(i))
             self.plt.append(tmp)
         plt.legend(loc="upper right")
 
@@ -376,6 +390,10 @@ class BsplineBasisFunctionWindow(QDialog):
         self.original_knots = []
         self.original_degree = None
 
+
+
+
+
     def setBasisFunction(self, knots, degree):
         self.knots_vector = knots
         self.max_knot = max(self.knots_vector)
@@ -430,10 +448,30 @@ class BsplineBasisFunctionWindow(QDialog):
         self.canvas.draw_idle()
 
     def updatePlot(self):
+        for curve in self.curves:
+            curve.remove()
+        del self.curves
         basis = Bspline(self.knots_vector, self.degree)
         x, N = basis.GetBasis()
-        for idx, line in enumerate(self.curves):
-            line.set_data(x, N[idx])
+        nrBasis = len(basis(0.0))
+        # setting
+        NUM_COLORS = nrBasis
+        cm = plt.get_cmap('gist_rainbow')
+        cNorm = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS - 1)
+        scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
+        colors = [scalarMap.to_rgba(i) for i in range(NUM_COLORS)]
+        settings = {"linestyle": 'solid',
+                    "linewidth": 1.0}
+        self.curves = []
+        for idx, xx in enumerate(x):
+            yy = N[idx]
+            for i in range(nrBasis):
+                # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
+                settings["color"] = colors[i]
+                ax, = self.ax.plot(xx, yy[:, i], **settings)
+                self.curves.append(ax)
+        # for idx, line in enumerate(self.curves):
+        #     line.set_data(x, N[idx])
         self.PlotUpdated.emit(self.knots_vector, self.degree)
 
     def plot(self):
@@ -451,11 +489,32 @@ class BsplineBasisFunctionWindow(QDialog):
         # plot data
         self.scatter = self.ax.scatter(self.knots_vector, [1] * len(self.knots_vector), picker=True, marker='x')
         basis = Bspline(self.knots_vector, self.degree)
+        nrBasis=len(basis(0.0))
         x, N = basis.GetBasis()
+
+        #setting
+        NUM_COLORS = nrBasis
+        cm = plt.get_cmap('gist_rainbow')
+        cNorm = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS - 1)
+        scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
+        colors = [scalarMap.to_rgba(i) for i in range(NUM_COLORS)]
+        settings = {"linestyle": 'solid',
+                    "linewidth": 1.0}
         self.curves = []
-        for i, n in enumerate(N):
-            plt, = self.ax.plot(x, n, label="Knots {}".format(i))
-            self.curves.append(plt)
+
+        for idx,xx in enumerate(x):
+            yy = N[idx]
+            print(yy)
+            for i in range(nrBasis):
+                # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
+                settings["color"] = colors[i]
+                ax, = self.ax.plot(xx, yy[:, i],**settings)
+                self.curves.append(ax)
+        # for i, n in enumerate(N):
+        #     print(x[i],n[i])
+        #     plt, = self.ax.plot(x[i], n[i], label="N{},{}".format(i,self.degree))
+        #     self.curves.append(plt)
+        # self.ax.legend(loc=3)
         # refresh canvas
         self.canvas.draw()
 
@@ -524,9 +583,10 @@ class BezierBasisFunctionWindow(QDialog):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    main = BezierBasisFunctionWindow()
-    main.setBasisFunction( 5)
-
+    # main = BezierBasisFunctionWindow()
+    # main.setBasisFunction( 5)
+    main=BsplineBasisFunctionWindow()
+    main.setBasisFunction([0,1,2,3,4,5],0)
     main.plot()
     main.show()
 
