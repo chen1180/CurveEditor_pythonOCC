@@ -14,7 +14,6 @@ class Sketch_PropertyBspline(Sketch_Property):
         self.ui_initialized = False
         self.mySObject: Sketch_Bspline = None
         self.canvas = BsplineBasisFunctionWindow(self)
-        self.canvas.setModal(Qt.NonModal)
         self.canvas.PlotUpdated.connect(self.UpdateBasisFunction)
         self.ui.PushButtonPlot.clicked.connect(self.plotBasisFunction)
         # ui
@@ -220,9 +219,9 @@ class Sketch_PropertyBspline(Sketch_Property):
     def UpdateBasisFunction(self,knots,degree):
         knots_no_duplicates=sorted(list(set(knots)))
         multiplicities=[knots.count(x) for x in knots_no_duplicates]
-
+        print("knots",len(self.mySObject.myKnots),"multi",len(self.mySObject.myMultiplicities),"poles",len(self.mySObject.myPoles),"weights",len(self.mySObject.myWeights))
         self.mySObject.SetKnots(knots_no_duplicates)
         self.mySObject.SetMultiplicities(multiplicities)
         self.mySObject.SetDegree(degree)
-        print(knots_no_duplicates,multiplicities,degree,self.mySObject.GetWeights())
-        self.mySObject.Recompute()
+        print(knots_no_duplicates,multiplicities)
+        self.mySObject.Compute()

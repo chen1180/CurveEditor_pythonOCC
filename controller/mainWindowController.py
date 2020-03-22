@@ -198,20 +198,19 @@ class Window(QtWidgets.QMainWindow):
         parent.addWidget(button)
 
     def createMenuBars(self):
-        menu = self._ui.menuBar.addMenu("&File")
-
-        def export_to_PNG():
-            self._glWindow.view.Dump('./capture_png.png')
-
-        menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
-                                         statusTip="Export current view as picture",
-                                         triggered=export_to_PNG))
+        # menu = self._ui.menuBar.addMenu("&File")
+        #
+        # def export_to_PNG():
+        #     self._glWindow.view.Dump('./capture_png.png')
+        #
+        # menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
+        #                                  statusTip="Export current view as picture",
+        #                                  triggered=export_to_PNG))
         pass
 
     def deleteTreeItem(self, index):
         indexes = self._uiTreeView.selectedIndexes()
         self.sketchController.DeleteSelectedObject()
-
     def deleteAllTreeItem(self):
         if self._model.hasChildren():
             root: Node = self._model._rootNode

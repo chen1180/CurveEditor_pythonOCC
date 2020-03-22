@@ -15,6 +15,7 @@ import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot as plt
 
+
 class memoize(object):
     """Cache the return value of a method.
        This class is meant to be used as a decorator of methods. The return value
@@ -89,7 +90,7 @@ class Bspline:
         self.plt = []
 
     def GetBasis(self):
-        nt_per_interval = 21
+        nt_per_interval = 16
 
         epsrel = 1e-10
         epsabs = epsrel * (self.knot_vector[-1] - self.knot_vector[0])
@@ -100,8 +101,8 @@ class Bspline:
             t_ip1 = I[1] - epsabs
             if t_ip1 - t_i > 0.:  # accept only intervals of length > 0 (to skip higher-multiplicity knots in the interior)
                 xxs.append(np.linspace(t_i, t_ip1, nt_per_interval))
-        yys=[]
-        for i,xx in enumerate(xxs):
+        yys = []
+        for i, xx in enumerate(xxs):
             yy = np.array([self(x) for x in xx])
             yys.append(yy)
 
@@ -348,7 +349,6 @@ class BsplineBasisFunctionWindow(QDialog):
 
     def __init__(self, parent=None):
         super(BsplineBasisFunctionWindow, self).__init__(parent)
-
         # a figure instance to plot on
         self.figure = plt.figure()
         self.setWindowTitle("Basis function plot")
@@ -356,7 +356,7 @@ class BsplineBasisFunctionWindow(QDialog):
         # this is the Canvas Widget that displays the `figure`
         # it takes the `figure` instance as a parameter to __init__
         self.canvas = FigureCanvas(self.figure)
-
+        self.setModal(Qt.WindowModal)
         # this is the Navigation widget
         # it takes the Canvas widget and a parent
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -390,9 +390,11 @@ class BsplineBasisFunctionWindow(QDialog):
         self.original_knots = []
         self.original_degree = None
 
-
-
-
+    # def closeEvent(self, QCloseEvent):
+    #     super(BsplineBasisFunctionWindow, self).closeEvent(QCloseEvent)
+    #     if (QMessageBox.question(self, "Close this window?"), "Close this window?", QWidget.QMessageBox.Yes,
+    #         QWidget.QMessageBox.QMessageBox.No) == QWidget.QMessageBox.QMessageBox.Yes:
+    #         self.close()
 
     def setBasisFunction(self, knots, degree):
         self.knots_vector = knots
@@ -452,8 +454,38 @@ class BsplineBasisFunctionWindow(QDialog):
             curve.remove()
         del self.curves
         basis = Bspline(self.knots_vector, self.degree)
-        x, N = basis.GetBasis()
+        xxs, yys = basis.GetBasis()
         nrBasis = len(basis(0.0))
+        # setting
+        NUM_COLORS = nrBasis
+        cm = plt.get_cmap('gist_rainbow')
+        cNorm = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS - 1)
+        scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
+        colors = [scalarMap.to_rgba(i) for i in range(NUM_COLORS)]
+        settings = {"linestyle": 'solid',
+                    "linewidth": 1.0}
+        self.curves = []
+        for idx, xx in enumerate(xxs):
+            yy = yys[idx]
+            for i in range(nrBasis):
+                # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
+                settings["color"] = colors[i]
+                ax, = self.ax.plot(xx, yy[:, i], **settings)
+                self.curves.append(ax)
+        self.PlotUpdated.emit(self.knots_vector, self.degree)
+
+    def plot(self):
+        ''' plot some random stuff '''
+        self.figure.clear()
+
+        # create an axis
+        self.ax = self.figure.add_subplot(111)
+
+        # plot data
+        self.scatter = self.ax.scatter(self.knots_vector, [1] * len(self.knots_vector), picker=True, marker='x')
+        basis = Bspline(self.knots_vector, self.degree)
+        nrBasis = len(basis(0.0))
+        x, N = basis.GetBasis()
         # setting
         NUM_COLORS = nrBasis
         cm = plt.get_cmap('gist_rainbow')
@@ -470,52 +502,6 @@ class BsplineBasisFunctionWindow(QDialog):
                 settings["color"] = colors[i]
                 ax, = self.ax.plot(xx, yy[:, i], **settings)
                 self.curves.append(ax)
-        # for idx, line in enumerate(self.curves):
-        #     line.set_data(x, N[idx])
-        self.PlotUpdated.emit(self.knots_vector, self.degree)
-
-    def plot(self):
-        ''' plot some random stuff '''
-
-        # instead of ax.hold(False)
-        self.figure.clear()
-
-        # create an axis
-        self.ax = self.figure.add_subplot(111)
-
-        # discards the old graph
-        # ax.hold(False) # deprecated, see above
-
-        # plot data
-        self.scatter = self.ax.scatter(self.knots_vector, [1] * len(self.knots_vector), picker=True, marker='x')
-        basis = Bspline(self.knots_vector, self.degree)
-        nrBasis=len(basis(0.0))
-        x, N = basis.GetBasis()
-
-        #setting
-        NUM_COLORS = nrBasis
-        cm = plt.get_cmap('gist_rainbow')
-        cNorm = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS - 1)
-        scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
-        colors = [scalarMap.to_rgba(i) for i in range(NUM_COLORS)]
-        settings = {"linestyle": 'solid',
-                    "linewidth": 1.0}
-        self.curves = []
-
-        for idx,xx in enumerate(x):
-            yy = N[idx]
-            print(yy)
-            for i in range(nrBasis):
-                # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
-                settings["color"] = colors[i]
-                ax, = self.ax.plot(xx, yy[:, i],**settings)
-                self.curves.append(ax)
-        # for i, n in enumerate(N):
-        #     print(x[i],n[i])
-        #     plt, = self.ax.plot(x[i], n[i], label="N{},{}".format(i,self.degree))
-        #     self.curves.append(plt)
-        # self.ax.legend(loc=3)
-        # refresh canvas
         self.canvas.draw()
 
     def resetPlot(self):
@@ -523,6 +509,8 @@ class BsplineBasisFunctionWindow(QDialog):
         self.knots_vector = self.original_knots
         self.plot()
         self.PlotUpdated.emit(self.knots_vector, self.degree)
+
+
 class BezierBasisFunctionWindow(QDialog):
 
     def __init__(self, parent=None):
@@ -535,7 +523,7 @@ class BezierBasisFunctionWindow(QDialog):
         # this is the Canvas Widget that displays the `figure`
         # it takes the `figure` instance as a parameter to __init__
         self.canvas = FigureCanvas(self.figure)
-
+        self.setModal(Qt.WindowModal)
         # this is the Navigation widget
         # it takes the Canvas widget and a parent
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -544,8 +532,6 @@ class BezierBasisFunctionWindow(QDialog):
         # Just some button connected to `plot` method
         self.plotButton = QPushButton('Plot')
         self.plotButton.clicked.connect(self.plot)
-
-
 
         # set the layout
         layout = QGridLayout()
@@ -559,7 +545,7 @@ class BezierBasisFunctionWindow(QDialog):
 
     def setBasisFunction(self, numPoints):
         self.numPoints = numPoints
-
+        self.degree = self.numPoints - 1
 
     def plot(self):
         # instead of ax.hold(False)
@@ -574,8 +560,9 @@ class BezierBasisFunctionWindow(QDialog):
         # plot data
         x = np.linspace(0, 1, 100)
         for j in range(self.numPoints):
-            y = [self.bezier.bernstein(i, j, self.numPoints-1) for i in x]
-            self.ax.plot(x, y)
+            y = [self.bezier.bernstein(i, j, self.degree) for i in x]
+            self.ax.plot(x, y, label="B{},{}".format(j, self.degree))
+        self.ax.legend()
         # refresh canvas
         self.canvas.draw()
 
@@ -585,8 +572,8 @@ if __name__ == '__main__':
 
     # main = BezierBasisFunctionWindow()
     # main.setBasisFunction( 5)
-    main=BsplineBasisFunctionWindow()
-    main.setBasisFunction([0,1,2,3,4,5],0)
+    main = BsplineBasisFunctionWindow()
+    main.setBasisFunction([0, 1, 2, 3, 4], 2)
     main.plot()
     main.show()
 

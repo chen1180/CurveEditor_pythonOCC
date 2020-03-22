@@ -18,6 +18,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         self.canvas = BezierBasisFunctionWindow(self)
         self.ui.PushButtonPlot.clicked.connect(self.plotBasisFunction)
         self.ui.PushButtonAnimate.clicked.connect(self.animateCurveConstruction)
+        self.animation=None
 
         # ui
         self.ui.TextLabelPoint1.close()
@@ -146,18 +147,18 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
 
     def animateCurveConstruction(self):
         self.animation = AnimationThread(self)  # This is the thread object
-        # self.animation.finished.connect(self.clearUp)
+        self.animation.finished.connect(self.clearUpAnimation)
         self.animation.start()
 
-    def clearUp(self):
+    def clearUpAnimation(self):
         # remove the last animation shape first
-        if self.animation.animatedGeometry:
-            for _ in  self.animation.animatedGeometry:
-                _.RemoveDisplay()
+        if self.animation:
+            if self.animation.animatedGeometry:
+                for _ in  self.animation.animatedGeometry:
+                    _.RemoveDisplay()
 
     def closeEvent(self, QCloseEvent):
         super(Sketch_PropertyBezierCurve, self).closeEvent(QCloseEvent)
-        self.clearUp()
 
 
 
@@ -265,4 +266,3 @@ class AnimationThread(QThread):
             if t >= self.myAnimationValue:
                 break
         self.finished.emit()
-        self.quit()

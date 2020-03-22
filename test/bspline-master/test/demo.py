@@ -137,6 +137,7 @@ def main():
     # for plotting the knot positions:
     unique_knots_xx = np.unique(original_knots)
     unique_knots_yy = np.zeros_like(unique_knots_xx)
+    print("unique",unique_knots_yy)
 
     # plot the basis functions B(x) and their first three derivatives
     plt.figure(1)
@@ -164,6 +165,6 @@ def main():
 
 
 if __name__ == '__main__':
-    # test()
+    test()
     main()
     plt.show()
