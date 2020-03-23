@@ -9,13 +9,14 @@ class Sketch_PropertyPoint(Sketch_Property):
         super(Sketch_PropertyPoint, self).__init__(parent, name, fl)
         if not name:
             self.setObjectName("Property Points")
+        self.setFixedSize(300, 300)
         self.ui.TextLabelPoint1.setText("Point. ")
         self.isPointWindow = True
         # UI
-        self.ui.TextLabelWidth.close()
-        self.ui.ComboBoxWidth.close()
         self.ui.TextLabelStyle.close()
         self.ui.ComboBoxStyle.close()
+        self.ui.verticalLayout_3.removeWidget(self.ui.GroupBoxPlot)
+        self.ui.GroupBoxPlot.close()
 
     def SetGeometry(self, *__args):
         self.curGeom2d_Point: Geom2d_CartesianPoint =  self.mySObject.GetGeometry2d()

@@ -146,12 +146,14 @@ class Sketch_BezierCurve(Sketch_Geometry):
 
     def SetStyle(self, theStyle):
         self.myWireStyle = theStyle
+        self.myWireAspect.SetTypeOfLine(theStyle)
 
     def GetWidth(self):
         return self.myWireWidth
 
     def SetWidth(self, theWidth):
         self.myWireWidth = theWidth
+        self.myWireAspect.SetWidth(theWidth)
 
     def GetColor(self):
         return self.myWireColor

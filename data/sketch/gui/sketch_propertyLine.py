@@ -9,6 +9,7 @@ class Sketch_PropertyLine(Sketch_Property):
         super(Sketch_PropertyLine, self).__init__(parent, name, fl)
         if not name:
             self.setObjectName("Property Lines")
+        self.setFixedSize(300, 300)
         self.secondPnt2d = gp_Pnt2d()
         self.temp2Pnt2d = gp_Pnt2d()
 
@@ -23,8 +24,10 @@ class Sketch_PropertyLine(Sketch_Property):
         self.TextLabelLength.setText("Length")
         self.LineEditLength = QLineEdit(self.ui.GroupBoxAttributes)
         self.LineEditLength.setEnabled(False)
-        self.ui.GroupBoxAttributesLayout.addWidget(self.TextLabelLength, 4,0)
+        self.ui.GroupBoxAttributesLayout.addWidget(self.TextLabelLength, 4, 0)
         self.ui.GroupBoxAttributesLayout.addWidget(self.LineEditLength, 4, 1)
+        self.ui.verticalLayout_3.removeWidget(self.ui.GroupBoxPlot)
+        self.ui.GroupBoxPlot.close()
 
     def SetGeometry(self, *__args):
         self.curGeom2d_Edge: Geom2d_Edge = self.mySObject.GetGeometry2d()
@@ -59,8 +62,8 @@ class Sketch_PropertyLine(Sketch_Property):
                 self.firstPnt2d.SetY(self.tempPnt2d.Y())
                 self.secondPnt2d.SetX(self.temp2Pnt2d.X())
                 self.secondPnt2d.SetY(self.temp2Pnt2d.Y())
-                self.mySObject.DragTo(0,self.firstPnt2d)
-                self.mySObject.DragTo(1,self.secondPnt2d)
+                self.mySObject.DragTo(0, self.firstPnt2d)
+                self.mySObject.DragTo(1, self.secondPnt2d)
                 self.SetLineLength()
                 return True
         return False

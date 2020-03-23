@@ -92,3 +92,4 @@ class Sketch_Point(Sketch_Geometry):
 
     def SetWidth(self, theWidth):
         self.myPointWidth = theWidth
+        self.myPointAspect.SetScale(theWidth)

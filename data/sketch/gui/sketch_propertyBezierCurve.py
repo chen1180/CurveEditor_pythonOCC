@@ -12,6 +12,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
         super(Sketch_PropertyBezierCurve, self).__init__(parent, name, fl)
         if not name:
             self.setObjectName("Property bezier curve")
+        self.setFixedSize(400, 500)
         self.geometry_dict = {}
         self.ui_initialized = False
         self.mySObject: Sketch_BezierCurve = None

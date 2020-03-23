@@ -111,12 +111,14 @@ class Sketch_Line(Sketch_Geometry):
 
     def SetStyle(self, theStyle):
         self.myLineStyle = theStyle
+        self.myLineAspect.SetTypeOfLine(theStyle)
 
     def GetWidth(self):
         return self.myLineWidth
 
     def SetWidth(self, theWidth):
         self.myLineWidth = theWidth
+        self.myLineAspect.SetWidth(theWidth)
 
     def GetColor(self):
         return self.myLineColor

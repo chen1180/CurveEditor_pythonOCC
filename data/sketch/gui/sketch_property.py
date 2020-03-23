@@ -27,7 +27,7 @@ class Sketch_Property(QWidget):
         # UI initialization
         self.ui = Ui_SketchProperty()
         self.ui.setupUi(self)
-        self.setMinimumSize(QSize(300, 500))
+        self.setMinimumSize(QSize(400, 600))
         self.setWindowModality(Qt.ApplicationModal)
         # color palette
         self.uiPalette = self.ui.PushButtonColor.palette()
@@ -71,16 +71,15 @@ class Sketch_Property(QWidget):
         self.myID = self.mySObject.GetName()
         self.myColor = self.mySObject.GetColor()
         self.myObjectType = self.mySObject.GetType()
-
+        self.myWidth = self.mySObject.GetWidth()
         if not self.isPointWindow:
             self.myObjectStyle = self.mySObject.GetStyle()
-            self.myWidth = self.mySObject.GetWidth()
             self.SetObjectStyle()
-            self.SetWidth()
+
 
         self.SetID()
         self.SetColor()
-
+        self.SetWidth()
         self.SetGeometry()
         self.show()
 
@@ -145,13 +144,17 @@ class Sketch_Property(QWidget):
     def GetAttributies(self):
         self.myColor = self.GetColor()
         self.mySObject.SetColor(self.myColor)
+
+        self.myWidth = self.GetWidth()
+        self.mySObject.SetWidth(self.myWidth)
+
         if self.isPointWindow:
             pass
         else:
             self.myObjectStyle = self.GetObjectStyle()
-            self.myWidth = self.GetWidth()
+
             self.mySObject.SetStyle(self.myObjectStyle)
-            self.mySObject.SetWidth(self.myWidth)
+
 
     def GetName(self):
         tempID = self.GetID()
@@ -185,10 +188,7 @@ class Sketch_Property(QWidget):
         self.ui.ComboBoxWidth.setCurrentIndex(int(self.myWidth) - 1)
 
     def GetWidth(self):
-        if self.isPointWindow:
-            return 1.0
-        else:
-            return self.ui.ComboBoxWidth.currentIndex() + 1
+        return self.ui.ComboBoxWidth.currentIndex() + 1
 
 
 if __name__ == '__main__':

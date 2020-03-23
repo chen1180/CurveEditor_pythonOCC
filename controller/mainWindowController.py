@@ -97,9 +97,10 @@ class Window(QtWidgets.QMainWindow):
 
     def checkCurrentPlane(self, parent: QtCore.QModelIndex, first, last):
         print(self._model.getNode(parent), self.sketchController.currentSketchNode, first, last)
-        if self._model.getNode(parent).childCount() == 0 and self._model.parent(parent).row()==0:
-            self.sketchController.currentSketchNode = None
-
+        print(self._model.rowCount(parent))
+        if self._model.rowCount(parent)==0:
+            # self.sketchController.currentSketchNode = None
+            pass
     def selectPlane(self, item):
         '''
 

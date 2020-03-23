@@ -9,6 +9,7 @@ class Sketch_PropertyBspline(Sketch_Property):
         super(Sketch_PropertyBspline, self).__init__(parent, name, fl)
         if not name:
             self.setObjectName("Property bezier curve")
+        self.setFixedSize(400, 500)
         self.geometry_dict = {}
         self.knots_distribution_dict = {0: "NonUniform ", 1: "Uniform", 2: "QuasiUniform ", 3: "PiecewiseBezier"}
         self.ui_initialized = False
