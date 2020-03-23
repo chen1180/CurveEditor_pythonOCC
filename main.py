@@ -2,7 +2,6 @@ from controller import mainWindowController
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-import traceback
 import logging
 import sys
 log = logging.getLogger(__name__)

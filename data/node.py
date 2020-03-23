@@ -48,7 +48,18 @@ class Node(object):
         if position < 0 or position > len(self._children):
             return False
         child = self._children.pop(position)
+        if isinstance(child,SketchNode):
+            child.getSketchPlane().RemoveDisplay()
+            index = 0
+            while index < child.childCount():
+                myCurObject = child.child(index).getSketchObject()
+                myCurObject.RemoveDisplay()
+                index+=1
+        elif isinstance(child,SketchObjectNode):
+            myCurObject=child.getSketchObject()
+            myCurObject.RemoveDisplay()
         child._parent = None
+        del child
         return True
 
     def childCount(self):
@@ -126,7 +137,6 @@ class SketchObjectNode(Node):
 
     def typeInfo(self):
         return "SketchObject"
-
 
 class PointNode(SketchObjectNode):
     def __init__(self, name, parent=None):

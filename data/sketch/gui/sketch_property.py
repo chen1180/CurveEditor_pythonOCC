@@ -24,32 +24,40 @@ class Sketch_Property(QWidget):
         self.firstPnt2d = gp_Pnt2d()
         self.tempPnt2d = gp_Pnt2d()
         self.isPointWindow = False
+        # UI initialization
         self.ui = Ui_SketchProperty()
         self.ui.setupUi(self)
+        self.setMinimumSize(QSize(300, 500))
         self.setWindowModality(Qt.ApplicationModal)
-
-
+        # color palette
+        self.uiPalette = self.ui.PushButtonColor.palette()
+        self.uiPalette.setColor(QPalette.Window, Qt.red)
+        self.ui.PushButtonColor.setPalette(self.uiPalette)
+        self.ui.PushButtonColor.setAutoFillBackground(True)
+        self.ui.PushButtonColor.clicked.connect(self.openColorDialog)
         if not name:
             self.setObjectName("Sketch_Property")
-        self.resize(400, 400)
-        self.setMaximumSize(QSize(400, 400))
+        # self.resize(400, 400)
+        # self.setMaximumSize(QSize(400, 400))
         self.setWindowTitle("Property")
 
         self.ui.PushButtonOK.clicked.connect(self.onOK)
         self.ui.PushButtonCancel.clicked.connect(self.close)
         self.ui.PushButtonApply.clicked.connect(self.onApply)
 
-        # fileName = "res"
-        # fileName = fileName + "/" + "property.png"
-        # myIcon = QIcon(QPixmap(fileName))
-        # self.setWindowIcon(myIcon)
+        myIcon = QIcon(QPixmap(":/settings.png"))
+        self.setWindowIcon(myIcon)
 
-        self.myNameOfColor = Quantity_NOC_YELLOW
+        self.myColor = Quantity_NOC_YELLOW
         self.myObjectStyle = Aspect_TOL_SOLID
         self.myWidth = 1.0
-        self.myPrs3dAspect = Prs3d_LineAspect(Quantity_Color(self.myNameOfColor), self.myObjectStyle, self.myWidth)
-        self.myDrawer = Prs3d_Drawer()
-        self.myDrawer.SetLineAspect(self.myPrs3dAspect)
+
+    def openColorDialog(self):
+        color:QColor = QColorDialog.getColor()
+        if color.isValid():
+            self.ui.PushButtonColor.setStyleSheet("background-color:{};".format(color.name()))
+            self.ui.PushButtonColor.setText(str(color.getRgb()))
+            self.myColor=color.getRgbF()
 
     def SetContext(self, theContext):
         self.myContext = theContext
@@ -61,7 +69,7 @@ class Sketch_Property(QWidget):
         self.mySObject: Sketch_Geometry = CurObject
         self.myAIS_Object = self.mySObject.GetAIS_Object()
         self.myID = self.mySObject.GetName()
-        self.myNameOfColor = self.mySObject.GetColor()
+        self.myColor = self.mySObject.GetColor()
         self.myObjectType = self.mySObject.GetType()
 
         if not self.isPointWindow:
@@ -130,26 +138,20 @@ class Sketch_Property(QWidget):
         return False
 
     def CheckAttributies(self):
-        if self.myNameOfColor != self.GetColor() or self.myObjectStyle != self.GetObjectStyle() or self.myWidth != self.GetWidth():
+        if self.myColor != self.GetColor() or self.myObjectStyle != self.GetObjectStyle() or self.myWidth != self.GetWidth():
             self.GetAttributies()
-            self.myContext.Redisplay(self.myAIS_Object, True)
+            self.myContext.Redisplay(self.mySObject.GetAIS_Object(), True)
 
     def GetAttributies(self):
-        self.myNameOfColor = self.GetColor()
-        self.mySObject.SetColor(self.myNameOfColor)
+        self.myColor = self.GetColor()
+        self.mySObject.SetColor(self.myColor)
         if self.isPointWindow:
-            self.myAIS_Object.SetColor(Quantity_Color(self.myNameOfColor))
+            pass
         else:
             self.myObjectStyle = self.GetObjectStyle()
             self.myWidth = self.GetWidth()
             self.mySObject.SetStyle(self.myObjectStyle)
             self.mySObject.SetWidth(self.myWidth)
-
-            self.myPrs3dAspect.SetColor(Quantity_Color(self.myNameOfColor))
-            self.myPrs3dAspect.SetTypeOfLine(self.myObjectStyle)
-            self.myPrs3dAspect.SetWidth(self.myWidth)
-            self.myDrawer.SetLineAspect(self.myPrs3dAspect)
-            self.myAIS_Object.SetAttributes(self.myDrawer)
 
     def GetName(self):
         tempID = self.GetID()
@@ -158,121 +160,17 @@ class Sketch_Property(QWidget):
             self.mySObject.SetObjectName(self.myID)
 
     def SetColor(self):
-        if self.myNameOfColor == Quantity_NOC_BLACK:
-            self.ui.ComboBoxColor.setCurrentIndex(0)
-
-        elif self.myNameOfColor == Quantity_NOC_BROWN:
-            self.ui.ComboBoxColor.setCurrentIndex(1)
-
-        elif self.myNameOfColor == Quantity_NOC_RED:
-            self.ui.ComboBoxColor.setCurrentIndex(2)
-
-        elif self.myNameOfColor == Quantity_NOC_ORANGE:
-            self.ui.ComboBoxColor.setCurrentIndex(3)
-
-        elif self.myNameOfColor == Quantity_NOC_YELLOW:
-            self.ui.ComboBoxColor.setCurrentIndex(4)
-
-        elif self.myNameOfColor == Quantity_NOC_FORESTGREEN:
-            self.ui.ComboBoxColor.setCurrentIndex(5)
-
-        elif self.myNameOfColor == Quantity_NOC_GREEN:
-            self.ui.ComboBoxColor.setCurrentIndex(6)
-
-        elif self.myNameOfColor == Quantity_NOC_BLUE1:
-            self.ui.ComboBoxColor.setCurrentIndex(7)
-
-        elif self.myNameOfColor == Quantity_NOC_DEEPSKYBLUE1:
-            self.ui.ComboBoxColor.setCurrentIndex(8)
-
-        elif self.myNameOfColor == Quantity_NOC_LIGHTSKYBLUE:
-            self.ui.ComboBoxColor.setCurrentIndex(9)
-
-        elif self.myNameOfColor == Quantity_NOC_CYAN1:
-            self.ui.ComboBoxColor.setCurrentIndex(10)
-
-        elif self.myNameOfColor == Quantity_NOC_PURPLE:
-            self.ui.ComboBoxColor.setCurrentIndex(11)
-
-        elif self.myNameOfColor == Quantity_NOC_MAGENTA1:
-            self.ui.ComboBoxColor.setCurrentIndex(12)
-
-        elif self.myNameOfColor == Quantity_NOC_VIOLET:
-            self.ui.ComboBoxColor.setCurrentIndex(13)
-
-        elif self.myNameOfColor == Quantity_NOC_DEEPPINK:
-            self.ui.ComboBoxColor.setCurrentIndex(14)
-
-        elif self.myNameOfColor == Quantity_NOC_PINK:
-            self.ui.ComboBoxColor.setCurrentIndex(15)
-
-        elif self.myNameOfColor == Quantity_NOC_GRAY70:
-            self.ui.ComboBoxColor.setCurrentIndex(16)
-
-        elif self.myNameOfColor == Quantity_NOC_WHITE:
-            self.ui.ComboBoxColor.setCurrentIndex(17)
-
-        else:
-            self.ui.ComboBoxColor.setCurrentIndex(4)
+        color=Quantity_Color(self.myColor).Values(Quantity_TOC_RGB)
+        color=tuple([int(i*255) for i in color])
+        self.ui.PushButtonColor.setText(str(color))
+        self.ui.PushButtonColor.setStyleSheet("background-color: rgb{};".format(color))
 
     def GetColor(self):
-        index = self.ui.ComboBoxColor.currentIndex()
-        if index == 0:
-            return Quantity_NOC_BLACK
-
-        elif index == 1:
-            return Quantity_NOC_BROWN
-
-        elif index == 2:
-            return Quantity_NOC_RED
-
-        elif index == 3:
-            return Quantity_NOC_ORANGE
-
-        elif index == 4:
-            return Quantity_NOC_YELLOW
-
-        elif index == 5:
-            return Quantity_NOC_FORESTGREEN
-
-        elif index == 6:
-            return Quantity_NOC_GREEN
-
-        elif index == 7:
-            return Quantity_NOC_BLUE1
-
-        elif index == 8:
-            return Quantity_NOC_DEEPSKYBLUE1
-
-        elif index == 9:
-            return Quantity_NOC_LIGHTSKYBLUE
-
-        elif index == 10:
-            return Quantity_NOC_CYAN1
-
-        elif index == 11:
-            return Quantity_NOC_PURPLE
-
-        elif index == 12:
-            return Quantity_NOC_MAGENTA1
-
-        elif index == 13:
-            return Quantity_NOC_VIOLET
-
-        elif index == 14:
-            return Quantity_NOC_DEEPPINK
-
-        elif index == 15:
-            return Quantity_NOC_PINK
-
-        elif index == 16:
-            return Quantity_NOC_GRAY70
-
-        elif index == 17:
-            return Quantity_NOC_WHITE
-
-        else:
-            return Quantity_NOC_YELLOW
+        color=self.ui.PushButtonColor.text().replace("(","").replace(")","").split(",")
+        r=float(color[0].strip())/255.0
+        g=float(color[1].strip())/255.0
+        b=float(color[2].strip())/255.0
+        return Quantity_Color().Name(r,g,b)
 
     def SetObjectStyle(self):
         self.ui.ComboBoxStyle.setCurrentIndex(self.myObjectStyle)

@@ -1,7 +1,4 @@
-from OCC.Core.Aspect import *
-from OCC.Core.Graphic3d import *
 from OCC.Core.V3d import *
-from OCC.Core.V3d import V3d_Viewer
 from PyQt5.QtCore import QObject, pyqtSignal, QModelIndex
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QStatusBar
@@ -12,12 +9,9 @@ from data.node import *
 from data.sketch.gui.sketch_qtgui import Sketch_QTGUI
 from data.sketch.sketch import Sketch
 from data.sketch.sketch_type import *
-from OCC.Core.Quantity import *
-
 
 class SketchController(QObject):
     sketchPlaneUpdated = pyqtSignal(object)
-    sketchObjectUpdated = pyqtSignal(object)
 
     def __init__(self, display, parent=None):
         super(SketchController, self).__init__(parent)
@@ -29,7 +23,6 @@ class SketchController(QObject):
         self.sketch = Sketch(self._display, self.sketchUI)
         self.model: SceneGraphModel = None
         self.currentSketchNode: SketchObjectNode = None
-        self.currentSketchIndex = None
         self.createActions()
 
     def highlightCurrentNode(self, current: QModelIndex, old: QModelIndex):
@@ -38,8 +31,8 @@ class SketchController(QObject):
             self.selectSketchNode(node)
         elif isinstance(node, SketchObjectNode):
             self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
-        # self._display.View.SetFront()
         self._display.Context.FitSelected(self._display.View)
+
 
     def setStatusBar(self, theStatusBar):
         self.statusBar: QStatusBar = theStatusBar
@@ -152,31 +145,22 @@ class SketchController(QObject):
         name = "Sketch "
         count = str(self.rootNode.childCount())
         name += count
-        self.currentSketchNode = SketchNode(name)
+        self.currentSketchNode = SketchNode(name,self.rootNode)
         coordinate_system: gp_Ax3 = self.new_sketch.getCoordinate()
-        sketch_plane = Sketch_Plane(self._display.Context, coordinate_system)
-        self.createDynamicGrid()
+        sketch_plane = Sketch_Plane(self._display, coordinate_system)
+        sketch_plane.Compute()
+        sketch_plane.CreateDynamicGrid(self.new_sketch.ui.uiOffset.value())
         self.currentSketchNode.setSketchPlane(sketch_plane)
         self.sketchPlaneUpdated.emit(self.currentSketchNode)
         self.selectSketchNode(self.currentSketchNode)
-
-    def createDynamicGrid(self):
-        # camera attribute
-        self.view: V3d_View = self._display.View
-        # scale factor by mosue scroller
-        self.camera: Graphic3d_Camera = self.view.Camera()
-        canvas_size = max(self.view.Size())
-        grid_interval = self.camera.Distance() // self.view.Scale() / 5
-        self._display.Viewer.ActivateGrid(Aspect_GT_Rectangular, Aspect_GDM_Lines)
-        self._display.Viewer.SetRectangularGridGraphicValues(canvas_size, canvas_size,
-                                                             self.new_sketch.ui.uiOffset.value())
-        self._display.Viewer.SetRectangularGridValues(0.0, 0.0, grid_interval, grid_interval, 0.0)
 
     def selectSketchNode(self, node: SketchNode):
         assert isinstance(self._display.Viewer, V3d_Viewer)
         assert isinstance(self._display.View, V3d_View)
         self._display.Viewer.SetPrivilegedPlane(node.getSketchPlane().GetCoordinate())
         # self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
+        self.currentSketchNode.getSketchPlane().DisplayGrid()
+
         self.sketch.SetRootNode(node)
         self.sketch.SetCoordinateSystem(node.getSketchPlane().GetCoordinate())
 
@@ -210,8 +194,6 @@ class SketchController(QObject):
     def OnMouseInputEvent(self, *kargs):
         if self.currentSketchNode:
             self.sketch.OnMouseInputEvent(*kargs)
-        # self.model.layoutChanged.emit()
-        # self.sketchObjectUpdated.emit(self.currentSketchNode)
 
     def OnMouseMoveEvent(self, *kargs):
         if self.currentSketchNode:
@@ -234,23 +216,25 @@ class SketchController(QObject):
             child = node.child(index)
             myCurObject: Sketch_Geometry = child.getSketchObject()
             myCurObject.RemoveDisplay()
-            myCurObject.RemoveLabel()
             index += 1
 
     def DeleteSelectedObject(self):
-        root: Node = self.currentSketchNode.parent()
-        for i, planeNode in enumerate(root.children()):
-            index = 0
-            while index < planeNode.childCount():
-                child = planeNode.child(index)
-                myCurObject: Sketch_Geometry = child.getSketchObject()
-                if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
-                    myCurObject.RemoveDisplay()
-                    myCurObject.RemoveLabel()
-                    # get parent sketch node
-                    planeIndex = self.model.index(i, 0, QModelIndex())
-                    self.model.removeRow(index, planeIndex)
-                else:
-                    index += 1
-        # inform model to update
-        self.model.layoutChanged.emit()
+        if self.currentSketchNode:
+            root: Node = self.currentSketchNode.parent()
+            for i, planeNode in enumerate(root.children()):
+                index = 0
+                # planeNode.getSketchPlane().RemoveDisplay()
+                while index < planeNode.childCount():
+                    child = planeNode.child(index)
+                    myCurObject: Sketch_Geometry = child.getSketchObject()
+                    if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
+                        myCurObject.RemoveDisplay()
+                        myCurObject.RemoveLabel()
+                        # get parent sketch node
+                        planeIndex = self.model.index(i, 0, QModelIndex())
+                        self.model.removeRow(index, planeIndex)
+                    else:
+                        index += 1
+                # self.model.removeRow(i,QModelIndex())
+            # inform model to update
+            self.model.layoutChanged.emit()

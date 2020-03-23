@@ -1,13 +1,19 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from view import nodeProperty, property, curveProperty, \
+from view import nodeProperty, property,  \
     newSketchProperty, clippingPlaneProperty, viewPortProperty
 from data.model import SceneGraphModel
 from data.node import *
-
+from data.design.geometry import *
+from OCC.Core.gp import *
 
 class PropertyEditor(QWidget):
+    """
+    This is property dock window controller.
+    It will popup window accordingly by different node type
+    """
+
     def __init__(self, parent=None):
         super(PropertyEditor, self).__init__(parent)
         self.ui = property.Ui_Form()
@@ -36,6 +42,12 @@ class PropertyEditor(QWidget):
         self.addEditor(self._sweepSurfaceEditor, "Sweep Surface")
 
     def addEditor(self, editor: QWidget, type: str):
+        """
+        This is the property window UI constructor.
+        @param editor: Custom section (Usually create in Qt Designer)
+        @param type: The node type corresponding to popup window.
+        @return: None
+        """
         if type == "Node":
             self.ui.layoutNode.addWidget(editor)
         else:
@@ -44,11 +56,24 @@ class PropertyEditor(QWidget):
         self._editor_dict[type] = editor
 
     def setModel(self, model):
+        """
+        Set model for widget view (Model-View controller design pattern)
+        @param model: model type (subclass of QAbstractModel)
+        @return:
+        """
         self._model = model
         for type, editor in self._editor_dict.items():
             editor.setModel(self._model)
 
     def showEditor(self, typeInfo):
+        """
+        Set editor visible, others invisible.
+        When certain node (for example "PointNode") is selected, point property window will be visible.
+        However other type of window will be hidden)
+
+        @param typeInfo: Node type
+        @return:
+        """
         for type, editor in self._editor_dict.items():
             if type == "Node":
                 continue
@@ -58,8 +83,13 @@ class PropertyEditor(QWidget):
                 editor.setVisible(False)
 
     def setSelection(self, current: QModelIndex, old: QModelIndex):
+        """
+        When mouse click a node in the treeview, this function will receive a current QModelIndex, corresponding window will popup.
+        @param current: current modelIndex
+        @param old: old modelIndex
+        @return:
+        """
         node = current.internalPointer()
-
         if node is not None:
             typeInfo = node.typeInfo()
             self.showEditor(typeInfo)
@@ -68,6 +98,10 @@ class PropertyEditor(QWidget):
 
 
 class NodeEditor(QWidget):
+    """
+    General property window. (Applied to all nodes)
+    """
+
     def __init__(self, parent=None):
         super(NodeEditor, self).__init__(parent)
         self.ui = nodeProperty.Ui_uiNodeEditor()
@@ -75,6 +109,12 @@ class NodeEditor(QWidget):
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
+        """
+        Map the UI slot with the custom tree data structure
+        (Check data/nodel.py or data/model.py for more information)
+        @param model: tree model
+        @return:
+        """
         self._model = model
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiName, 0)
@@ -87,6 +127,10 @@ class NodeEditor(QWidget):
 
 
 class PointEditor(QWidget):
+    """
+    Point property editor.
+    """
+
     def __init__(self, parent=None):
         super(PointEditor, self).__init__(parent)
         self.ui = viewPortProperty.Ui_Form()
@@ -94,6 +138,11 @@ class PointEditor(QWidget):
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
+        """
+        Map UI with the tree model data structure
+        @param model: tree model
+        @return:
+        """
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiViewport, 2)
@@ -112,6 +161,9 @@ class PointEditor(QWidget):
 
 
 class LineEditor(QWidget):
+    """
+    Line property window
+    """
     def __init__(self, parent=None):
         super(LineEditor, self).__init__(parent)
         self.ui = viewPortProperty.Ui_Form()
@@ -119,6 +171,11 @@ class LineEditor(QWidget):
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
+        """
+              Map UI with the tree model data structure
+              @param model: tree model
+              @return:
+              """
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiViewport, 2)
@@ -135,6 +192,9 @@ class LineEditor(QWidget):
 
 
 class BezierCurveEditor(QWidget):
+    """
+    Bezier curve property window
+    """
     def __init__(self, parent=None):
         super(BezierCurveEditor, self).__init__(parent)
         self.ui = viewPortProperty.Ui_Form()
@@ -142,6 +202,11 @@ class BezierCurveEditor(QWidget):
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
+        """
+              Map UI with the tree model data structure
+              @param model: tree model
+              @return:
+        """
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiViewport, 2)
@@ -158,6 +223,9 @@ class BezierCurveEditor(QWidget):
 
 
 class BsplineEditor(QWidget):
+    """
+    Bspline property window
+    """
     def __init__(self, parent=None):
         super(BsplineEditor, self).__init__(parent)
         self.ui = viewPortProperty.Ui_Form()
@@ -165,6 +233,11 @@ class BsplineEditor(QWidget):
         self._dataMapper = QDataWidgetMapper()
 
     def setModel(self, model):
+        """
+              Map UI with the tree model data structure
+              @param model: tree model
+              @return:
+        """
         self._model: SceneGraphModel = model
         self._dataMapper.setModel(model)
         self._dataMapper.addMapping(self.ui.uiViewport, 2)
@@ -180,13 +253,13 @@ class BsplineEditor(QWidget):
         self._dataMapper.setCurrentModelIndex(current)
 
 
-from data.design.geometry import *
-from OCC.Core.gp import gp_Vec
-from OCC.Core.Graphic3d import Graphic3d_ClipPlane, Graphic3d_Vec4d
-from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
+
 
 
 class SurfaceEditor(QWidget):
+    """
+    Base class for surface editor class
+    """
     def __init__(self, parent=None):
         super(SurfaceEditor, self).__init__(parent)
         self.ui = clippingPlaneProperty.Ui_Form()
@@ -198,6 +271,11 @@ class SurfaceEditor(QWidget):
         self.ui.resetPushButton.pressed.connect(self.resetClipping)
 
     def setModel(self, model):
+        """
+              Map UI with the tree model data structure
+              @param model: tree model
+              @return:
+        """
         self._model = model
         self._dataMapper.setModel(model)
 
@@ -229,9 +307,18 @@ class SurfaceEditor(QWidget):
     #     # self._surface.myContext.Display(self.myAIS_Plane, True)
 
     def clippingOn(self, checked):
+        """
+        set clipping plane on/off
+        @param checked: bool
+        @return:
+        """
         self._surface.OnClippingPlane(checked)
 
     def changeClippingPlane(self):
+        """
+        Change clipping plane equation by choosing radio button.
+        @return:
+        """
         dir = gp_Dir(0., 0., 1.)
         checkedButton = self.ui.buttonGroup.checkedButton()
         if checkedButton == self.ui.xRadioButton:
@@ -243,6 +330,10 @@ class SurfaceEditor(QWidget):
         self._surface.UpdateClippingPlane(dir)
 
     def animateClipping(self):
+        """
+        Animate clipping process
+        @return:
+        """
         if self.ui.checkBox.isChecked():
             h = 1.0
             direction = gp_Vec(0., 0., h)
@@ -251,15 +342,21 @@ class SurfaceEditor(QWidget):
                 direction = gp_Vec(h, 0., 0.)
             elif checkedButton == "Y":
                 direction = gp_Vec(0., h, 0.)
-            for i in range(100):
+
+            for i in range(100): # the constant number means animation time.
                 self._surface.TranslateClippingPlane(direction)
 
     def resetClipping(self):
+        """
+        Reset clipping plane to the initial position
+        @return:
+        """
         if self.ui.checkBox.isChecked():
             self.changeClippingPlane()
 
 
 class RuledSurfaceEditor(SurfaceEditor):
+    """Ruled surface editor (Inherited from Surface Editor)"""
     def __init__(self, parent=None):
         super(RuledSurfaceEditor, self).__init__(parent)
 
@@ -271,8 +368,8 @@ class RuledSurfaceEditor(SurfaceEditor):
             self._surface: Surface_LinearExtrusion = node.getSketchObject()
 
 
-
 class BezierSurfaceEditor(SurfaceEditor):
+    """Bezier surface editor (Inherited from Surface Editor)"""
     def __init__(self, parent=None):
         super(BezierSurfaceEditor, self).__init__(parent)
 
@@ -286,6 +383,7 @@ class BezierSurfaceEditor(SurfaceEditor):
 
 
 class RevolutedSurfaceEditor(SurfaceEditor):
+    """Revolved surface editor (Inherited from Surface Editor)"""
     def __init__(self, parent=None):
         super(RevolutedSurfaceEditor, self).__init__(parent)
 
@@ -299,6 +397,7 @@ class RevolutedSurfaceEditor(SurfaceEditor):
 
 
 class SweepSurfaceEditor(SurfaceEditor):
+    """Sweep surface editor (Inherited from Surface Editor)"""
     def __init__(self, parent=None):
         super(SweepSurfaceEditor, self).__init__(parent)
 
@@ -311,13 +410,17 @@ class SweepSurfaceEditor(SurfaceEditor):
             self.changeClippingPlane()
 
 
-from OCC.Core.gp import gp_Pnt, gp_Pln, gp_Dir, gp_Ax3, gp
-from OCC.Core.Geom import *
-from OCC.Core.AIS import *
-
 
 class Sketch_NewSketchEditor(QWidget):
+    """
+    UI window for creation of new sketch plane
+    """
     def __init__(self, parent=None, display=None):
+        """
+
+        @param parent: parent widget
+        @param display: openGL display handle
+        """
         super(Sketch_NewSketchEditor, self).__init__(parent)
         self.ui = newSketchProperty.Ui_newSketchEditor()
         self.ui.setupUi(self)

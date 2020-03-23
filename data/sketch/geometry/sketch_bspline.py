@@ -279,6 +279,7 @@ class Sketch_Bspline(Sketch_Geometry):
 
     def SetColor(self, theColor):
         self.myWireColor = theColor
+        self.myWireAspect.SetColor(Quantity_Color(theColor))
 
     def RemoveLabel(self):
         for point in self.myPoles:

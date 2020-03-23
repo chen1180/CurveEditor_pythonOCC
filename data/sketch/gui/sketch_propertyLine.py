@@ -23,8 +23,7 @@ class Sketch_PropertyLine(Sketch_Property):
         self.TextLabelLength.setText("Length")
         self.LineEditLength = QLineEdit(self.ui.GroupBoxAttributes)
         self.LineEditLength.setEnabled(False)
-
-        self.ui.GroupBoxAttributesLayout.addWidget(self.TextLabelLength, 4, 0)
+        self.ui.GroupBoxAttributesLayout.addWidget(self.TextLabelLength, 4,0)
         self.ui.GroupBoxAttributesLayout.addWidget(self.LineEditLength, 4, 1)
 
     def SetGeometry(self, *__args):
@@ -60,13 +59,8 @@ class Sketch_PropertyLine(Sketch_Property):
                 self.firstPnt2d.SetY(self.tempPnt2d.Y())
                 self.secondPnt2d.SetX(self.temp2Pnt2d.X())
                 self.secondPnt2d.SetY(self.temp2Pnt2d.Y())
-                Geom_Point1 = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), self.firstPnt2d))
-                Geom_Point2 = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), self.secondPnt2d))
-                myAIS_Line = AIS_Line(Geom_Point1, Geom_Point2)
-                # edge = BRepBuilderAPI_MakeEdge(Geom_Point1.Pnt(), Geom_Point2.Pnt())
-                # myAIS_Line = AIS_Shape(edge.Shape())
-                self.myContext.Remove(self.myAIS_Object, True)
-                self.myAIS_Object = myAIS_Line
+                self.mySObject.DragTo(0,self.firstPnt2d)
+                self.mySObject.DragTo(1,self.secondPnt2d)
                 self.SetLineLength()
                 return True
         return False

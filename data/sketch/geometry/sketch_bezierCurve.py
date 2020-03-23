@@ -158,3 +158,4 @@ class Sketch_BezierCurve(Sketch_Geometry):
 
     def SetColor(self, theColor):
         self.myWireColor = theColor
+        self.myWireAspect.SetColor(Quantity_Color(theColor))

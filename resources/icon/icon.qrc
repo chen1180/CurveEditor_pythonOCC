@@ -27,5 +27,6 @@
         <file>move.png</file>
         <file>desktop_icon.png</file>
         <file>splash_screen.png</file>
+        <file>settings.png</file>
     </qresource>
 </RCC>

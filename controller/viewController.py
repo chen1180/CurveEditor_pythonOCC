@@ -1,7 +1,6 @@
-from PyQt5.QtCore import QObject, pyqtSignal, QModelIndex
-from PyQt5.QtGui import QIcon,QPixmap
-from PyQt5.QtWidgets import QAction, QStatusBar
-
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 class ViewController(QObject):
@@ -22,6 +21,7 @@ class ViewController(QObject):
                                       statusTip="Fit all shapes on screen",
                                       triggered=self._display.FitAll)
         self.actions.append(self._action_fitAll)
+
         def setView(a0):
             if a0 == True:
                 self._display.SetPerspectiveProjection()
@@ -30,6 +30,7 @@ class ViewController(QObject):
                 self._display.SetOrthographicProjection()
                 self._action_setView.setText("Ortho")
             self._display.Repaint()
+
         icon = QIcon()
         icon.addPixmap(QPixmap(":/orthorgraphic.png"), QIcon.Normal, QIcon.Off)
         icon.addPixmap(QPixmap(":/perspective.png"), QIcon.Normal, QIcon.On)
@@ -42,6 +43,7 @@ class ViewController(QObject):
                                        statusTip="Change view point",
                                        triggered=self._display.View_Iso)
         self.actions.append(self._action_viewIso)
+
         def switchDisplayMode(state):
             if state:
                 self._display.SetModeWireFrame()
@@ -49,10 +51,68 @@ class ViewController(QObject):
             else:
                 self._display.SetModeShaded()
                 self._action_switchDisplayMode.setText("Shading")
-        icon=QIcon()
-        icon.addPixmap(QPixmap(":/shading.png"),QIcon.Normal,QIcon.Off)
-        icon.addPixmap(QPixmap(":/wireframe.png"),QIcon.Normal,QIcon.On)
+
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/shading.png"), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap(":/wireframe.png"), QIcon.Normal, QIcon.On)
         self._action_switchDisplayMode = QAction(icon, "Shading", self,
                                                  statusTip="Wireframe mode",
                                                  triggered=switchDisplayMode, checkable=True)
         self.actions.append(self._action_switchDisplayMode)
+
+
+class CustomTreeViewController(QTreeView):
+    def __init__(self, parent=None):
+        super(CustomTreeViewController, self).__init__(parent)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.openMenu)
+        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    def openMenu(self, position):
+        indexes = self.selectedIndexes()
+        level = 0
+        if len(indexes) > 0:
+            level = 0
+            index = indexes[0]
+            while index.parent().isValid():
+                index = index.parent()
+                level += 1
+        menu = QMenu()
+        menu.addAction(QAction(QIcon(), "Delete", self,
+                               statusTip="Delete selected node",
+                               triggered=self.deleteTreeItem))
+        if level == 0:
+            menu.addAction(QAction(QIcon(), "Delete all", self,
+                                   statusTip="Delete all objects in the scene",
+                                   triggered=self.deleteAllTreeItem))
+        elif level == 1:
+            menu.addAction(self.tr("Edit object/container"))
+        elif level == 2:
+            menu.addAction(self.tr("Edit object"))
+        menu.exec_(self.viewport().mapToGlobal(position))
+
+
+    def deleteAllTreeItem(self):
+        """
+        Delete all object on the tree
+        @return:
+        """
+        index = self.currentIndex()
+        parent = index.parent()
+        self.model().removeRows(0, self.model().rowCount(QModelIndex()))
+
+    def deleteTreeItem(self):
+        """
+        Delete current selected object on the tree
+        @return:
+        """
+        index = self.currentIndex()
+        parent = index.parent()
+        self.model().removeRows(index.row(), 1, parent)
+    def updateIndex(self,node):
+        if node:
+            row = self._rootNode.childCount()
+            column = node.childCount()
+            index = self._model.index(row - 1, column, QtCore.QModelIndex())
+            self._uiTreeView.setCurrentIndex(index.child(index.column() - 1, 0))
+            self._uiTreeView.updateEditorData()
+            self._uiTreeView.expandAll()

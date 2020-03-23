@@ -72,6 +72,7 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
 
     def setupUI(self):
         self.tree = QTreeWidget()
+        self.tree.setColumnWidth(1,10)
         self.tree.setColumnCount(3)
         self.tree.setHeaderLabels(['Key', 'Value', 'Action'])
         self.ui.GroupBoxGPLayout.addWidget(self.tree, 1, 0, 1, 3)
@@ -115,7 +116,6 @@ class Sketch_PropertyBezierCurve(Sketch_Property):
             self.tree.setItemWidget(weights_children, 1, widget)
 
         self.tree.addTopLevelItem(self.poles)
-
     def degreeElevation(self):
         self.mySObject.IncreaseDegree(self.geometry_dict["degree"] + 1)
         self.SetGeometry()

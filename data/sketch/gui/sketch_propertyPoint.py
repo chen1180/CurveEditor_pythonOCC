@@ -29,10 +29,6 @@ class Sketch_PropertyPoint(Sketch_Property):
         if not self.firstPnt2d.IsEqual(self.tempPnt2d, 1.0e-6):
             self.firstPnt2d = self.tempPnt2d
             self.curGeom2d_Point.SetPnt2d(self.firstPnt2d)
-            newGeom_Point = Geom_CartesianPoint(elclib.To3d(self.myCoordinateSystem.Ax2(), self.firstPnt2d))
-            vertex = BRepBuilderAPI_MakeVertex(newGeom_Point.Pnt())
-            newAIS_Point = AIS_Shape(vertex.Shape())
-            self.myContext.Remove(self.myAIS_Object, True)
-            self.myAIS_Object = newAIS_Point
+            self.mySObject.DragTo(self.tempPnt2d)
             return True
         return False

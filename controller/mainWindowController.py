@@ -1,4 +1,4 @@
-from view import mainWindow, customToolButton
+from view import mainWindow
 from controller import editorController, openglWindowController, sketchController, partController, viewController
 import resources.icon.icon
 from data.model import *
@@ -30,11 +30,8 @@ class Window(QtWidgets.QMainWindow):
         self.setCentralWidget(self._glWindow)
 
         # setup sceneGraph editor
-        self._uiTreeView = QtWidgets.QTreeView()
+        self._uiTreeView = viewController.CustomTreeViewController()
         self._uiTreeView.setModel(self._model)
-        self._uiTreeView.setSortingEnabled(True)
-        self._uiTreeView.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self._uiTreeView.customContextMenuRequested.connect(self.openMenu)
 
         # view manager
         self.viewController = viewController.ViewController(self._glWindow._display, self)
@@ -95,9 +92,13 @@ class Window(QtWidgets.QMainWindow):
         # sceneGraph and property synchronization
         self._uiTreeView.selectionModel().currentChanged.connect(self._propEditor.setSelection)
         self._uiTreeView.selectionModel().currentChanged.connect(self.sketchController.highlightCurrentNode)
-
+        self._uiTreeView.model().rowsRemoved.connect(self.checkCurrentPlane)
         self.sketchController.sketchPlaneUpdated.connect(self.selectPlane)
-        self.sketchController.sketchObjectUpdated.connect(self.selectSketchObjects)
+
+    def checkCurrentPlane(self, parent: QtCore.QModelIndex, first, last):
+        print(self._model.getNode(parent), self.sketchController.currentSketchNode, first, last)
+        if self._model.getNode(parent).childCount() == 0 and self._model.parent(parent).row()==0:
+            self.sketchController.currentSketchNode = None
 
     def selectPlane(self, item):
         '''
@@ -109,22 +110,16 @@ class Window(QtWidgets.QMainWindow):
 
         '''
         position = self._rootNode.childCount()
-        self._model.insertNode(item, position, 1)
         self._propEditor.setModel(self._model)
         # select latest row
         self._uiTreeView.setCurrentIndex(self._model.index(position, 0, QtCore.QModelIndex()))
-        self.sketchController.currentSketchIndex = self._uiTreeView.currentIndex()
         self._uiTreeView.updateEditorData()
         self._uiTreeView.expandAll()
 
-    def selectSketchObjects(self, item):
-        if item:
-            row = self._rootNode.childCount()
-            column = item.childCount()
-            index = self._model.index(row - 1, column, QtCore.QModelIndex())
-            self._uiTreeView.setCurrentIndex(index.child(index.column() - 1, 0))
-            self._uiTreeView.updateEditorData()
-            self._uiTreeView.expandAll()
+    def selectSketchObjects(self, position, parent):
+        self._uiTreeView.setCurrentIndex(self._model.index(position - 1, 0, parent))
+        self._uiTreeView.updateEditorData()
+        self._uiTreeView.expandAll()
 
     def createToolBars(self):
         # Curve tool bar
@@ -206,46 +201,3 @@ class Window(QtWidgets.QMainWindow):
         #                                  statusTip="Export current view as picture",
         #                                  triggered=export_to_PNG))
         pass
-
-    def deleteTreeItem(self, index):
-        indexes = self._uiTreeView.selectedIndexes()
-        self.sketchController.DeleteSelectedObject()
-
-    def deleteAllTreeItem(self):
-        if self._model.hasChildren():
-            root: Node = self._model._rootNode
-            index = 0
-            while index < root.childCount():
-                planeNode = root.child(index)
-                if isinstance(planeNode, SketchNode):
-                    self.sketchController.HideSketchNodeChildren(planeNode)
-                else:
-                    planeNode.getSketchObject().RemoveDisplay()
-                index += 1
-            self._model.removeRows(0, self._model.rowCount(QtCore.QModelIndex()))
-        #clear current node
-        self.sketchController.currentSketchNode=None
-        self._glWindow._display.Viewer.DeactivateGrid()
-        print(self._rootNode)
-    def openMenu(self, position):
-        indexes = self._uiTreeView.selectedIndexes()
-        level = 0
-        if len(indexes) > 0:
-            level = 0
-            index = indexes[0]
-            while index.parent().isValid():
-                index = index.parent()
-                level += 1
-        menu = QtWidgets.QMenu()
-        menu.addAction(QtWidgets.QAction(QtGui.QIcon(), "Delete this", self,
-                                         statusTip="Delete selected node",
-                                         triggered=self.deleteTreeItem))
-        if level == 0:
-            menu.addAction(QtWidgets.QAction(QtGui.QIcon(), "Empty Scene", self,
-                                             statusTip="Delete all objects in the scene",
-                                             triggered=self.deleteAllTreeItem))
-        elif level == 1:
-            menu.addAction(self.tr("Edit object/container"))
-        elif level == 2:
-            menu.addAction(self.tr("Edit object"))
-        menu.exec_(self._uiTreeView.viewport().mapToGlobal(position))

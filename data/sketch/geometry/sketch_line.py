@@ -1,3 +1,5 @@
+from OCC.Core.Quantity import Quantity_Color
+
 from .sketch_geometry import *
 from .sketch_point import Sketch_Point
 from .geom2d_edge import Geom2d_Edge
@@ -121,4 +123,4 @@ class Sketch_Line(Sketch_Geometry):
 
     def SetColor(self, theColor):
         self.myLineColor = theColor
-        self.myLineAspect.SetColor(theColor)
+        self.myLineAspect.SetColor(Quantity_Color(theColor))

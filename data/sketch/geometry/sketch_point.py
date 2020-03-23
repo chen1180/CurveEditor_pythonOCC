@@ -85,7 +85,7 @@ class Sketch_Point(Sketch_Geometry):
 
     def SetColor(self, theColor):
         self.myPointColor = theColor
-        self.myPointAspect.SetColor(theColor)
+        self.myPointAspect.SetColor(Quantity_Color(theColor))
 
     def GetWidth(self):
         return self.myPointWidth

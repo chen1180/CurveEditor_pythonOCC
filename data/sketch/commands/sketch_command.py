@@ -7,7 +7,7 @@ from OCC.Core.Quantity import *
 from OCC.Core.Geom2d import *
 from OCC.Core.TCollection import *
 from OCC.Core.GeomConvert import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QModelIndex
 from OCC.Core.Geom2dAPI import *
 from OCC.Core.GeomAPI import *
 
