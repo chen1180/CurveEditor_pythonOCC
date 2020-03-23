@@ -29,8 +29,9 @@ class SketchController(QObject):
         node: SketchObjectNode = current.internalPointer()
         if isinstance(node, SketchNode):
             self.selectSketchNode(node)
+            self._display.Context.SetSelected(node.getSketchPlane().GetAIS_Object(),True)
         elif isinstance(node, SketchObjectNode):
-            self._display.Context.SetSelected(node.sketchObject.myAIS_InteractiveObject, True)
+            self._display.Context.SetSelected(node.getSketchObject().GetAIS_Object(), True)
         self._display.Context.FitSelected(self._display.View)
 
 
@@ -159,10 +160,10 @@ class SketchController(QObject):
         assert isinstance(self._display.View, V3d_View)
         self._display.Viewer.SetPrivilegedPlane(node.getSketchPlane().GetCoordinate())
         # self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
-        self.currentSketchNode.getSketchPlane().DisplayGrid()
-
+        node.getSketchPlane().DisplayGrid()
         self.sketch.SetRootNode(node)
         self.sketch.SetCoordinateSystem(node.getSketchPlane().GetCoordinate())
+
 
     def sketchPoint(self):
         self.sketch.ObjectAction(Sketch_ObjectTypeOfMethod.Point_Method)

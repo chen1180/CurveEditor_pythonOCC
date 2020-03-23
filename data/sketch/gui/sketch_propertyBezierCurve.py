@@ -203,7 +203,7 @@ class AnimationThread(QThread):
         bezier_point = Sketch_Point(self.myContext, self.myCoordinateSystem)
         bezier_point.Compute(poles[0])
         bezier_point.SetStyle(Aspect_TOM_O_PLUS)
-        bezier_point.SetColor(Quantity_Color(Quantity_NOC_RED1))
+        bezier_point.SetColor(Quantity_NOC_RED1)
         self.animatedGeometry.append(bezier_point)
         line_list = []
         for _ in points_list:
@@ -214,7 +214,7 @@ class AnimationThread(QThread):
                     line.AddPoints(_[idx])
                     line.AddPoints(_[idx + 1])
                     line.Compute()
-                    line.SetColor(Quantity_Color(1, i / degree, 1, 0))
+                    line.SetColor((1, i / degree, 1, 0))
                     lines.append(line)
                     self.animatedGeometry.append(line)
                 line_list.append(lines)

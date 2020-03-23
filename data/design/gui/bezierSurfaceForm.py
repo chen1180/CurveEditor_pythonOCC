@@ -24,7 +24,7 @@ class BezierSurfaceForm(QWidget):
         self.ui.uiOk.clicked.connect(self.ApplyChange)
         self.parent = parent
         self.myCurves = []
-        self.myGeomSurface=None
+        self.myGeomSurface = None
 
     def SetContext(self, theContext):
         self.myContext: AIS_InteractiveContext = theContext
@@ -50,9 +50,9 @@ class BezierSurfaceForm(QWidget):
 
     def CheckType(self):
         if self.myCurves:
-            if len(self.myCurves)<2:
+            if len(self.myCurves) < 2:
                 raise ValueError("At least 2 curves required !")
-            if len(self.myCurves)>4:
+            if len(self.myCurves) > 4:
                 raise ValueError("At most 4 curves needed!\nPlease delete extra geometry!")
             for curve in self.myCurves:
                 if curve.GetTypeOfMethod() is not Sketch_ObjectTypeOfMethod.BezierCurve_Method:
@@ -76,8 +76,9 @@ class BezierSurfaceForm(QWidget):
             bezierSurfaceNode.setSketchObject(self.myGeomSurface)
             self.myModel.layoutChanged.emit()
         self.Finish()
+
     def Finish(self):
-        self.myGeomSurface=None
+        self.myGeomSurface = None
         self.parent.Hide()
 
 

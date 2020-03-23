@@ -67,6 +67,7 @@ class CustomTreeViewController(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.openMenu)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
     def openMenu(self, position):
         indexes = self.selectedIndexes()
         level = 0
@@ -85,11 +86,12 @@ class CustomTreeViewController(QTreeView):
                                    statusTip="Delete all objects in the scene",
                                    triggered=self.deleteAllTreeItem))
         elif level == 1:
-            menu.addAction(self.tr("Edit object/container"))
+            # menu.addAction(self.tr("Edit object/container"))
+            pass
         elif level == 2:
-            menu.addAction(self.tr("Edit object"))
+            # menu.addAction(self.tr("Edit object"))
+            pass
         menu.exec_(self.viewport().mapToGlobal(position))
-
 
     def deleteAllTreeItem(self):
         """
@@ -108,11 +110,12 @@ class CustomTreeViewController(QTreeView):
         index = self.currentIndex()
         parent = index.parent()
         self.model().removeRows(index.row(), 1, parent)
-    def updateIndex(self,node):
+
+    def updateIndex(self, node):
         if node:
             row = self._rootNode.childCount()
             column = node.childCount()
-            index = self._model.index(row - 1, column, QtCore.QModelIndex())
+            index = self._model.index(row - 1, column, QModelIndex())
             self._uiTreeView.setCurrentIndex(index.child(index.column() - 1, 0))
             self._uiTreeView.updateEditorData()
             self._uiTreeView.expandAll()

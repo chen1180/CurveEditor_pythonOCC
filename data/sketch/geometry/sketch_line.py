@@ -124,5 +124,9 @@ class Sketch_Line(Sketch_Geometry):
         return self.myLineColor
 
     def SetColor(self, theColor):
+        if type(theColor)==tuple:
+            self.myLineAspect.SetColor(Quantity_Color(theColor[0],theColor[1],theColor[2],theColor[3]))
+        else:
+            self.myLineAspect.SetColor(Quantity_Color(theColor))
         self.myLineColor = theColor
-        self.myLineAspect.SetColor(Quantity_Color(theColor))
+
