@@ -1,5 +1,5 @@
 from view import mainWindow
-from controller import editorController, openglWindowController, sketchController, partController, viewController
+from controller import editorController, openglWindowController, sketchController, partController, viewController,menuController
 import resources.icon.icon
 from data.model import *
 
@@ -34,9 +34,9 @@ class Window(QtWidgets.QMainWindow):
         self._uiTreeView.setModel(self._model)
 
         # view manager
-        self.viewController = viewController.ViewController(self._glWindow._display, self)
+        self.viewController = viewController.ViewController( self)
         # sketch manager
-        self.sketchController = sketchController.SketchController(self._glWindow._display, self)
+        self.sketchController = sketchController.SketchController(self)
         self.sketchController.setModel(self._model)
         self.sketchController.setRootNode(self._rootNode)
         self._glWindow.register_mousePress_callback(self.sketchController.OnMouseInputEvent)
@@ -46,15 +46,16 @@ class Window(QtWidgets.QMainWindow):
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.sketchController.OnCancel)
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.sketchController.DeleteSelectedObject)
         # part manager
-        self.partController = partController.PartController(self._glWindow._display, self)
+        self.partController = partController.PartController(self)
         self.partController.setModel(self._model)
         self.partController.setRootNode(self._rootNode)
         self._glWindow.register_mousePress_callback(self.partController.OnMouseInputEvent)
         self._glWindow.register_mouseMove_callback(self.partController.OnMouseMoveEvent)
         self._glWindow.register_keymap(QtCore.Qt.Key_Escape, self.partController.OnCancel)
         self._glWindow.register_keymap(QtCore.Qt.Key_Delete, self.partController.DeleteSelectedObject)
+        #menu manager
+        self.menuBarController=menuController.MenuBarController(self)
         # setup tool bar
-        self.createMenuBars()
         self.createToolBars()
 
         # create sceneGraph dock widget
@@ -192,13 +193,4 @@ class Window(QtWidgets.QMainWindow):
         button.setAutoRaise(True)
         parent.addWidget(button)
 
-    def createMenuBars(self):
-        # menu = self._ui.menuBar.addMenu("&File")
-        #
-        # def export_to_PNG():
-        #     self._glWindow.view.Dump('./capture_png.png')
-        #
-        # menu.addAction(QtWidgets.QAction(QtGui.QIcon(":/newPlane.png"), "ScreenShot", self,
-        #                                  statusTip="Export current view as picture",
-        #                                  triggered=export_to_PNG))
-        pass
+

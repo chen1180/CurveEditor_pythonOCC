@@ -31,6 +31,7 @@ class PropertyEditor(QWidget):
         self._ruledSurfaceEditor = RuledSurfaceEditor(self)
         self._revolutedSurfaceEditor = RevolutedSurfaceEditor(self)
         self._sweepSurfaceEditor = SweepSurfaceEditor(self)
+        self._importSurfaceEditor = ImportedSurfaceEditor(self)
         self.addEditor(self._nodeEditor, "Node")
         self.addEditor(self._pointEditor, "Point")
         self.addEditor(self._lineEditor, "Line")
@@ -40,7 +41,7 @@ class PropertyEditor(QWidget):
         self.addEditor(self._revolutedSurfaceEditor, "Surface of Revolution")
         self.addEditor(self._ruledSurfaceEditor, "Ruled Surface")
         self.addEditor(self._sweepSurfaceEditor, "Sweep Surface")
-
+        self.addEditor(self._importSurfaceEditor, "Imported Surface")
     def addEditor(self, editor: QWidget, type: str):
         """
         This is the property window UI constructor.
@@ -409,7 +410,18 @@ class SweepSurfaceEditor(SurfaceEditor):
             self._surface = node.getSketchObject()
             self.changeClippingPlane()
 
+class ImportedSurfaceEditor(SurfaceEditor):
+    """Import surface editor (Inherited from Surface Editor)"""
+    def __init__(self, parent=None):
+        super(ImportedSurfaceEditor, self).__init__(parent)
 
+    def setSelection(self, current):
+        super(ImportedSurfaceEditor, self).setSelection(current)
+        # node information can be obtained
+        node = self._model.getNode(current)
+        if type(node) == ImportedSurfaceNode:
+            self._surface = node.getSketchObject()
+            self.changeClippingPlane()
 
 class Sketch_NewSketchEditor(QWidget):
     """

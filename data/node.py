@@ -48,15 +48,15 @@ class Node(object):
         if position < 0 or position > len(self._children):
             return False
         child = self._children.pop(position)
-        if isinstance(child,SketchNode):
+        if isinstance(child, SketchNode):
             child.getSketchPlane().RemoveDisplay()
             index = 0
             while index < child.childCount():
                 myCurObject = child.child(index).getSketchObject()
                 myCurObject.RemoveDisplay()
-                index+=1
-        elif isinstance(child,SketchObjectNode):
-            myCurObject=child.getSketchObject()
+                index += 1
+        elif isinstance(child, SketchObjectNode):
+            myCurObject = child.getSketchObject()
             myCurObject.RemoveDisplay()
         child._parent = None
         del child
@@ -137,6 +137,7 @@ class SketchObjectNode(Node):
 
     def typeInfo(self):
         return "SketchObject"
+
 
 class PointNode(SketchObjectNode):
     def __init__(self, name, parent=None):
@@ -347,6 +348,25 @@ class BezierSurfaceNode(SketchObjectNode):
         return ":/bezier_surface.png"
 
 
+class BsplineSurfaceNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(BsplineSurfaceNode, self).__init__(name, parent)
+
+    def data(self, column):
+        r = super(BsplineSurfaceNode, self).data(column)
+
+        return r
+
+    def setData(self, column, value):
+        super(BsplineSurfaceNode, self).setData(column, value)
+
+    def typeInfo(self):
+        return "Bspline Surface"
+
+    def resource(self):
+        return ":/bspline_surface.png"
+
+
 class RevolvedSurfaceNode(SketchObjectNode):
     def __init__(self, name, parent=None):
         super(RevolvedSurfaceNode, self).__init__(name, parent)
@@ -405,3 +425,19 @@ class SweepSurfaceNode(SketchObjectNode):
 
     def resource(self):
         return ":/sweep.png"
+
+
+class ImportedSurfaceNode(SketchObjectNode):
+    def __init__(self, name, parent=None):
+        super(ImportedSurfaceNode, self).__init__(name, parent)
+
+    def data(self, column):
+        r = super(ImportedSurfaceNode, self).data(column)
+
+        return r
+
+    def setData(self, column, value):
+        super(ImportedSurfaceNode, self).setData(column, value)
+
+    def typeInfo(self):
+        return "Imported Surface"

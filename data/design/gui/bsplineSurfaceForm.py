@@ -1,0 +1,90 @@
+from view import createBezierSurfaceForm
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from OCC.Core.AIS import *
+from data.model import SceneGraphModel
+from data.sketch.geometry import *
+from data.sketch.sketch_type import *
+from data.node import *
+
+
+class BsplineSurfaceForm(QWidget):
+    def __init__(self, parent=None):
+        super(BsplineSurfaceForm, self).__init__()
+        self.ui = createBezierSurfaceForm.Ui_Form()
+        self.ui.setupUi(self)
+        self.ui.comboBox.setItemData(0, "the style with the flattest patches", Qt.ToolTipRole)
+        self.ui.comboBox.setItemData(1, "a rounded style of patch with less depth than those of Curved", Qt.ToolTipRole)
+        self.ui.comboBox.setItemData(2, " the style with the most rounded patches", Qt.ToolTipRole)
+        self.ui.listWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.ui.uiAddCurve.clicked.connect(self.AddCurve)
+        self.ui.uiDeleteCurve.clicked.connect(self.DeleteCurve)
+        self.ui.uiPreview.clicked.connect(self.PreviewSurface)
+        self.ui.uiOk.clicked.connect(self.ApplyChange)
+        self.parent = parent
+        self.myCurves = []
+        self.myGeomSurface = None
+
+    def SetContext(self, theContext):
+        self.myContext: AIS_InteractiveContext = theContext
+
+    def SetModel(self, theModel):
+        self.myModel: SceneGraphModel = theModel
+
+    def AddCurve(self):
+        root = self.myModel.getNode(QModelIndex())
+        for i, planeNode in enumerate(root.children()):
+            for child in planeNode.children():
+                myCurObject: Sketch_Geometry = child.getSketchObject()
+                if self.myContext.IsSelected(myCurObject.GetAIS_Object()):
+                    self.ui.listWidget.addItem(myCurObject.GetName())
+                    self.myCurves.append(myCurObject)
+
+    def DeleteCurve(self):
+        items = self.ui.listWidget.selectedItems()
+        for i, item in enumerate(items):
+            row = self.ui.listWidget.row(item)
+            self.ui.listWidget.takeItem(row)
+            self.myCurves.pop(row)
+
+    def CheckType(self):
+        if self.myCurves:
+            if len(self.myCurves) < 2:
+                raise ValueError("At least 2 curves required !")
+            if len(self.myCurves) > 4:
+                raise ValueError("At most 4 curves needed!\nPlease delete extra geometry!")
+            for curve in self.myCurves:
+                if curve.GetTypeOfMethod() is not Sketch_ObjectTypeOfMethod.BSpline_Method:
+                    raise TypeError("Selections must be Bspline. Pls remove the other types of geometry")
+            return True
+
+    def PreviewSurface(self):
+        if self.myGeomSurface:
+            self.myGeomSurface.RemoveDisplay()
+            del self.myGeomSurface
+        if self.CheckType():
+            self.myGeomSurface = Surface_Bspline(self.myContext)
+            self.myGeomSurface.SetCurves([curve.GetGeometry() for curve in self.myCurves])
+            self.myGeomSurface.SetStyle(self.ui.comboBox.currentIndex())
+            self.myGeomSurface.Compute()
+
+    def ApplyChange(self):
+        if self.myGeomSurface:
+            root = self.myModel.getNode(QModelIndex())
+            bsplineSurfaceNode = BsplineSurfaceNode(self.myGeomSurface.GetName(), root)
+            bsplineSurfaceNode.setSketchObject(self.myGeomSurface)
+            self.myModel.layoutChanged.emit()
+        self.Finish()
+
+    def Finish(self):
+        self.myGeomSurface = None
+        self.parent.Hide()
+
+
+# -----------------------------Debugging-----------------------------------#
+if __name__ == '__main__':
+    application = QApplication([])
+    window = BsplineSurfaceForm()  # Opengl window creation
+    window.show()
+    application.exec_()

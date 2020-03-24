@@ -11,9 +11,9 @@ from data.design.gui import part_qtgui
 class PartController(QObject):
     modelUpdated = pyqtSignal(object)
 
-    def __init__(self, display, parent=None):
+    def __init__(self, parent=None):
         super(PartController, self).__init__(parent)
-        self._display = display
+        self._display = parent._glWindow._display
         self._statusBar: QStatusBar = parent.statusBar()
         self.partGUI = part_qtgui.Part_QTGUI(parent)
         self.part = Part(self._display, self._statusBar, self.partGUI)
@@ -33,9 +33,14 @@ class PartController(QObject):
     def createActions(self):
         self.action_addBezierSurface = QAction(QIcon(":/bezier_surface.png"), "Bezier Surface",
                                                self,
-                                               statusTip="Create from two Bezier curve",
+                                               statusTip="Create surface from Bezier curve",
                                                triggered=self.partBezierSurface)
         self.actions.append(self.action_addBezierSurface)
+        self.action_addBsplineSurface = QAction(QIcon(":/bspline_surface.png"), "Bspline Surface",
+                                               self,
+                                               statusTip="Create from Bspline curve",
+                                               triggered=self.partBsplineSurface)
+        self.actions.append(self.action_addBsplineSurface)
         self.action_revolutedSurface = QAction(QIcon(":/revolve.png"), "Revolve", self,
                                                statusTip="Create surface of revolution based on a selected shape",
                                                triggered=self.partRevolveSurface)
@@ -59,6 +64,9 @@ class PartController(QObject):
 
     def partBezierSurface(self):
         self.part.ObjectAction(Part_ObjectTypeOfMethod.BezierSurface_Method)
+
+    def partBsplineSurface(self):
+        self.part.ObjectAction(Part_ObjectTypeOfMethod.BSplineSurface_Method)
 
     def partRevolveSurface(self):
         self.part.ObjectAction(Part_ObjectTypeOfMethod.RevolvedSurface_Method)
@@ -86,9 +94,7 @@ class PartController(QObject):
         index = 0
         while index < root.childCount():
             child = root.child(index)
-            if isinstance(child, BezierSurfaceNode) or isinstance(child, SweepSurfaceNode) or isinstance(child,
-                                                                                                         ExtrudedSurfaceNode) or isinstance(
-                    child, RevolvedSurfaceNode):
+            if not isinstance(child, SketchNode):
                 myCurObject: Sketch_Geometry = child.getSketchObject()
                 if self._display.Context.IsSelected(myCurObject.GetAIS_Object()):
                     myCurObject.RemoveDisplay()

@@ -13,9 +13,9 @@ from data.sketch.sketch_type import *
 class SketchController(QObject):
     sketchPlaneUpdated = pyqtSignal(object)
 
-    def __init__(self, display, parent=None):
+    def __init__(self, parent=None):
         super(SketchController, self).__init__(parent)
-        self._display = display
+        self._display = parent._glWindow._display
         self.actions = []
         self.statusBar: QStatusBar = parent.statusBar()
 

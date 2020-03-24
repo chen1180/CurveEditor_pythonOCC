@@ -5,18 +5,18 @@ from PyQt5.QtWidgets import *
 
 class ViewController(QObject):
 
-    def __init__(self, display, parent=None):
+    def __init__(self, parent=None):
         super(ViewController, self).__init__(parent)
-        self._display = display
+        self._display = parent._glWindow._display
         self.actions = []
         self.createActions()
 
     def createActions(self):
 
-        self._action_transform = QAction(QIcon(":/move.png"), "Transform", self,
-                                         statusTip="Transform a object",
-                                         triggered=self._display.View.SetFront)
-        self.actions.append(self._action_transform)
+        # self._action_transform = QAction(QIcon(":/move.png"), "Transform", self,
+        #                                  statusTip="Transform a object",
+        #                                  triggered=self._display.View.SetFront)
+        # self.actions.append(self._action_transform)
         self._action_fitAll = QAction(QIcon(":/fitContent.png"), "Fit all", self,
                                       statusTip="Fit all shapes on screen",
                                       triggered=self._display.FitAll)

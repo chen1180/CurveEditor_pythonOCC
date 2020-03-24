@@ -9,6 +9,7 @@
         <file>ruled_surface.png</file>
         <file>arc.png</file>
         <file>spline.png</file>
+        <file>bspline_surface.png</file>
         <file>nurbs.png</file>
         <file>inputLine.png</file>
         <file>point.png</file>

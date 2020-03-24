@@ -23,6 +23,7 @@ class Surface_Geometry:
         self.myName = name
         self.myGeometryType = None
         self.myTypeOfMethod = None
+        self.myAIS_ClippingPlane=None
 
     def SetContext(self, theContext):
         self.myContext: AIS_InteractiveContext = theContext

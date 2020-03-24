@@ -157,10 +157,7 @@ class Sketch_CommandBSpline(Sketch_Command):
         if self.myBSplineCurveAction == BSplineCurveAction.Nothing:
             pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_1Point:
-            self.rootNode.removeChild(self.rootNode.childCount() - 1)
-            # self.myContext.Remove(self.myRubberLine, True)
-            self.bspline.RemoveLabel()
-            del self.bspline
+            pass
         elif self.myBSplineCurveAction == BSplineCurveAction.Input_2Point:
             self.rootNode.removeChild(self.rootNode.childCount() - 1)
             # self.myContext.Remove(self.myRubberLine, True)

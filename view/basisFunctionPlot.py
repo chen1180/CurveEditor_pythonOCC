@@ -367,18 +367,18 @@ class BsplineBasisFunctionWindow(QDialog):
         self.resetButton = QPushButton('Reset')
         self.resetButton.clicked.connect(self.resetPlot)
 
-        degreeLabel = QLabel("Degree")
-        self.degreeLineEdit = QLineEdit()
-        degreeLabel.setBuddy(self.degreeLineEdit)
+        # degreeLabel = QLabel("Degree")
+        # self.degreeLineEdit = QLineEdit()
+        # degreeLabel.setBuddy(self.degreeLineEdit)
 
         # set the layout
         layout = QGridLayout()
-        layout.addWidget(degreeLabel, 0, 0, 1, 2)
-        layout.addWidget(self.degreeLineEdit, 0, 1, 1, 2)
-        layout.addWidget(self.toolbar, 1, 0, 1, 4)
-        layout.addWidget(self.canvas, 2, 0, 1, 4)
-        layout.addWidget(self.plotButton, 3, 0, 1, 4)
-        layout.addWidget(self.resetButton, 4, 0, 1, 4)
+        # layout.addWidget(degreeLabel, 0, 0, 1, 2)
+        # layout.addWidget(self.degreeLineEdit, 0, 1, 1, 2)
+        layout.addWidget(self.toolbar, 0, 0, 1, 4)
+        layout.addWidget(self.canvas, 1, 0, 1, 4)
+        layout.addWidget(self.plotButton, 2, 0, 1, 4)
+        layout.addWidget(self.resetButton, 3, 0, 1, 4)
 
         self.setLayout(layout)
         self._ind = None
