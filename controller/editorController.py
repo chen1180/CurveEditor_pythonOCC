@@ -28,6 +28,7 @@ class PropertyEditor(QWidget):
         self._bezierCurveEditor = BezierCurveEditor(self)
         self._bsplineEditor = BsplineEditor(self)
         self._bezierSurfaceEditor = BezierSurfaceEditor(self)
+        self._bsplineSurfaceEditor = BsplineSurfaceEditor(self)
         self._ruledSurfaceEditor = RuledSurfaceEditor(self)
         self._revolutedSurfaceEditor = RevolutedSurfaceEditor(self)
         self._sweepSurfaceEditor = SweepSurfaceEditor(self)
@@ -38,6 +39,7 @@ class PropertyEditor(QWidget):
         self.addEditor(self._bezierCurveEditor, "Bezier Curve")
         self.addEditor(self._bsplineEditor, "Bspline")
         self.addEditor(self._bezierSurfaceEditor, "Bezier Surface")
+        self.addEditor(self._bsplineSurfaceEditor, "Bspline Surface")
         self.addEditor(self._revolutedSurfaceEditor, "Surface of Revolution")
         self.addEditor(self._ruledSurfaceEditor, "Ruled Surface")
         self.addEditor(self._sweepSurfaceEditor, "Sweep Surface")
@@ -381,7 +383,18 @@ class BezierSurfaceEditor(SurfaceEditor):
         if type(node) == BezierSurfaceNode:
             self._surface = node.getSketchObject()
             self.changeClippingPlane()
+class BsplineSurfaceEditor(SurfaceEditor):
+    """Bspline surface editor (Inherited from Surface Editor)"""
+    def __init__(self, parent=None):
+        super(BsplineSurfaceEditor, self).__init__(parent)
 
+    def setSelection(self, current):
+        super(BsplineSurfaceEditor, self).setSelection(current)
+        # node information can be obtained
+        node = self._model.getNode(current)
+        if type(node) == BsplineSurfaceNode:
+            self._surface = node.getSketchObject()
+            self.changeClippingPlane()
 
 class RevolutedSurfaceEditor(SurfaceEditor):
     """Revolved surface editor (Inherited from Surface Editor)"""

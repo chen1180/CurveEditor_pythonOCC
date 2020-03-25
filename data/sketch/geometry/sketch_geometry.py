@@ -16,7 +16,7 @@ class Sketch_Geometry:
     def __init__(self, name, theContext, theAxis):
         self.myGeometry = None
         self.myGeometry2d = None
-        self.myAIS_InteractiveObject: AIS_InteractiveObject = None
+        self.myAIS_InteractiveObject: AIS_Shape = None
         self.myAIS_Name: AIS_TextLabel = None
         self.myAIS_Coordinate: AIS_TextLabel = None
         self.curCoordinateSystem: gp_Ax3 = theAxis
