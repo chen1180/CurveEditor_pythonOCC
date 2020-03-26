@@ -12,7 +12,7 @@ class Sketch_Line(Sketch_Geometry):
         super(Sketch_Line, self).__init__("Line", theContext, theAxis)
         self.myGeometry: Geom_Line = None
         self.myGeometry2d: Geom2d_Edge = None
-        self.myAIS_InteractiveObject: AIS_Line = None
+        self.myAIS_InteractiveObject: AIS_Shape = None
         Sketch_Line.IndexCounter += 1
         self.myName = "Line" + str(self.IndexCounter)
         self.myPoles = []
@@ -35,8 +35,9 @@ class Sketch_Line(Sketch_Geometry):
         endPnt = self.myPoles[1].GetGeometry().Pnt()
         dir = gp_Dir(gp_Vec(startPnt, endPnt))
         self.myGeometry = Geom_Line(startPnt, dir)
-
-        self.myAIS_InteractiveObject = AIS_Line(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
+        edge = BRepBuilderAPI_MakeEdge(startPnt, endPnt)
+        self.myAIS_InteractiveObject=AIS_Shape(edge.Shape())
+        # self.myAIS_InteractiveObject = AIS_Line(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
         self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
 
@@ -50,7 +51,9 @@ class Sketch_Line(Sketch_Geometry):
         dir = gp_Dir(gp_Vec(startPnt, endPnt))
         self.myGeometry.SetLocation(startPnt)
         self.myGeometry.SetDirection(dir)
-        self.myAIS_InteractiveObject.SetPoints(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
+        edge = BRepBuilderAPI_MakeEdge(startPnt, endPnt)
+        self.myAIS_InteractiveObject.SetShape(edge.Shape())
+        # self.myAIS_InteractiveObject.SetPoints(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def DragTo(self, index, newPnt2d):
@@ -64,7 +67,9 @@ class Sketch_Line(Sketch_Geometry):
         dir = gp_Dir(gp_Vec(startPnt, endPnt))
         self.myGeometry.SetLocation(startPnt)
         self.myGeometry.SetDirection(dir)
-        self.myAIS_InteractiveObject.SetPoints(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
+        # self.myAIS_InteractiveObject.SetPoints(self.myPoles[0].GetGeometry(), self.myPoles[1].GetGeometry())
+        edge = BRepBuilderAPI_MakeEdge(startPnt, endPnt)
+        self.myAIS_InteractiveObject.SetShape(edge.Shape())
         self.myAIS_InteractiveObject.Redisplay(True)
 
     def RemoveDisplay(self):
@@ -110,23 +115,23 @@ class Sketch_Line(Sketch_Geometry):
         return self.myLineStyle
 
     def SetStyle(self, theStyle):
-        self.myLineStyle = theStyle
-        self.myLineAspect.SetTypeOfLine(theStyle)
+        self.myWireStyle = theStyle
+        self.myWireStyle.SetTypeOfLine(theStyle)
 
     def GetWidth(self):
         return self.myLineWidth
 
     def SetWidth(self, theWidth):
-        self.myLineWidth = theWidth
-        self.myLineAspect.SetWidth(theWidth)
+        self.myWireWidth = theWidth
+        self.myWireWidth.SetWidth(theWidth)
 
     def GetColor(self):
-        return self.myLineColor
+        return self.myWireColor
 
     def SetColor(self, theColor):
         if type(theColor)==tuple:
-            self.myLineAspect.SetColor(Quantity_Color(theColor[0],theColor[1],theColor[2],theColor[3]))
+            self.myWireAspect.SetColor(Quantity_Color(theColor[0],theColor[1],theColor[2],theColor[3]))
         else:
-            self.myLineAspect.SetColor(Quantity_Color(theColor))
-        self.myLineColor = theColor
+            self.myWireAspect.SetColor(Quantity_Color(theColor))
+        self.myWireColor = theColor
 

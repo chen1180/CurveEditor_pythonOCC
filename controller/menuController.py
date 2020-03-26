@@ -31,38 +31,37 @@ class MenuBarController(QObject):
         menu.addAction(QAction(QIcon(""), "Import", self,
                                statusTip="Import *step *stl *iges file",
                                triggered=self.importFile))
+        menu.addAction(QAction(QIcon(""), "Quit", self, statusTip="Quit application",
+                               triggered=self.quit))
         menu.addAction(QAction(QIcon(":/newPlane.png"), "ScreenShot", self,
                                statusTip="Export current view as picture",
                                triggered=self.export_to_PNG))
 
     def load(self):
-        file = self.getfiles()
+        dlg = QFileDialog()
+        fileFilter = ["Supported format(*.ce)"]
+        dlg.setNameFilters(fileFilter)
+        dlg.selectNameFilter(fileFilter[0])
+        if dlg.exec_():
+            path = dlg.selectedFiles()[0]
+            infile = open(path, 'rb')
+            objects = pickle.load(infile, encoding='bytes')
+            for object in objects:
+                self._display.DisplayShape(object, update=True)
 
     def saveAs(self):
-        # # set the directory where to output the
-        # stl_output_dir = os.path.abspath(os.path.join("..", "assets", "models"))
-        #
-        # # make sure the path exists otherwise OCE get confused
-        # if not os.path.isdir(stl_output_dir):
-        #     raise AssertionError("wrong path provided")
-        # stl_low_resolution_file = os.path.join(stl_output_dir, "torus_default_resolution.stl")
-        # write_stl_file(my_torus, stl_low_resolution_file)
-        #
-        # # then we change the mesh resolution, and export as binary
-        # stl_high_resolution_file = os.path.join(stl_output_dir, "torus_high_resolution.stl")
-        # # we set the format to binary
-        # write_stl_file(my_torus, stl_low_resolution_file, mode="binary", linear_deflection=0.5, angular_deflection=0.3)
-        # Create shape
-        # iterate node
-        output=[]
-        for child in self.parent._rootNode.children():
-            if isinstance(child, SketchObjectNode):
-                output.append(pickle.dumps(child.getSketchObject().GetAIS_Object().Shape()))
-            elif isinstance(child, SketchNode):
-                for subChild in child.children():
-                    output.append(pickle.dumps(subChild.getSketchObject().GetAIS_Object().Shape()))
-                    print(pickle.dumps(subChild.getSketchObject().GetAIS_Object().Shape()))
-                    print(pickle.dumps(subChild))
+        dlg = QFileDialog()
+        dlg.setAcceptMode(QFileDialog.AcceptSave)
+        path = dlg.getSaveFileName(self.parent,"Save a file","","Supported format(*.ce)")
+        with open(path[0], "wb") as f:
+            object = []
+            for child in self.parent._rootNode.children():
+                if isinstance(child, SketchObjectNode):
+                    object.append(child.getSketchObject().GetAIS_Object().Shape())
+                elif isinstance(child, SketchNode):
+                    for subChild in child.children():
+                        object.append(subChild.getSketchObject().GetAIS_Object().Shape())
+            pickle.dump(object, f)
 
     def importFile(self):
         dlg = QFileDialog()
@@ -108,6 +107,9 @@ class MenuBarController(QObject):
     def import_to_IGES(self, fileName):
         iges_shp = read_iges_file(fileName)
         return iges_shp
+
+    def quit(self):
+        self.parent.close()
 
     def export_to_PNG(self):
         self.glWindow.view.Dump('./capture_png.png')

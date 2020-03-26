@@ -32,7 +32,6 @@ class Window(QtWidgets.QMainWindow):
         # setup sceneGraph editor
         self._uiTreeView = viewController.CustomTreeViewController()
         self._uiTreeView.setModel(self._model)
-
         # view manager
         self.viewController = viewController.ViewController( self)
         # sketch manager
