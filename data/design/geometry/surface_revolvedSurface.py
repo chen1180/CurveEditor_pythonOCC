@@ -40,6 +40,8 @@ class Surface_Revolved(Surface_Geometry):
         self.myContext.Display(self.myAIS_InteractiveObject, True)
         self.SetCenter(shape)
         self.InitClippingPlane()
+
+
     def SetCurves(self, theCurves):
         self.myCurve = theCurves
 

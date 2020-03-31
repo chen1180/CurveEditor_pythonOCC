@@ -51,6 +51,18 @@ class Sketch_Point(Sketch_Geometry):
         self.myAIS_Coordinate.Redisplay(True)
         self.myAIS_Name.Redisplay(True)
 
+    def FromShape(self, theGeom, theShape):
+        pnt2d = projectPointOnPlane(theGeom.Pnt(), self.curCoordinateSystem)
+        self.myGeometry2d = Geom2d_CartesianPoint(pnt2d)
+        self.myGeometry = theGeom
+        self.myAIS_InteractiveObject = AIS_Shape(theShape)
+        self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
+        self.myContext.Display(self.myAIS_InteractiveObject, True)
+        # Text label
+        coordinate = "({},{})".format(round(theGeom.X(), 1), round(theGeom.Y(), 1))
+        self.myAIS_Coordinate = self.CreateLabel(coordinate, Quantity_NOC_GREEN)
+        self.myAIS_Name = self.CreateLabel(self.myName, Quantity_NOC_BLUE1, offset=gp_Vec(-50, -50, -50))
+
     def GetGeometryType(self):
         return Sketch_GeometryType.PointSketchObject
 

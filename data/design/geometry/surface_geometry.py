@@ -23,13 +23,20 @@ class Surface_Geometry:
         self.myName = name
         self.myGeometryType = None
         self.myTypeOfMethod = None
-        self.myAIS_ClippingPlane=None
+        self.myAIS_ClippingPlane = None
 
     def SetContext(self, theContext):
         self.myContext: AIS_InteractiveContext = theContext
 
     def SetAIS_Object(self, theAIS_InteractiveObject):
         self.myAIS_InteractiveObject = theAIS_InteractiveObject
+
+    def FromShape(self,theGeom, theShape):
+        self.myGeometry = theGeom
+        self.myAIS_InteractiveObject = AIS_Shape(theShape)
+        self.myContext.Display(self.myAIS_InteractiveObject, True)
+        self.SetCenter(theShape)
+        self.InitClippingPlane()
 
     def GetAIS_Object(self):
         return self.myAIS_InteractiveObject

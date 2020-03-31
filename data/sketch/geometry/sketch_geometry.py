@@ -136,3 +136,11 @@ class Sketch_Geometry:
 
     def DisplayAuxiliryLine(self):
         pass
+
+    def FromShape(self,theGeom,theShape):
+        """
+        This is the constructor from ToposDs_shape
+        Mainly used for loading the data from file
+        @return:
+        """
+        pass

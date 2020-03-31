@@ -33,17 +33,17 @@ class PropertyEditor(QWidget):
         self._revolutedSurfaceEditor = RevolutedSurfaceEditor(self)
         self._sweepSurfaceEditor = SweepSurfaceEditor(self)
         self._importSurfaceEditor = ImportedSurfaceEditor(self)
-        self.addEditor(self._nodeEditor, "Node")
-        self.addEditor(self._pointEditor, "Point")
-        self.addEditor(self._lineEditor, "Line")
-        self.addEditor(self._bezierCurveEditor, "Bezier Curve")
-        self.addEditor(self._bsplineEditor, "Bspline")
-        self.addEditor(self._bezierSurfaceEditor, "Bezier Surface")
-        self.addEditor(self._bsplineSurfaceEditor, "Bspline Surface")
-        self.addEditor(self._revolutedSurfaceEditor, "Surface of Revolution")
-        self.addEditor(self._ruledSurfaceEditor, "Ruled Surface")
-        self.addEditor(self._sweepSurfaceEditor, "Sweep Surface")
-        self.addEditor(self._importSurfaceEditor, "Imported Surface")
+        self.addEditor(self._nodeEditor, NodeType.Node)
+        self.addEditor(self._pointEditor, NodeType.PointNode)
+        self.addEditor(self._lineEditor, NodeType.LineNode)
+        self.addEditor(self._bezierCurveEditor, NodeType.BezierNode)
+        self.addEditor(self._bsplineEditor, NodeType.BsplineNode)
+        self.addEditor(self._bezierSurfaceEditor, NodeType.BezierSurfaceNode)
+        self.addEditor(self._bsplineSurfaceEditor, NodeType.BsplineSurfaceNode)
+        self.addEditor(self._revolutedSurfaceEditor, NodeType.RevolvedSurfaceNode)
+        self.addEditor(self._ruledSurfaceEditor, NodeType.ExtrudedSurfaceNode)
+        self.addEditor(self._sweepSurfaceEditor, NodeType.SweepSurfaceNode)
+        self.addEditor(self._importSurfaceEditor, NodeType.ImportedSurfaceNode)
     def addEditor(self, editor: QWidget, type: str):
         """
         This is the property window UI constructor.
@@ -51,7 +51,7 @@ class PropertyEditor(QWidget):
         @param type: The node type corresponding to popup window.
         @return: None
         """
-        if type == "Node":
+        if type == NodeType.Node:
             self.ui.layoutNode.addWidget(editor)
         else:
             self.ui.layoutSpec.addWidget(editor)

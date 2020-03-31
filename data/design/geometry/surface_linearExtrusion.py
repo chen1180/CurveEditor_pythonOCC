@@ -38,6 +38,7 @@ class Surface_LinearExtrusion(Surface_Geometry):
         self.myContext.Display(self.myAIS_InteractiveObject, True)
         self.SetCenter(prism)
         self.InitClippingPlane()
+
     def SetCurves(self, theCurves):
         self.myCurve = theCurves
 

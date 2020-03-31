@@ -60,6 +60,7 @@ class Sketch_Line(Sketch_Geometry):
         self.myPoles[index].DragTo(newPnt2d)
         startPnt2d = self.myPoles[0].GetGeometry2d().Pnt2d()
         endPnt2d = self.myPoles[1].GetGeometry2d().Pnt2d()
+
         self.myGeometry2d.SetPoints(startPnt2d, endPnt2d)
 
         startPnt = self.myPoles[0].GetGeometry().Pnt()
@@ -71,6 +72,22 @@ class Sketch_Line(Sketch_Geometry):
         edge = BRepBuilderAPI_MakeEdge(startPnt, endPnt)
         self.myAIS_InteractiveObject.SetShape(edge.Shape())
         self.myAIS_InteractiveObject.Redisplay(True)
+    def FromShape(self,theGeom:tuple,theShape):
+        startPnt,endPnt=theGeom
+        startPnt2d =projectPointOnPlane(startPnt, self.curCoordinateSystem)
+        endPnt2d=projectPointOnPlane( endPnt, self.curCoordinateSystem)
+        self.AddPoints(startPnt2d)
+        self.AddPoints(endPnt2d)
+
+        self.myGeometry2d = Geom2d_Edge()
+        self.myGeometry2d.SetPoints(startPnt2d, endPnt2d)
+
+        dir = gp_Dir(gp_Vec(startPnt, endPnt))
+        self.myGeometry = Geom_Line(startPnt, dir)
+
+        self.myAIS_InteractiveObject = AIS_Shape(theShape)
+        self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
+        self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def RemoveDisplay(self):
         super(Sketch_Line, self).RemoveDisplay()

@@ -28,19 +28,20 @@ class Surface_Bspline(Surface_Geometry):
             self.myGeometry = GeomFill_BSplineCurves(self.myCurves[0], self.myCurves[1], self.myStyle)
         elif len(self.myCurves) == 3:
             self.myGeometry = GeomFill_BSplineCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2],
-                                                    self.myStyle)
+                                                     self.myStyle)
         elif len(self.myCurves) == 4:
             self.myGeometry = GeomFill_BSplineCurves(self.myCurves[0], self.myCurves[1], self.myCurves[2],
-                                                    self.myCurves[3], self.myStyle)
+                                                     self.myCurves[3], self.myStyle)
         self.myGeometry = self.myGeometry.Surface()
         face = BRepBuilderAPI_MakeFace()
         face.Init(self.myGeometry, True, 1.0e-6)
         face.Build()
-        face=face.Shape()
+        face = face.Shape()
         self.myAIS_InteractiveObject = AIS_Shape(face)
         self.myContext.Display(self.myAIS_InteractiveObject, True)
         self.SetCenter(face)
         self.InitClippingPlane()
+
 
     def SetCurves(self, theCurves):
         self.myCurves = theCurves

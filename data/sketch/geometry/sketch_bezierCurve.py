@@ -74,6 +74,24 @@ class Sketch_BezierCurve(Sketch_Geometry):
         for index, pole in enumerate(poles_list):
             self.myGeometry.SetPole(index + 1, pole, self.myWeights[index])
         self.myAIS_InteractiveObject.Redisplay(True)
+    def FromShape(self,theGeom:Geom_BezierCurve,theShape):
+        self.myGeometry =theGeom
+        myPoles=TColgp_Array1OfPnt2d_to_point_list( self.myGeometry.Poles())
+        poles2d_list = [projectPointOnPlane(pole, self.curCoordinateSystem) for pole in myPoles]
+        for pnt2d in poles2d_list:
+            self.AddPoles(pnt2d)
+        if self.myGeometry.IsRational()==True:
+            arrayOfWeights=self.myGeometry.Weights()
+        else:
+            arrayOfWeights =  float_list_to_TColStd_Array1OfReal(self.myWeights)
+        arrayOfPoles2d = point_list_to_TColgp_Array1OfPnt2d(poles2d_list)
+
+        self.myGeometry2d = Geom2d_BezierCurve(arrayOfPoles2d, arrayOfWeights)
+
+
+        self.myAIS_InteractiveObject = AIS_Shape(theShape)
+        self.myAIS_InteractiveObject.SetAttributes(self.myDrawer)
+        self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def IncreaseDegree(self, theDegree):
         if theDegree <= 2 or theDegree < self.myGeometry2d.Degree():

@@ -138,9 +138,8 @@ class Sketch_CommandBezierCurve(Sketch_Command):
         elif self.myBezierCurveAction == BezierCurveAction.Input_1Point:
             pass
         elif self.myBezierCurveAction == BezierCurveAction.Input_2Point:
-            self.rootNode.removeChild(self.rootNode.childCount() - 1)
             # self.myContext.Remove(self.myRubberLine, True)
-            self.bezier_curve.RemoveLabel()
+            self.bezier_curve.RemoveDisplay()
         elif self.myBezierCurveAction == BezierCurveAction.Input_OtherPoints:
             self.myGeom2d_BezierCurve.RemovePole(self.IndexCounter)
             self.myGeom_BezierCurve.RemovePole(self.IndexCounter)

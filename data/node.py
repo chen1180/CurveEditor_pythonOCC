@@ -1,3 +1,18 @@
+class NodeType:
+    Node="Node"
+    SketchNode="Plane"
+    SketchObjectNode="SketchObject"
+    PointNode="Point"
+    LineNode="Line"
+    BezierNode="Bezier Curve"
+    BsplineNode="Bspline"
+
+    BsplineSurfaceNode="Bspline Surface"
+    BezierSurfaceNode="Bezier Surface"
+    RevolvedSurfaceNode="Surface of Revolution"
+    ExtrudedSurfaceNode="Ruled Surface"
+    SweepSurfaceNode="Sweep Surface"
+    ImportedSurfaceNode="Imported Surface"
 class Node(object):
 
     def __init__(self, name, parent=None):
@@ -14,7 +29,7 @@ class Node(object):
             parent.addChild(self)
 
     def typeInfo(self):
-        return "Node"
+        return NodeType.Node
 
     def addChild(self, child):
         self._children.append(child)
@@ -106,7 +121,7 @@ class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
         self.sketch_plane: Sketch_Plane = None
-
+        self.shapeObject = None
     def setSketchPlane(self, thePlane):
         self.sketch_plane = thePlane
 
@@ -114,7 +129,7 @@ class SketchNode(Node):
         return self.sketch_plane
 
     def typeInfo(self):
-        return "Plane"
+        return NodeType.SketchNode
 
 
 from OCC.Core.gp import *
@@ -128,7 +143,7 @@ class SketchObjectNode(Node):
     def __init__(self, name, parent=None):
         super(SketchObjectNode, self).__init__(name, parent)
         self.sketchObject: Sketch_Geometry = None
-
+        self.shapeObject=None
     def setSketchObject(self, theObject: Sketch_Object):
         self.sketchObject = theObject
 
@@ -136,7 +151,7 @@ class SketchObjectNode(Node):
         return self.sketchObject
 
     def typeInfo(self):
-        return "SketchObject"
+        return NodeType.SketchObjectNode
 
 
 class PointNode(SketchObjectNode):
@@ -180,7 +195,7 @@ class PointNode(SketchObjectNode):
         return r
 
     def typeInfo(self):
-        return "Point"
+        return NodeType.PointNode
 
     def resource(self):
         return ":/point.png"
@@ -227,7 +242,7 @@ class LineNode(SketchObjectNode):
         return r
 
     def typeInfo(self):
-        return "Line"
+        return NodeType.LineNode
 
     def resource(self):
         return ":/inputLine.png"
@@ -277,7 +292,7 @@ class BezierNode(SketchObjectNode):
         return r
 
     def typeInfo(self):
-        return "Bezier Curve"
+        return NodeType.BezierNode
 
     def resource(self):
         return ":/bezier_curve.png"
@@ -323,7 +338,7 @@ class BsplineNode(SketchObjectNode):
         return r
 
     def typeInfo(self):
-        return "Bspline"
+        return NodeType.BsplineNode
 
     def resource(self):
         return ":/bspline_curve.png"
@@ -342,7 +357,7 @@ class BezierSurfaceNode(SketchObjectNode):
         super(BezierSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Bezier Surface"
+        return NodeType.BezierSurfaceNode
 
     def resource(self):
         return ":/bezier_surface.png"
@@ -361,7 +376,7 @@ class BsplineSurfaceNode(SketchObjectNode):
         super(BsplineSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Bspline Surface"
+        return NodeType.BsplineSurfaceNode
 
     def resource(self):
         return ":/bspline_surface.png"
@@ -380,7 +395,7 @@ class RevolvedSurfaceNode(SketchObjectNode):
         super(RevolvedSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Surface of Revolution"
+        return NodeType.RevolvedSurfaceNode
 
     def resource(self):
         return ":/revolve.png"
@@ -399,7 +414,7 @@ class ExtrudedSurfaceNode(SketchObjectNode):
         super(ExtrudedSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Ruled Surface"
+        return NodeType.ExtrudedSurfaceNode
 
     def resource(self):
         return ":/ruled_surface.png"
@@ -421,7 +436,7 @@ class SweepSurfaceNode(SketchObjectNode):
         super(SweepSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Sweep Surface"
+        return NodeType.SweepSurfaceNode
 
     def resource(self):
         return ":/sweep.png"
@@ -440,4 +455,4 @@ class ImportedSurfaceNode(SketchObjectNode):
         super(ImportedSurfaceNode, self).setData(column, value)
 
     def typeInfo(self):
-        return "Imported Surface"
+        return NodeType.ImportedSurfaceNode

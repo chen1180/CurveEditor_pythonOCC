@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from OCC.Extend.DataExchange import read_stl_file, read_step_file, read_iges_file, write_stl_file, \
     read_step_file_with_names_colors
+from OCC.Core.TopoDS import *
+from data.design.part_utilities import *
 from data.design.geometry import *
 from data.node import *
 import os
@@ -44,24 +46,91 @@ class MenuBarController(QObject):
         dlg.selectNameFilter(fileFilter[0])
         if dlg.exec_():
             path = dlg.selectedFiles()[0]
-            infile = open(path, 'rb')
-            objects = pickle.load(infile, encoding='bytes')
-            for object in objects:
-                self._display.DisplayShape(object, update=True)
+            with open(path, 'rb') as infile:
+                objects = pickle.load(infile, encoding='bytes')
+            # reset root node to the saved scene
+            if self.parent._model._rootNode.childCount() > 0:
+                self.parent._uiTreeView.deleteAllTreeItem()
+            self.parent._model._rootNode = objects
+            self.parent.sketchController.setRootNode(objects)
+            self.parent.partController.setRootNode(objects)
+            self.parent._model.layoutChanged.emit()
+            # update sketch object from the loading node
+            for object in objects.children():
+                if isinstance(object, SketchObjectNode):
+                    surface_geometry = shape_to_geometry(object.shapeObject)
+                    if object.typeInfo() == NodeType.BezierSurfaceNode:
+                        sketch = Surface_Bezier(self._display.Context)
+                    elif object.typeInfo() == NodeType.BsplineSurfaceNode:
+                        sketch = Surface_Bspline(self._display.Context)
+                    elif object.typeInfo() == NodeType.ExtrudedSurfaceNode:
+                        sketch = Surface_LinearExtrusion(self._display.Context)
+                    elif object.typeInfo() == NodeType.RevolvedSurfaceNode:
+                        sketch = Surface_Revolved(self._display.Context)
+                    elif object.typeInfo() == NodeType.SweepSurfaceNode:
+                        sketch = Surface_Sweep(self._display.Context)
+                    elif object.typeInfo() == NodeType.ImportedSurfaceNode:
+                        sketch = Surface_ImportedShape(object.name(),self._display.Context)
+                    sketch.FromShape(surface_geometry, object.shapeObject)
+                    object.setSketchObject(sketch)
+                elif isinstance(object, SketchNode):
+                    plane = shape_to_geometry(object.shapeObject)
+                    sketch = Sketch_Plane(self._display, plane.Position())
+                    sketch.Compute()
+                    object.setSketchPlane(sketch)
+                    for child in object.children():
+                        sketch_geometry = shape_to_geometry(child.shapeObject)
+                        if child.typeInfo() == NodeType.PointNode:
+                            sketch = Sketch_Point(self._display.Context, plane.Position())
+                        elif child.typeInfo() == NodeType.LineNode:
+                            sketch = Sketch_Line(self._display.Context, plane.Position())
+                        elif child.typeInfo() == NodeType.BsplineNode:
+                            sketch = Sketch_Bspline(self._display.Context, plane.Position())
+                        elif child.typeInfo() == NodeType.BezierNode:
+                            sketch = Sketch_BezierCurve(self._display.Context, plane.Position())
+                        sketch.FromShape(sketch_geometry, child.shapeObject)
+                        child.setSketchObject(sketch)
 
     def saveAs(self):
         dlg = QFileDialog()
         dlg.setAcceptMode(QFileDialog.AcceptSave)
-        path = dlg.getSaveFileName(self.parent,"Save a file","","Supported format(*.ce)")
-        with open(path[0], "wb") as f:
-            object = []
-            for child in self.parent._rootNode.children():
-                if isinstance(child, SketchObjectNode):
-                    object.append(child.getSketchObject().GetAIS_Object().Shape())
-                elif isinstance(child, SketchNode):
-                    for subChild in child.children():
-                        object.append(subChild.getSketchObject().GetAIS_Object().Shape())
-            pickle.dump(object, f)
+        path = dlg.getSaveFileName(self.parent, "Save a file", "", "Supported format(*.ce)")
+        if os.path.exists(path[0]):
+            # Swig object can't be pickled. So create a copy of tree with no swig variable
+            with open(path[0], "wb") as f:
+                object = []
+                root = Node(self.parent._model._rootNode.name(), None)
+                for child in self.parent._model._rootNode.children():
+                    if isinstance(child, SketchObjectNode):
+                        if child.typeInfo() == NodeType.BezierSurfaceNode:
+                            node = BezierSurfaceNode(child.name(), root)
+                        elif child.typeInfo() == NodeType.BsplineSurfaceNode:
+                            node = BsplineSurfaceNode(child.name(), root)
+                        elif child.typeInfo() == NodeType.ExtrudedSurfaceNode:
+                            node = ExtrudedSurfaceNode(child.name(), root)
+                        elif child.typeInfo() == NodeType.RevolvedSurfaceNode:
+                            node = RevolvedSurfaceNode(child.name(), root)
+                        elif child.typeInfo() == NodeType.SweepSurfaceNode:
+                            node = SweepSurfaceNode(child.name(), root)
+                        elif child.typeInfo() == NodeType.ImportedSurfaceNode:
+                            node = ImportedSurfaceNode(child.name(), root)
+                        node.shapeObject = child.getSketchObject().GetAIS_Object().Shape()
+                        object.append(child.getSketchObject().GetAIS_Object().Shape())
+                    elif isinstance(child, SketchNode):
+                        curNode = SketchNode(child.name(), root)
+                        curNode.shapeObject = child.getSketchPlane().GetShape()
+                        for subChild in child.children():
+                            if subChild.typeInfo() == NodeType.PointNode:
+                                node = PointNode(subChild.name(), curNode)
+                            elif subChild.typeInfo() == NodeType.LineNode:
+                                node = LineNode(subChild.name(), curNode)
+                            elif subChild.typeInfo() == NodeType.BsplineNode:
+                                node = BsplineNode(subChild.name(), curNode)
+                            elif subChild.typeInfo() == NodeType.BezierNode:
+                                node = BezierNode(subChild.name(), curNode)
+                            node.shapeObject = subChild.getSketchObject().GetAIS_Object().Shape()
+                            object.append(subChild.getSketchObject().GetAIS_Object().Shape())
+                pickle.dump(root, f)
 
     def importFile(self):
         dlg = QFileDialog()
@@ -85,7 +154,7 @@ class MenuBarController(QObject):
                 imported_surface = Surface_ImportedShape(baseName, self._display.Context)
                 imported_surface.SetGeometry(shape)
                 imported_surface.Compute()
-                importedNode = ImportedSurfaceNode(imported_surface.GetName(), self.parent._rootNode)
+                importedNode = ImportedSurfaceNode(imported_surface.GetName(), self.parent._model._rootNode)
                 importedNode.setSketchObject(imported_surface)
                 self.parent._model.layoutChanged.emit()
 

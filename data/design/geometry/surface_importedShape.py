@@ -14,7 +14,7 @@ from .surface_geometry import Surface_Geometry
 class Surface_ImportedShape(Surface_Geometry):
     def __init__(self, theName, theContext):
         super(Surface_ImportedShape, self).__init__(theName, theContext)
-        self.myGeometry = None
+        self.myGeometry= None
         self.myAIS_InteractiveObject = None
 
     def Compute(self):

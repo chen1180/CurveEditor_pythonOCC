@@ -1,10 +1,12 @@
 from OCC.Core.TColgp import TColgp_Array1OfPnt2d, TColgp_Array1OfPnt
 from OCC.Core.TColStd import TColStd_Array1OfReal, TColStd_Array1OfInteger
 from OCC.Core.ElCLib import elclib
-
-
+from OCC.Core.Geom import *
+from OCC.Core.GeomAPI import *
+from OCC.Core.gp import *
 def Pnt2dToPnt(pnt2d, theAxis):
     return elclib.To3d(theAxis.Ax2(), pnt2d)
+
 
 def TColgp_Array1OfPnt2d_to_point_list(li):
     pts = []
@@ -95,11 +97,30 @@ def setPiecewiseBezierKnots(poles_size: int, degree: int):
     multipicities = [degree + 1]
     for i in range(middle_size // degree):
         multipicities.append(degree)
-    remainder=middle_size%degree
-    if remainder!=0:
+    remainder = middle_size % degree
+    if remainder != 0:
         multipicities.append(remainder)
     multipicities += [degree + 1]
     knots = []
     for i in range(len(multipicities)):
         knots.append(float(i))
     return (multipicities, knots)
+def projectPointOnPlane(point, myCoordinate):
+    myTempPnt = point
+    line = Geom_Line(myTempPnt, myCoordinate.Direction())
+    myIntCS = GeomAPI_IntCS()
+    myCurrentPlane = Geom_Plane(myCoordinate)
+    myIntCS.Perform(line, myCurrentPlane)  # perfrom intersection calculation
+    myCurrentPnt2d = gp.Origin2d()
+    if myIntCS.NbPoints() >= 1:
+        myTempPnt = myIntCS.Point(1)
+        myCurrentPnt2d.SetX((
+                                    myTempPnt.X() - myCoordinate.Location().X()) * myCoordinate.XDirection().X() + (
+                                    myTempPnt.Y() - myCoordinate.Location().Y()) * myCoordinate.XDirection().Y() + (
+                                    myTempPnt.Z() - myCoordinate.Location().Z()) * myCoordinate.XDirection().Z())
+        myCurrentPnt2d.SetY(
+            (
+                    myTempPnt.X() - myCoordinate.Location().X()) * myCoordinate.YDirection().X() + (
+                    myTempPnt.Y() - myCoordinate.Location().Y()) * myCoordinate.YDirection().Y() + (
+                    myTempPnt.Z() - myCoordinate.Location().Z()) * myCoordinate.YDirection().Z())
+        return myCurrentPnt2d

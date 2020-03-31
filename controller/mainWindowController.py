@@ -15,6 +15,7 @@ class Window(QtWidgets.QMainWindow):
         self._rootNode = Node("Scene")
         self._model = SceneGraphModel(self._rootNode)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
         # """VIEW <------> PROXY MODEL <------> DATA MODEL"""
         # self._proxyModel = QtCore.QSortFilterProxyModel()
         # self._proxyModel.setSourceModel(self._model)

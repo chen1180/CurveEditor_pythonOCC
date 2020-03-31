@@ -43,6 +43,7 @@ class Surface_Sweep(Surface_Geometry):
         self.SetCenter(face)
         self.InitClippingPlane()
 
+
     def SetSections(self, theSection):
         self.mySections = theSection
 

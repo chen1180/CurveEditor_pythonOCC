@@ -144,7 +144,7 @@ class SketchController(QObject):
 
     def createSketchNode(self):
         name = "Sketch "
-        count = str(self.rootNode.childCount())
+        count = str(sum(isinstance(i, SketchNode) for i in self.rootNode.children()))
         name += count
         self.currentSketchNode = SketchNode(name,self.rootNode)
         coordinate_system: gp_Ax3 = self.new_sketch.getCoordinate()
@@ -161,6 +161,7 @@ class SketchController(QObject):
         self._display.Viewer.SetPrivilegedPlane(node.getSketchPlane().GetCoordinate())
         # self._display.Viewer.DisplayPrivilegedPlane(True, 1000)
         node.getSketchPlane().DisplayGrid()
+        self.currentSketchNode=node
         self.sketch.SetRootNode(node)
         self.sketch.SetCoordinateSystem(node.getSketchPlane().GetCoordinate())
 
