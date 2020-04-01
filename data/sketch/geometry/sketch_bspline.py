@@ -65,7 +65,7 @@ class Sketch_Bspline(Sketch_Geometry):
             self.myContext.Display(self.myAIS_InteractiveObject, True)
 
     def FromShape(self, theGeom: Geom_BSplineCurve, theShape):
-        self.myGeometry = Geom_BSplineCurve.DownCast(theGeom.Copy())
+        self.myGeometry = theGeom
 
         myPoles = TColgp_Array1OfPnt2d_to_point_list(self.myGeometry.Poles())
         poles2d_list = [projectPointOnPlane(pole, self.curCoordinateSystem) for pole in myPoles]
