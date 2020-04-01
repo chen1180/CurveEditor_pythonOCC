@@ -7,7 +7,6 @@ from data.model import *
 class Window(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
-
         self._ui = mainWindow.Ui_MainWindow()
         self._ui.setupUi(self)
 
