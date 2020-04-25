@@ -120,13 +120,13 @@ class Node(object):
 class SketchNode(Node):
     def __init__(self, name, parent=None):
         super(SketchNode, self).__init__(name, parent)
-        self.sketch_plane: Sketch_Plane = None
+        self.sketchPlane: Sketch_Plane = None
         self.shapeObject = None
     def setSketchPlane(self, thePlane):
-        self.sketch_plane = thePlane
+        self.sketchPlane = thePlane
 
     def getSketchPlane(self):
-        return self.sketch_plane
+        return self.sketchPlane
 
     def typeInfo(self):
         return NodeType.SketchNode

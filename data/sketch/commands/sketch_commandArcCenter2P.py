@@ -35,6 +35,8 @@ class Sketch_CommandArcCenter2P(Sketch_Command):
         if self.myArcCenter2PAction == ArcCenter2PAction.Nothing:
             pass
         elif self.myArcCenter2PAction == ArcCenter2PAction.Input_CenterArc:
+            self.tempGeom_Circle = Geom_Circle(self.curCoordinateSystem.Ax2(), SKETCH_RADIUS)
+
             self.curPnt2d = self.myAnalyserSnap.MouseInput(thePnt2d)
             self.myFirstgp_Pnt2d = gp_Pnt2d(self.curPnt2d.X(), self.curPnt2d.Y())
             self.myFirstPoint.SetPnt(elclib.To3d(self.curCoordinateSystem.Ax2(), self.myFirstgp_Pnt2d))

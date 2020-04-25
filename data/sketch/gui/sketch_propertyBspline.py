@@ -153,7 +153,7 @@ class Sketch_PropertyBspline(Sketch_Property):
             weights_children = QTreeWidgetItem(self.weights)
             weights_children.setText(0, str(idx))
             widget = QDoubleSpinBox()
-            widget.setRange(0.1, 1.0)
+            widget.setRange(0.01, 10.0)
             widget.setSingleStep(0.1)
             widget.setValue(value)
             self.tree.setItemWidget(weights_children, 1, widget)

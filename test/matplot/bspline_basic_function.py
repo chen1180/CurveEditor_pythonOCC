@@ -381,7 +381,7 @@ def onpick(event):
     # fig.canvas.flush_events()
 
 
-knot_vector = [0.   ,0.  , 0.  , 0. ,  0.25 ,0.5 , 0.75 ,1.   ,1.,   1. ,  1.  ]
+knot_vector = [0,1,2,3]
 fig, ax = plt.subplots()
 scatter = ax.scatter(knot_vector, [1] * len(knot_vector), picker=True)
 cid = fig.canvas.mpl_connect('button_press_event', onclick)

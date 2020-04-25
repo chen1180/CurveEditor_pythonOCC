@@ -454,24 +454,30 @@ class BsplineBasisFunctionWindow(QDialog):
             curve.remove()
         del self.curves
         basis = Bspline(self.knots_vector, self.degree)
-        xxs, yys = basis.GetBasis()
+        x, N = basis.GetBasis()
         nrBasis = len(basis(0.0))
         # setting
         NUM_COLORS = nrBasis
-        cm = plt.get_cmap('gist_rainbow')
+        cm = plt.get_cmap('prism')
         cNorm = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS - 1)
         scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
         colors = [scalarMap.to_rgba(i) for i in range(NUM_COLORS)]
         settings = {"linestyle": 'solid',
                     "linewidth": 1.0}
         self.curves = []
-        for idx, xx in enumerate(xxs):
-            yy = yys[idx]
-            for i in range(nrBasis):
-                # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
-                settings["color"] = colors[i]
-                ax, = self.ax.plot(xx, yy[:, i], **settings)
-                self.curves.append(ax)
+        # for idx, xx in enumerate(xxs):
+        #     yy = yys[idx]
+        #     for i in range(nrBasis):
+        #         # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
+        #         settings["color"] = colors[i]
+        #         ax, = self.ax.plot(xx, yy[:, i], **settings)
+        #         self.curves.append(ax)
+        xxs = np.concatenate(x)
+        for i in range(nrBasis):
+            arr = np.concatenate([N[idx][:, i] for idx in range(len(x))])
+            settings["color"] = colors[i]
+            ax, = self.ax.plot(xxs, arr, **settings, label="N{},{}".format(i, self.degree ))
+            self.curves.append(ax)
         self.PlotUpdated.emit(self.knots_vector, self.degree)
 
     def plot(self):
@@ -488,20 +494,28 @@ class BsplineBasisFunctionWindow(QDialog):
         x, N = basis.GetBasis()
         # setting
         NUM_COLORS = nrBasis
-        cm = plt.get_cmap('gist_rainbow')
+        cm = plt.get_cmap('prism')
         cNorm = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS - 1)
         scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
         colors = [scalarMap.to_rgba(i) for i in range(NUM_COLORS)]
         settings = {"linestyle": 'solid',
                     "linewidth": 1.0}
+
+        # for idx, xx in enumerate(x):
+        #     print(xx)
+        #     yy = N[idx]
+        #     for i in range(nrBasis):
+        #         settings["color"] = colors[i]
+        #         ax, = self.ax.plot(xx, yy[:, i], **settings,label="N{},{}--[{},{})".format(idx, self.degree-1,round(xx[0]),round(xx[-1])))
+        #         self.curves.append(ax)
         self.curves = []
-        for idx, xx in enumerate(x):
-            yy = N[idx]
-            for i in range(nrBasis):
-                # plt, = self.ax.plot(xx, yy[:,i], label="N{},{}".format(i, self.degree))
-                settings["color"] = colors[i]
-                ax, = self.ax.plot(xx, yy[:, i], **settings)
-                self.curves.append(ax)
+        xxs=np.concatenate(x)
+        for i in range(nrBasis):
+            arr=np.concatenate([N[idx][:,i] for idx in range(len(x))])
+            settings["color"] = colors[i]
+            ax, = self.ax.plot(xxs, arr, **settings,label="N{},{}".format(i, self.degree))
+            self.curves.append(ax)
+        self.ax.legend(loc=1)
         self.canvas.draw()
 
     def resetPlot(self):
@@ -573,7 +587,7 @@ if __name__ == '__main__':
     # main = BezierBasisFunctionWindow()
     # main.setBasisFunction( 5)
     main = BsplineBasisFunctionWindow()
-    main.setBasisFunction([0, 1, 2, 3, 4], 2)
+    main.setBasisFunction([0, 1, 2, 3], 1)
     main.plot()
     main.show()
 
