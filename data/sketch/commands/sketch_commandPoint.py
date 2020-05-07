@@ -8,8 +8,6 @@ from enum import Enum
 class PointAction(Enum):
     Nothing = 0
     Input_Point = 1
-
-
 class Sketch_CommandPoint(Sketch_Command):
     def __init__(self):
         super(Sketch_CommandPoint, self).__init__("Point.")
